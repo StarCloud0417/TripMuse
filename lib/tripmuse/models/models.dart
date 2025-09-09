@@ -8,6 +8,7 @@ export 'day_plan.dart';
 export 'activity.dart';
 export 'destination.dart';
 export 'trip_request.dart';
+export 'user.dart';
 export 'user_preference_analysis.dart';
 
 // 列舉類型

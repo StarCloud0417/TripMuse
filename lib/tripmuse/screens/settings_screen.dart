@@ -7,12 +7,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
+import '../providers/user_provider.dart';
+import '../models/models.dart';
+import 'profile_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(userAuthNotifierProvider);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('設定'),
@@ -22,57 +27,10 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           // 使用者資訊區域
-          Container(
-            padding: const EdgeInsets.all(TripMuseSpacing.lg),
-            decoration: const BoxDecoration(
-              color: TripMuseTheme.primaryColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(TripMuseRadius.xl),
-                bottomRight: Radius.circular(TripMuseRadius.xl),
-              ),
-            ),
-            child: Column(
-              children: [
-                // 使用者頭像
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.white.withValues(alpha: 51),
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                ),
-                
-                const SizedBox(height: TripMuseSpacing.md),
-                
-                // 使用者名稱
-                const Text(
-                  '訪客使用者',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                
-                const SizedBox(height: TripMuseSpacing.sm),
-                
-                // 登入按鈕
-                OutlinedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('登入功能開發中...')),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white),
-                  ),
-                  child: const Text('登入 Google 帳號'),
-                ),
-              ],
-            ),
+          userAsync.when(
+            data: (user) => _buildUserSection(context, ref, user),
+            loading: () => _buildLoadingUserSection(),
+            error: (_, __) => _buildErrorUserSection(context, ref),
           ),
           
           const SizedBox(height: TripMuseSpacing.lg),
@@ -549,7 +507,7 @@ class SettingsScreen extends ConsumerWidget {
     showAboutDialog(
       context: context,
       applicationName: 'TripMuse',
-      applicationVersion: '0.0.3',
+      applicationVersion: '0.1.0',
       applicationIcon: const Icon(
         Icons.luggage,
         size: 48,
@@ -560,6 +518,174 @@ class SettingsScreen extends ConsumerWidget {
         SizedBox(height: 16),
         Text('使用 Flutter 和 MapBox Maps SDK 開發，提供跨平台的優質體驗。'),
       ],
+    );
+  }
+  
+  Widget _buildUserSection(BuildContext context, WidgetRef ref, User? user) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(TripMuseSpacing.lg),
+        decoration: const BoxDecoration(
+          color: TripMuseTheme.primaryColor,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(TripMuseRadius.xl),
+            bottomRight: Radius.circular(TripMuseRadius.xl),
+          ),
+        ),
+        child: Column(
+          children: [
+            // 使用者頭像
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.white.withValues(alpha: 51),
+              backgroundImage: user?.avatarUrl != null 
+                  ? NetworkImage(user!.avatarUrl!) 
+                  : null,
+              child: user?.avatarUrl == null
+                  ? Icon(
+                      user?.isGuest == true ? Icons.person_outline : Icons.person,
+                      size: 40,
+                      color: Colors.white,
+                    )
+                  : null,
+            ),
+            
+            const SizedBox(height: TripMuseSpacing.md),
+            
+            // 使用者名稱
+            Text(
+              user?.name ?? '未登入',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            
+            const SizedBox(height: TripMuseSpacing.sm),
+            
+            // 使用者狀態或登入按鈕
+            if (user == null)
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white),
+                ),
+                child: const Text('登入或註冊'),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: TripMuseSpacing.md,
+                  vertical: TripMuseSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 51),
+                  borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                ),
+                child: Text(
+                  user.isGuest ? '訪客模式' : '已登入',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            
+            const SizedBox(height: TripMuseSpacing.sm),
+            
+            // 點擊提示
+            const Text(
+              '點擊查看個人資料',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildLoadingUserSection() {
+    return Container(
+      padding: const EdgeInsets.all(TripMuseSpacing.lg),
+      decoration: const BoxDecoration(
+        color: TripMuseTheme.primaryColor,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(TripMuseRadius.xl),
+          bottomRight: Radius.circular(TripMuseRadius.xl),
+        ),
+      ),
+      child: const Column(
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+          SizedBox(height: TripMuseSpacing.md),
+          Text(
+            '載入中...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildErrorUserSection(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.all(TripMuseSpacing.lg),
+      decoration: const BoxDecoration(
+        color: TripMuseTheme.primaryColor,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(TripMuseRadius.xl),
+          bottomRight: Radius.circular(TripMuseRadius.xl),
+        ),
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.error_outline,
+            size: 40,
+            color: Colors.white,
+          ),
+          const SizedBox(height: TripMuseSpacing.md),
+          const Text(
+            '載入失敗',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: TripMuseSpacing.sm),
+          OutlinedButton(
+            onPressed: () {
+              ref.invalidate(userAuthNotifierProvider);
+            },
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: const BorderSide(color: Colors.white),
+            ),
+            child: const Text('重試'),
+          ),
+        ],
+      ),
     );
   }
 }

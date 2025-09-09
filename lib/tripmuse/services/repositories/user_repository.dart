@@ -3,93 +3,7 @@
 /// 實作使用者資料的 CRUD 操作和認證管理
 
 import '../storage/storage_service.dart';
-
-/// 使用者資料模型
-class User {
-  final String id;
-  final String? googleId;
-  final String email;
-  final String name;
-  final String? avatarUrl;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool isGuest;
-  
-  const User({
-    required this.id,
-    this.googleId,
-    required this.email,
-    required this.name,
-    this.avatarUrl,
-    required this.createdAt,
-    required this.updatedAt,
-    this.isGuest = false,
-  });
-  
-  /// 從 JSON 建立使用者
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'] as String,
-      googleId: json['googleId'] as String?,
-      email: json['email'] as String,
-      name: json['name'] as String,
-      avatarUrl: json['avatarUrl'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      isGuest: json['isGuest'] as bool? ?? false,
-    );
-  }
-  
-  /// 轉換為 JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'googleId': googleId,
-      'email': email,
-      'name': name,
-      'avatarUrl': avatarUrl,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'isGuest': isGuest,
-    };
-  }
-  
-  /// 建立訪客使用者
-  factory User.guest() {
-    final now = DateTime.now();
-    return User(
-      id: 'guest_${now.millisecondsSinceEpoch}',
-      email: 'guest@tripmuse.local',
-      name: '訪客使用者',
-      createdAt: now,
-      updatedAt: now,
-      isGuest: true,
-    );
-  }
-  
-  /// 複製並更新使用者資料
-  User copyWith({
-    String? id,
-    String? googleId,
-    String? email,
-    String? name,
-    String? avatarUrl,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    bool? isGuest,
-  }) {
-    return User(
-      id: id ?? this.id,
-      googleId: googleId ?? this.googleId,
-      email: email ?? this.email,
-      name: name ?? this.name,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      isGuest: isGuest ?? this.isGuest,
-    );
-  }
-}
+import '../../models/models.dart';
 
 /// 使用者 Repository 介面
 abstract class UserRepository {
@@ -175,16 +89,11 @@ class UserRepositoryImpl implements UserRepository {
     try {
       // 這裡應該整合 Google Sign-In
       // 暫時返回模擬的使用者資料
-      final now = DateTime.now();
-      final user = User(
-        id: 'google_user_123',
+      final user = User.fromGoogle(
         googleId: 'google_123456789',
         email: 'user@gmail.com',
         name: 'Google 使用者',
         avatarUrl: 'https://example.com/avatar.jpg',
-        createdAt: now,
-        updatedAt: now,
-        isGuest: false,
       );
       
       await saveUser(user);
@@ -292,82 +201,7 @@ class UserRepositoryImpl implements UserRepository {
   }
 }
 
-/// 使用者偏好設定
-class UserPreferences {
-  final String language;
-  final String theme;
-  final bool enableNotifications;
-  final bool enableLocationTracking;
-  final bool enableOfflineMode;
-  final String defaultCurrency;
-  final String defaultMapStyle;
-  
-  const UserPreferences({
-    required this.language,
-    required this.theme,
-    required this.enableNotifications,
-    required this.enableLocationTracking,
-    required this.enableOfflineMode,
-    required this.defaultCurrency,
-    required this.defaultMapStyle,
-  });
-  
-  factory UserPreferences.fromJson(Map<String, dynamic> json) {
-    return UserPreferences(
-      language: json['language'] as String,
-      theme: json['theme'] as String,
-      enableNotifications: json['enableNotifications'] as bool,
-      enableLocationTracking: json['enableLocationTracking'] as bool,
-      enableOfflineMode: json['enableOfflineMode'] as bool,
-      defaultCurrency: json['defaultCurrency'] as String,
-      defaultMapStyle: json['defaultMapStyle'] as String,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'language': language,
-      'theme': theme,
-      'enableNotifications': enableNotifications,
-      'enableLocationTracking': enableLocationTracking,
-      'enableOfflineMode': enableOfflineMode,
-      'defaultCurrency': defaultCurrency,
-      'defaultMapStyle': defaultMapStyle,
-    };
-  }
-  
-  factory UserPreferences.defaultPreferences() {
-    return const UserPreferences(
-      language: 'zh-TW',
-      theme: 'system',
-      enableNotifications: true,
-      enableLocationTracking: true,
-      enableOfflineMode: true,
-      defaultCurrency: 'TWD',
-      defaultMapStyle: 'streets',
-    );
-  }
-  
-  UserPreferences copyWith({
-    String? language,
-    String? theme,
-    bool? enableNotifications,
-    bool? enableLocationTracking,
-    bool? enableOfflineMode,
-    String? defaultCurrency,
-    String? defaultMapStyle,
-  }) {
-    return UserPreferences(
-      language: language ?? this.language,
-      theme: theme ?? this.theme,
-      enableNotifications: enableNotifications ?? this.enableNotifications,
-      enableLocationTracking: enableLocationTracking ?? this.enableLocationTracking,
-      enableOfflineMode: enableOfflineMode ?? this.enableOfflineMode,
-      defaultCurrency: defaultCurrency ?? this.defaultCurrency,
-      defaultMapStyle: defaultMapStyle ?? this.defaultMapStyle,
-    );
-  }
-}
+
 
 /// 使用者 Repository 例外
 class UserRepositoryException implements Exception {
