@@ -5,6 +5,86 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2025-01-09
+
+### Added
+- 🗄️ Complete TripMuse storage system with offline-first architecture
+- 📦 Hive local database integration:
+  - Custom TypeAdapters for all data models
+  - Automatic cache management with TTL support
+  - Trip, settings, and cache data storage
+- 🔐 Flutter Secure Storage for sensitive data:
+  - JWT tokens and refresh tokens
+  - Google authentication credentials
+  - Cross-platform encrypted storage
+- 🏗️ Repository pattern implementation:
+  - `TripRepository` - Complete CRUD operations for trips
+  - `UserRepository` - User data and preferences management
+  - Advanced features: search, filtering, statistics
+- 🔄 Offline-first sync service:
+  - Automatic sync queue management
+  - Network status monitoring with connectivity_plus
+  - Retry mechanism with exponential backoff
+  - Conflict resolution (last-writer-wins)
+- 📊 Storage management system:
+  - `StorageManager` - Unified storage service management
+  - Riverpod providers for dependency injection
+  - Storage statistics and monitoring
+  - Data export/import functionality
+- 🧪 Comprehensive test coverage:
+  - 22+ test cases covering all storage components
+  - Mock implementations for testing
+  - Data model serialization validation
+
+### Technical Features
+- ✨ Type-safe Hive TypeAdapters for all models
+- 🔄 Automatic offline sync with queue management
+- 📈 Performance optimizations with caching
+- 🛡️ Complete error handling and exception management
+- 🧪 Interface separation for testability
+- 🔧 Extensible architecture for future cloud integration
+
+---
+
+## [0.0.3] - 2025-01-09
+
+### 新增功能
+- 🗄️ 完整的 TripMuse 儲存系統，採用離線優先架構
+- 📦 Hive 本地資料庫整合：
+  - 為所有資料模型建立自訂 TypeAdapter
+  - 支援 TTL 的自動快取管理
+  - 行程、設定和快取資料儲存
+- 🔐 Flutter Secure Storage 敏感資料儲存：
+  - JWT token 和 refresh token
+  - Google 認證憑證
+  - 跨平台加密儲存
+- 🏗️ Repository 模式實作：
+  - `TripRepository` - 行程的完整 CRUD 操作
+  - `UserRepository` - 使用者資料和偏好管理
+  - 進階功能：搜尋、篩選、統計
+- 🔄 離線優先同步服務：
+  - 自動同步佇列管理
+  - 使用 connectivity_plus 監控網路狀態
+  - 指數退避重試機制
+  - 衝突解決（最後寫入者優先）
+- 📊 儲存管理系統：
+  - `StorageManager` - 統一儲存服務管理
+  - Riverpod provider 依賴注入
+  - 儲存統計和監控
+  - 資料匯出/匯入功能
+- 🧪 完整測試覆蓋：
+  - 22+ 個測試案例涵蓋所有儲存組件
+  - 測試用模擬實作
+  - 資料模型序列化驗證
+
+### 技術特色
+- ✨ 所有模型的類型安全 Hive TypeAdapter
+- 🔄 佇列管理的自動離線同步
+- 📈 快取效能最佳化
+- 🛡️ 完整的錯誤處理和例外管理
+- 🧪 介面分離提升可測試性
+- 🔧 為未來雲端整合預留的可擴展架構
+
 ## [0.0.2] - 2025-01-09
 
 ### Added

@@ -24,7 +24,7 @@ Map<String, dynamic> _$$DayPlanImplToJson(_$DayPlanImpl instance) =>
       'dayIndex': instance.dayIndex,
       'date': instance.date.toIso8601String(),
       'theme': instance.theme,
-      'activities': instance.activities,
+      'activities': instance.activities.map((e) => e.toJson()).toList(),
       'notes': instance.notes,
       'estimatedTotalCost': instance.estimatedTotalCost,
     };

@@ -41,7 +41,10 @@
   - 撰寫資料模型的單元測試
   - _Requirements: 2.2, 2.3_
 
-- [ ] 1.3 設定 TripMuse 儲存系統
+- [x] 1.3 設定 TripMuse 儲存系統
+
+
+
   - 在 lib/tripmuse/services/ 配置 Hive 作為本地資料庫，建立 TypeAdapter
   - 設定 Flutter Secure Storage 用於敏感資料
   - 實作 Repository 模式的資料存取層

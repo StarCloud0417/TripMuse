@@ -37,9 +37,9 @@ Map<String, dynamic> _$$TripImplToJson(_$TripImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'destination': instance.destination,
-      'days': instance.days,
-      'preferenceAnalysis': instance.preferenceAnalysis,
+      'destination': instance.destination.toJson(),
+      'days': instance.days.map((e) => e.toJson()).toList(),
+      'preferenceAnalysis': instance.preferenceAnalysis?.toJson(),
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
       'userId': instance.userId,
@@ -47,7 +47,7 @@ Map<String, dynamic> _$$TripImplToJson(_$TripImpl instance) =>
       'status': _$TripStatusEnumMap[instance.status]!,
       'notes': instance.notes,
       'isFavorite': instance.isFavorite,
-      'sharingSettings': instance.sharingSettings,
+      'sharingSettings': instance.sharingSettings?.toJson(),
     };
 
 const _$TripStatusEnumMap = {

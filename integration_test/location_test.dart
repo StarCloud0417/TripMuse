@@ -38,6 +38,7 @@ void main() {
         accuracyRingBorderColor: Colors.black.toARGB32(),
         pulsingColor: Colors.amber.toARGB32(),
         pulsingEnabled: true,
+
         pulsingMaxRadius: 20.0,
         puckBearingEnabled: true,
         layerAbove: "layer-above",
