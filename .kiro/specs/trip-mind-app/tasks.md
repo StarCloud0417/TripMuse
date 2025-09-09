@@ -1,48 +1,53 @@
 # Implementation Plan
 
-## 基於 MapBox 範例的專案重構
+## 方案 4：最小侵入式開發 - 在現有基礎上新增功能
 
-- [ ] 1. 重構現有 MapBox 專案為 TripMuse 應用
-  - 將 mapbox_maps_example 重新命名為 TripMuse
-  - 更新 pubspec.yaml 的應用名稱、描述和版本
-  - 清理不需要的範例文件，保留有用的工具函數
-  - 建立新的應用圖示和啟動畫面
+- [ ] 1. 最小化設定 TripMuse 開發環境
+  - **完全保留**現有專案結構和所有檔案不動
+  - 僅在 pubspec.yaml 中**新增**必要的依賴套件
+  - 在 main.dart 的範例列表中**新增** TripMuse 選項
+  - 創建 lib/tripmuse/ 目錄存放所有新功能
+  - 直接引用現有的 utils.dart 和範例程式碼
   - _Requirements: 10.1_
 
-- [ ] 1.1 整合狀態管理和核心依賴
-  - 在 pubspec.yaml 中添加核心依賴：
+- [ ] 1.1 新增必要依賴套件（不修改現有配置）
+  - 在 pubspec.yaml 中**僅新增**以下依賴：
     * 狀態管理：flutter_riverpod
     * 網路請求：dio
     * 本地儲存：hive, hive_flutter, flutter_secure_storage
     * 資料模型：freezed, json_annotation
     * Firebase：firebase_core, firebase_auth, google_sign_in, cloud_firestore
     * PDF 生成：pdf, printing
-  - 建立 lib/core/ 目錄結構（models, services, providers, utils）
-  - 設定 Riverpod 作為狀態管理解決方案
-  - 建立全域錯誤處理和日誌系統
+  - **僅創建** lib/tripmuse/ 目錄結構：
+    * lib/tripmuse/models/
+    * lib/tripmuse/services/
+    * lib/tripmuse/screens/
+    * lib/tripmuse/widgets/
+  - **不修改**現有任何檔案和目錄
   - _Requirements: 10.1, 9.5_
 
-- [ ] 1.2 建立核心資料模型
-  - 在 lib/core/models/ 建立 Trip, DayPlan, Activity 等資料模型
+- [ ] 1.2 建立 TripMuse 資料模型
+  - 在 lib/tripmuse/models/ 建立 Trip, DayPlan, Activity 等資料模型
   - 使用 Freezed 和 json_annotation 實作序列化
   - 建立 UserPreferenceAnalysis 和相關 enum 類型
   - 撰寫資料模型的單元測試
   - _Requirements: 2.2, 2.3_
 
-- [ ] 1.3 設定本地儲存系統
-  - 配置 Hive 作為本地資料庫，建立 TypeAdapter
+- [ ] 1.3 設定 TripMuse 儲存系統
+  - 在 lib/tripmuse/services/ 配置 Hive 作為本地資料庫，建立 TypeAdapter
   - 設定 Flutter Secure Storage 用於敏感資料
   - 實作 Repository 模式的資料存取層
   - 建立離線資料同步機制
   - _Requirements: 8.1, 8.3, 10.2_
 
-## 主應用架構和導航
+## TripMuse 應用入口
 
-- [ ] 2. 建立主應用架構和導航系統
-  - 重構 main.dart，移除範例列表，建立 TripMuse 主應用
-  - 建立底部導航欄（地圖、行程列表、設定）
-  - 實作頁面路由和狀態管理
-  - 建立應用主題和樣式系統
+- [ ] 2. 建立 TripMuse 應用入口（不修改 main.dart 結構）
+  - 在 main.dart 的現有範例列表中**新增一行** TripMuse 選項
+  - 創建 lib/tripmuse/tripmuse_app.dart 作為 TripMuse 主頁面
+  - 在 TripMuse 內建立底部導航欄（地圖、行程列表、設定）
+  - 實作 TripMuse 內部的頁面路由和狀態管理
+  - 建立 TripMuse 專用的主題和樣式
   - _Requirements: 7.4_
 
 - [ ] 2.1 建立簡化的使用者系統（MVP 版本）
@@ -107,29 +112,29 @@
 
 ## 基於現有範例的地圖功能開發
 
-- [ ] 5. 建立 TripMuse 專用地圖組件
-  - 基於 simple_map_example.dart 建立 TripMapWidget
-  - 參考 point_annotations_example.dart 實作景點標記功能
-  - 利用現有的 utils.dart 工具函數
-  - 建立地圖狀態管理和控制器
+- [ ] 5. 建立 TripMuse 地圖組件
+  - 創建 lib/tripmuse/widgets/trip_map_widget.dart，**複製並修改** simple_map_example.dart 的程式碼
+  - **直接引用** point_annotations_example.dart 的標記功能程式碼
+  - **直接使用**現有的 utils.dart 工具函數
+  - 建立 TripMuse 專用的地圖狀態管理
   - _Requirements: 3.2_
 
 - [ ] 5.1 實作行程可視化功能
-  - 基於 PointAnnotationManager 建立美化的景點標記
-  - 參考 polyline_annotations_example.dart 實作路線顯示
+  - **複製** PointAnnotationManager 相關程式碼到 trip_map_widget.dart
+  - **複製** polyline_annotations_example.dart 的路線顯示程式碼
   - 為每日行程使用不同顏色主題
   - 實作標記點擊事件和資訊彈窗
   - _Requirements: 3.2, 3.3, 3.5_
 
 - [ ] 5.2 整合位置服務和導航
-  - 利用現有的 location_example.dart 實作位置追蹤
+  - **複製** location_example.dart 的位置追蹤程式碼
   - 建立旅程進度指示器
   - 實作當前景點高亮顯示
   - 加入外部導航應用連結
   - _Requirements: 3.4, 3.9, 4.5_
 
 - [ ] 5.3 實作地圖互動和動畫
-  - 參考 animation_example.dart 實作平滑切換動畫
+  - **複製** animation_example.dart 的動畫程式碼
   - 建立日期篩選控制項
   - 實作地圖視角自動調整
   - 加入標記和路線的動畫效果
@@ -138,7 +143,7 @@
 ## 時間軸視圖系統
 
 - [ ] 6. 建立時間軸視圖組件
-  - 設計並實作 TimelineWidget 主要組件
+  - 在 lib/tripmuse/widgets/ 設計並實作 TimelineWidget 主要組件
   - 建立 DayTimelineCard 顯示每日行程
   - 實作 ActivityCard 顯示個別活動資訊
   - 建立地圖和時間軸視圖的切換功能
@@ -232,14 +237,14 @@
 ## 效能最佳化和測試
 
 - [ ] 11. 實作效能最佳化
-  - 利用現有的 MapBox 最佳化實踐
-  - 參考 cluster_example.dart 實作標記聚合
-  - 建立記憶體管理和快取清理機制
+  - **直接使用**現有的 MapBox 最佳化實踐
+  - **複製** cluster_example.dart 的標記聚合程式碼
+  - 建立 TripMuse 專用的記憶體管理和快取清理機制
   - 實作圖片快取和壓縮功能
   - _Requirements: 10.1_
 
 - [ ] 11.1 撰寫測試（基於現有測試結構）
-  - 參考現有的 integration_test/ 目錄結構
+  - 在 integration_test/ 目錄中建立完整的應用測試
   - 為核心資料模型撰寫單元測試
   - 建立 Service 和 Repository 的測試
   - 實作 Widget 測試覆蓋主要 UI 組件
@@ -247,7 +252,7 @@
 
 - [ ] 11.2 建立部署流程
   - 利用現有的 Android 和 iOS 配置
-  - 更新應用簽名和發布設定
+  - 更新應用簽名和發布設定為 TripMuse
   - 建立版本管理和發布流程
   - 設定應用商店資產和描述
   - _Requirements: 10.1_
@@ -306,15 +311,19 @@
   - 準備使用者文件和支援資源
   - _Requirements: 10.5_
 
-## 開發優勢總結
+## 方案 4 最小侵入式開發優勢總結
 
-**基於現有 MapBox 範例的優勢：**
-- ✅ MapBox SDK 已完整配置和測試
-- ✅ 豐富的地圖功能範例可直接參考
-- ✅ Android/iOS 平台配置已完成
-- ✅ 現有的工具函數和最佳實踐
-- ✅ 完整的測試框架和結構
-- ✅ 可快速原型開發和驗證
+**最小侵入式開發的優勢：**
+- ✅ **零風險**：完全不修改現有專案結構，避免破壞性變更
+- ✅ **高效率**：直接複製和引用現有程式碼，無需重新實作
+- ✅ **快速開發**：MapBox SDK 已完整配置，立即可用
+- ✅ **穩定基礎**：Android/iOS 平台配置已完成且經過測試
+- ✅ **程式碼重用**：現有工具函數和範例程式碼可直接使用
+- ✅ **漸進式開發**：在 lib/tripmuse/ 目錄中獨立開發新功能
+- ✅ **易於維護**：新功能與現有範例完全分離
+- ✅ **學習友善**：可隨時參考現有範例的實作方式
+- ✅ **回退安全**：出問題時可輕易移除 tripmuse 目錄
+- ✅ **團隊協作**：不影響其他人使用現有範例進行開發
 #
 # Firebase 設定詳細步驟
 
@@ -357,3 +366,122 @@ void main() async {
 ```
 
 **建議：** 在開始實作任務 12 之前，先完成 Firebase 專案的建立和基本配置，這樣可以避免後續的配置問題。
+
+## 方案 4 最小侵入式開發實作策略
+
+### 目錄結構規劃（完全不動現有結構）
+
+```
+lib/
+├── main.dart                    # 僅新增一行：TripMuse 選項
+├── mapbox_maps_example.dart     # 完全不動
+├── example/                     # 完全不動：所有現有範例
+│   ├── simple_map_example.dart
+│   ├── point_annotations_example.dart
+│   ├── polyline_annotations_example.dart
+│   └── ...
+├── utils.dart                   # 完全不動：直接引用使用
+└── tripmuse/                    # 新增：TripMuse 專用目錄
+    ├── tripmuse_app.dart        # TripMuse 主應用
+    ├── models/                  # 資料模型
+    ├── services/                # 服務層
+    ├── screens/                 # 頁面
+    └── widgets/                 # 組件
+```
+
+### main.dart 最小修改策略
+
+```dart
+// 在現有的範例列表中僅新增一個 ListTile
+// 找到現有的 ListView children，新增：
+ListTile(
+  title: Text('🧳 TripMuse App'),
+  subtitle: Text('AI 智能旅行規劃應用'),
+  onTap: () => Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => TripMuseApp()),
+  ),
+),
+// 其他現有程式碼完全不動
+```
+
+### 開發流程建議
+
+1. **第一階段**：建立基礎架構
+   - 創建 lib/tripmuse/ 目錄結構
+   - 實作基本的 TripMuseApp 入口
+   - 設定狀態管理和依賴注入
+
+2. **第二階段**：參考範例實作地圖功能
+   - 複製 simple_map_example.dart 的核心邏輯到 trip_map_widget.dart
+   - 參考 point_annotations_example.dart 實作標記功能
+   - 利用現有 utils.dart 的工具函數
+
+3. **第三階段**：逐步添加 TripMuse 特有功能
+   - 實作行程生成和 AI 整合
+   - 建立時間軸視圖
+   - 添加 PDF 匯出功能
+
+4. **第四階段**：測試和優化
+   - 在 integration_test/ 中添加 TripMuse 測試
+   - 參考現有範例的效能最佳化實踐
+   - 準備發布配置
+
+### 程式碼重用策略（直接複製和引用）
+
+```dart
+// 直接引用現有工具函數
+import '../utils.dart';
+
+// 直接複製 simple_map_example.dart 的程式碼並修改
+class TripMapWidget extends StatefulWidget {
+  @override
+  _TripMapWidgetState createState() => _TripMapWidgetState();
+}
+
+class _TripMapWidgetState extends State<TripMapWidget> {
+  MapboxMap? mapboxMap;
+
+  @override
+  Widget build(BuildContext context) {
+    return MapWidget(
+      key: ValueKey("mapWidget"),
+      resourceOptions: ResourceOptions(
+        accessToken: ACCESS_TOKEN, // 直接使用 utils.dart 的常數
+      ),
+      onMapCreated: _onMapCreated,
+    );
+  }
+
+  void _onMapCreated(MapboxMap mapboxMap) {
+    this.mapboxMap = mapboxMap;
+    // 直接複製 simple_map_example.dart 的初始化程式碼
+  }
+}
+```
+
+### 測試策略
+
+```dart
+// 在 integration_test/ 中添加 TripMuse 測試
+void main() {
+  group('TripMuse Integration Tests', () {
+    testWidgets('should navigate to TripMuse from main menu', (tester) async {
+      await tester.pumpWidget(MyApp());
+      
+      // 點擊 TripMuse 選項
+      await tester.tap(find.text('🧳 TripMuse App'));
+      await tester.pumpAndSettle();
+      
+      // 驗證進入 TripMuse 應用
+      expect(find.byType(TripMuseApp), findsOneWidget);
+    });
+  });
+}
+```
+
+這種並行開發策略確保了：
+- 現有範例完全不受影響，可隨時參考和測試
+- TripMuse 功能獨立開發，降低風險
+- 可以逐步建立功能，隨時回退到穩定狀態
+- 團隊成員可以同時學習 MapBox 用法和開發 TripMuse 功能
