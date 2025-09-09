@@ -28,6 +28,9 @@ import 'package:mapbox_maps_example/vector_tile_source_example.dart';
 import 'package:mapbox_maps_example/viewport_example.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
+// TripMuse 新增 import
+import 'tripmuse/tripmuse_app.dart';
+
 import 'full_map_example.dart';
 import 'location_example.dart';
 import 'example.dart';
@@ -99,10 +102,25 @@ class MapsDemo extends StatelessWidget {
       body: ACCESS_TOKEN.isEmpty || ACCESS_TOKEN.contains("YOUR_TOKEN")
           ? buildAccessTokenWarning()
           : ListView.separated(
-              itemCount: _allPages.length,
+              itemCount: _allPages.length + 1, // +1 for TripMuse
               separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (_, int index) {
-                final example = _allPages[index];
+                // TripMuse 選項放在第一個
+                if (index == 0) {
+                  return ListTile(
+                    leading: const Icon(Icons.luggage, color: Colors.blue),
+                    title: const Text('🧳 TripMuse App'),
+                    subtitle: const Text('AI 智能旅行規劃應用'),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const TripMuseApp(),
+                      ),
+                    ),
+                  );
+                }
+                
+                // 原有範例（index 需要 -1）
+                final example = _allPages[index - 1];
                 return ListTile(
                   leading: example.leading,
                   title: Text(example.title),
@@ -113,7 +131,7 @@ class MapsDemo extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         )
                       : null,
-                  onTap: () => _pushPage(context, _allPages[index]),
+                  onTap: () => _pushPage(context, _allPages[index - 1]),
                 );
               },
             ),
