@@ -8,6 +8,7 @@ import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../widgets/trip_card.dart';
 import '../providers/trip_provider.dart';
+import 'create_trip_screen.dart';
 
 class TripListScreen extends ConsumerStatefulWidget {
   const TripListScreen({super.key});
@@ -544,9 +545,11 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
   }
   
   void _createNewTrip() {
-    // 建立新行程功能 - 目前顯示提示訊息
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('建立新行程功能開發中...')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CreateTripScreen(),
+      ),
     );
   }
   

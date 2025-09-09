@@ -8,6 +8,7 @@ import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
+import 'create_trip_screen.dart';
 import 'trip_list_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -85,9 +86,12 @@ class HomeScreen extends ConsumerWidget {
                   Card(
                     child: InkWell(
                       onTap: () {
-                        // 建立新行程功能 - 目前顯示提示訊息
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('建立新行程功能開發中...')),
+                        // 導航到建立行程頁面
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CreateTripScreen(),
+                          ),
                         );
                       },
                       borderRadius: BorderRadius.circular(TripMuseRadius.lg),

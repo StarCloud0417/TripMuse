@@ -2,6 +2,12 @@
 /// 
 /// 提供所有服務的統一匯入點
 
+// API 服務
+export 'api_client.dart';
+export 'api_service.dart';
+export 'network_service.dart';
+export 'trip_api_service_impl.dart';
+
 // 儲存服務
 export 'storage/storage_service.dart';
 export 'storage/hive_adapters.dart';

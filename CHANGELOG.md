@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2025-01-09
+
+### Added
+- 完整的 API 客戶端和網路層架構 (Complete API Client and Network Layer Architecture)
+- 使用 Dio 實作 HTTP 請求處理 (HTTP request handling using Dio)
+- 智能重試機制和網路狀態檢測 (Smart retry mechanism and network status detection)
+- 標準化 API 請求/回應格式 (Standardized API request/response format)
+- 認證攔截器自動處理 Bearer Token (Authentication interceptor for automatic Bearer Token handling)
+- 錯誤攔截器和請求日誌記錄 (Error interceptor and request logging)
+- 網路連線狀態監控服務 (Network connectivity monitoring service)
+- 行程 API 服務實作 (Trip API service implementation)
+- API Provider 整合 Riverpod 狀態管理 (API Provider integration with Riverpod state management)
+
+### Enhanced
+- 完善的錯誤處理和異常分類 (Comprehensive error handling and exception classification)
+- 自動網路重連和指數退避策略 (Automatic network reconnection with exponential backoff)
+- 安全的認證 Token 儲存機制 (Secure authentication token storage)
+- 完整的測試覆蓋 (Complete test coverage)
+
+### Technical
+- ApiClient: 統一的 HTTP 客戶端 (Unified HTTP client)
+- NetworkService: 網路狀態管理 (Network status management)
+- RetryInterceptor: 智能重試邏輯 (Smart retry logic)
+- ApiResponse<T>: 泛型回應包裝 (Generic response wrapper)
+- 19 個單元測試全部通過 (19 unit tests all passing)
+
 ## [0.1.1] - 2025-01-09
 
 ### Added

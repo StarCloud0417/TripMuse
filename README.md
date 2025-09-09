@@ -52,7 +52,13 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **Trip list screen with search & filter** / **行程列表頁面含搜尋篩選**  
 ✅ **Trip card component** / **行程卡片組件**  
 ✅ **Trip status management** / **行程狀態管理**  
-🚧 User system and trip management in progress / 使用者系統和行程管理開發進行中 
+✅ **Complete API client and network layer** / **完整 API 客戶端和網路層**  
+✅ **HTTP request handling with Dio** / **使用 Dio 處理 HTTP 請求**  
+✅ **Smart retry mechanism** / **智能重試機制**  
+✅ **Network status monitoring** / **網路狀態監控**  
+✅ **Authentication interceptor** / **認證攔截器**  
+✅ **Standardized API response format** / **標準化 API 回應格式**  
+🚧 AI trip generation service in progress / AI 行程生成服務開發進行中 
 
 ## 🛠️ Tech Stack / 技術棧
 
@@ -117,6 +123,26 @@ lib/
     ├── screens/                 # UI screens / 使用者介面頁面
     └── widgets/                 # UI components / 使用者介面組件
 ```
+
+## 📈 Latest Updates / 最新更新
+
+### v0.1.3 (2025-01-09)
+- 🌐 **完整 API 架構** | Complete API client and network layer architecture
+- 🔄 **智能重試機制** | Smart retry mechanism with exponential backoff
+- 📡 **網路狀態監控** | Real-time network connectivity monitoring
+- 🔐 **認證攔截器** | Automatic Bearer token authentication
+- 📊 **標準化回應** | Standardized API request/response format
+- 🧪 **完整測試** | 19 unit tests with full coverage
+
+### v0.1.1 (2025-01-09)
+- 📋 **行程列表頁面** | Trip list screen with search and filter
+- 🎴 **行程卡片組件** | Trip card component with status management
+- 🔍 **搜尋篩選功能** | Advanced search and filter functionality
+
+### v0.1.0 (2024-12-19)
+- 🎉 **初始版本** | Initial release with basic architecture
+- 🏗️ **基礎架構** | Core data models and storage system
+- 👤 **使用者系統** | User system with Guest mode
 
 ## 🤝 Contributing / 貢獻
 

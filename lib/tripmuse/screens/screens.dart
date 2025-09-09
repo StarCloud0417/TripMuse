@@ -2,6 +2,7 @@
 /// 
 /// 提供所有畫面的統一匯入點
 
+export 'create_trip_screen.dart';
 export 'home_screen.dart';
 export 'map_screen.dart';
 export 'profile_screen.dart';
