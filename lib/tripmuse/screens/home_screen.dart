@@ -1,10 +1,14 @@
 /// TripMuse 首頁畫面
 /// 
-/// 顯示行程列表和快速操作
+/// 顯示行程概覽和快速操作
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../widgets/widgets.dart';
+import 'trip_list_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -81,7 +85,7 @@ class HomeScreen extends ConsumerWidget {
                   Card(
                     child: InkWell(
                       onTap: () {
-                        // TODO: 導航到建立行程頁面
+                        // 建立新行程功能 - 目前顯示提示訊息
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('建立新行程功能開發中...')),
                         );
@@ -153,7 +157,12 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          // TODO: 查看所有行程
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TripListScreen(),
+                            ),
+                          );
                         },
                         child: const Text('查看全部'),
                       ),
@@ -165,13 +174,134 @@ class HomeScreen extends ConsumerWidget {
           ),
           
           // 行程列表
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return _buildTripCard(context, index);
-              },
-              childCount: 3, // 暫時顯示 3 個範例行程
-            ),
+          Consumer(
+            builder: (context, ref, child) {
+              final recentTripsAsync = ref.watch(recentTripsProvider);
+              
+              return recentTripsAsync.when(
+                data: (trips) {
+                  if (trips.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(TripMuseSpacing.lg),
+                        child: Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: TripMuseTheme.surfaceColor,
+                            borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                            border: Border.all(
+                              color: TripMuseTheme.borderColor,
+                              width: 1,
+                            ),
+                          ),
+                          child: const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.luggage,
+                                  size: 48,
+                                  color: TripMuseTheme.textSecondary,
+                                ),
+                                SizedBox(height: TripMuseSpacing.md),
+                                Text(
+                                  '還沒有任何行程',
+                                  style: TextStyle(
+                                    color: TripMuseTheme.textSecondary,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(height: TripMuseSpacing.sm),
+                                Text(
+                                  '點擊下方按鈕開始建立您的第一個行程',
+                                  style: TextStyle(
+                                    color: TripMuseTheme.textSecondary,
+                                    fontSize: 14,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final trip = trips[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: TripMuseSpacing.md,
+                            vertical: TripMuseSpacing.xs,
+                          ),
+                          child: TripCard(
+                            trip: trip,
+                            onTap: () => _openTrip(context, trip),
+                            onEdit: () => _editTrip(context, trip),
+                            onShare: () => _shareTrip(context, trip),
+                            onDelete: () => _deleteTrip(context, ref, trip),
+                          ),
+                        );
+                      },
+                      childCount: trips.length,
+                    ),
+                  );
+                },
+                loading: () => const SliverToBoxAdapter(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(TripMuseSpacing.lg),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
+                error: (error, stackTrace) => SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(TripMuseSpacing.lg),
+                    child: Container(
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: TripMuseTheme.errorColor.withValues(alpha: 25.5),
+                        borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                        border: Border.all(
+                          color: TripMuseTheme.errorColor.withValues(alpha: 76.5),
+                        ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: TripMuseTheme.errorColor,
+                            ),
+                            const SizedBox(height: TripMuseSpacing.md),
+                            const Text(
+                              '載入行程時發生錯誤',
+                              style: TextStyle(
+                                color: TripMuseTheme.errorColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: TripMuseSpacing.sm),
+                            ElevatedButton(
+                              onPressed: () {
+                                ref.invalidate(recentTripsProvider);
+                              },
+                              child: const Text('重試'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
           
           // 底部間距
@@ -184,7 +314,7 @@ class HomeScreen extends ConsumerWidget {
       // 浮動操作按鈕
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: 建立新行程
+          // 建立新行程功能 - 目前顯示提示訊息
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('建立新行程功能開發中...')),
           );
@@ -195,137 +325,53 @@ class HomeScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildTripCard(BuildContext context, int index) {
-    // 範例行程資料
-    final trips = [
-      {
-        'title': '台北美食3日遊',
-        'destination': '台北, 台灣',
-        'days': 3,
-        'status': '草稿',
-        'image': '🏙️',
-      },
-      {
-        'title': '東京櫻花季',
-        'destination': '東京, 日本',
-        'days': 5,
-        'status': '進行中',
-        'image': '🌸',
-      },
-      {
-        'title': '巴黎浪漫之旅',
-        'destination': '巴黎, 法國',
-        'days': 7,
-        'status': '已完成',
-        'image': '🗼',
-      },
-    ];
-    
-    final trip = trips[index];
-    
-    return Card(
-      child: InkWell(
-        onTap: () {
-          // TODO: 導航到行程詳情
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('查看 ${trip['title']} 詳情')),
-          );
-        },
-        borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-        child: Padding(
-          padding: const EdgeInsets.all(TripMuseSpacing.md),
-          child: Row(
-            children: [
-              // 行程圖示
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: TripMuseTheme.backgroundColor,
-                  borderRadius: BorderRadius.circular(TripMuseRadius.md),
-                ),
-                child: Center(
-                  child: Text(
-                    trip['image'] as String,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(width: TripMuseSpacing.md),
-              
-              // 行程資訊
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      trip['title'] as String,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      trip['destination'] as String,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: TripMuseTheme.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(trip['status'] as String).withValues(alpha: 25),
-                            borderRadius: BorderRadius.circular(TripMuseRadius.sm),
-                          ),
-                          child: Text(
-                            trip['status'] as String,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: _getStatusColor(trip['status'] as String),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${trip['days']} 天',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              // 更多選項
-              IconButton(
-                onPressed: () {
-                  // TODO: 顯示更多選項
-                },
-                icon: const Icon(Icons.more_vert),
-              ),
-            ],
-          ),
-        ),
-      ),
+
+  
+  void _openTrip(BuildContext context, Trip trip) {
+    // 開啟行程詳情 - 目前顯示提示訊息
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('開啟行程: ${trip.title}')),
     );
   }
   
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case '草稿':
-        return TripMuseTheme.warningColor;
-      case '進行中':
-        return TripMuseTheme.infoColor;
-      case '已完成':
-        return TripMuseTheme.successColor;
-      default:
-        return TripMuseTheme.textSecondary;
-    }
+  void _editTrip(BuildContext context, Trip trip) {
+    // 編輯行程功能 - 目前顯示提示訊息
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('編輯行程: ${trip.title}')),
+    );
+  }
+  
+  void _shareTrip(BuildContext context, Trip trip) {
+    // 分享行程功能 - 目前顯示提示訊息
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('分享行程: ${trip.title}')),
+    );
+  }
+  
+  void _deleteTrip(BuildContext context, WidgetRef ref, Trip trip) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('刪除行程'),
+        content: Text('確定要刪除「${trip.title}」嗎？此操作無法復原。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ref.read(tripNotifierProvider.notifier).deleteTrip(trip.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('已刪除行程: ${trip.title}')),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: TripMuseTheme.errorColor),
+            child: const Text('刪除'),
+          ),
+        ],
+      ),
+    );
   }
 }

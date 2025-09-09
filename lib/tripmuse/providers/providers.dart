@@ -2,4 +2,5 @@
 /// 
 /// 提供所有 Riverpod Providers 的統一匯入點
 
+export 'trip_provider.dart';
 export 'user_provider.dart';

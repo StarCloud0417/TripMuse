@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-01-09
+
+### Added
+- 📋 Complete trip list screen (TripListScreen) functionality
+- 🎴 Trip card component (TripCard) displaying trip preview information
+- 🔍 Trip search and filtering features (supports title and destination search)
+- 📊 Trip status management (upcoming, ongoing, completed)
+- ➕ FAB (Floating Action Button) for creating new trips
+- 🏠 Integrated home screen navigation to trip list
+- 🔄 Complete trip CRUD operations with Riverpod providers
+- 📱 Pull-to-refresh and comprehensive error handling
+
+### Enhanced
+- 🔧 Optimized trip data models and state management
+- ✨ Improved user experience and interface interactions
+- 🧪 Enhanced test coverage with all tests passing
+- 🐛 Fixed model definitions and compilation issues
+
+### Technical
+- 🏗️ Built comprehensive TripProvider with Riverpod state management
+- 🔍 Implemented trip filtering and search logic
+- 📈 Optimized trip statistics and status calculations
+- 🔧 Fixed Destination, Activity, DayPlan model issues
+
+---
+
+## [0.1.1] - 2025-01-09
+
+### 新增功能
+- 📋 完成行程列表頁面 (TripListScreen) 功能
+- 🎴 實作行程卡片組件 (TripCard) 顯示行程預覽資訊
+- 🔍 建立行程搜尋和篩選功能（支援標題、目的地搜尋）
+- 📊 實作行程狀態管理（即將開始、進行中、已完成）
+- ➕ 添加 FAB 建立新行程按鈕
+- 🏠 整合首頁導航到行程列表功能
+- 🔄 建立完整的行程 CRUD 操作 Provider
+- 📱 實作下拉刷新和完善的錯誤處理機制
+
+### 優化改進
+- 🔧 優化行程資料模型和狀態管理
+- ✨ 改善用戶體驗和界面互動
+- 🧪 完善測試覆蓋，所有測試通過
+- 🐛 修復模型定義和編譯問題
+
+### 技術改進
+- 🏗️ 建立 TripProvider 完整的 Riverpod 狀態管理
+- 🔍 實作行程篩選和搜尋邏輯
+- 📈 優化行程統計和狀態計算
+- 🔧 修復 Destination, Activity, DayPlan 等模型問題
+
 ## [0.1.0] - 2025-01-09
 
 ### Added

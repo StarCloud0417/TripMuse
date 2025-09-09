@@ -6,3 +6,4 @@ export 'home_screen.dart';
 export 'map_screen.dart';
 export 'profile_screen.dart';
 export 'settings_screen.dart';
+export 'trip_list_screen.dart';
