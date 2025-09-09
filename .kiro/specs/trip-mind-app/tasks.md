@@ -53,7 +53,10 @@
 
 ## TripMuse 應用入口
 
-- [ ] 2. 建立 TripMuse 應用入口（不修改 main.dart 結構）
+- [x] 2. 建立 TripMuse 應用入口（不修改 main.dart 結構）
+
+
+
   - 在 main.dart 的現有範例列表中**新增一行** TripMuse 選項
   - 創建 lib/tripmuse/tripmuse_app.dart 作為 TripMuse 主頁面
   - 在 TripMuse 內建立底部導航欄（地圖、行程列表、設定）
@@ -61,12 +64,16 @@
   - 建立 TripMuse 專用的主題和樣式
   - _Requirements: 7.4_
 
+
 - [ ] 2.1 建立簡化的使用者系統（MVP 版本）
+
+
   - 實作 Guest 模式的本地使用者管理
   - 建立簡單的使用者偏好設定頁面
   - 實作本地資料的使用者隔離（如果需要）
   - 為 Firebase Authentication 預留介面和資料結構
   - _Requirements: 7.1, 7.2_
+
 
 - [ ] 2.2 建立行程列表頁面
   - 設計並實作行程列表主頁面

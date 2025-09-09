@@ -5,6 +5,96 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2025-01-09
+
+### Added
+- 📱 Complete TripMuse app UI with bottom navigation
+- 🎨 Comprehensive theme system with Material 3 design:
+  - Brand colors and visual identity
+  - Light and dark theme support
+  - Consistent spacing, radius, and shadow constants
+  - Custom component themes (AppBar, Cards, Buttons, etc.)
+- 🏠 Home screen with beautiful design:
+  - SliverAppBar with gradient background
+  - Quick action cards for creating new trips
+  - Recent trips list with status indicators
+  - Floating action button for easy access
+- 🗺️ Map screen with interactive controls:
+  - Map view placeholder with gradient design
+  - Top search bar and layer controls
+  - Right-side location and zoom controls
+  - Bottom trip information card with progress indicator
+- ⚙️ Settings screen with comprehensive options:
+  - User profile section with guest mode support
+  - General settings (language, theme, currency)
+  - Map settings (style, location tracking, offline maps)
+  - Notification preferences
+  - Data and privacy controls
+  - About and help sections
+- 🔄 State management with Riverpod:
+  - Page navigation state management
+  - Storage system integration
+  - Error handling and user feedback
+- 📱 Responsive UI design:
+  - Smooth page transitions with PageView
+  - Consistent visual feedback
+  - Placeholder content with development indicators
+
+### Technical Features
+- ✨ Material 3 design system implementation
+- 🎨 Comprehensive theme architecture
+- 📱 Bottom navigation with smooth transitions
+- 🔄 Riverpod state management integration
+- 🗄️ Storage system initialization and error handling
+- 📐 Responsive design with consistent spacing
+- 🎯 Modular screen architecture
+
+---
+
+## [0.1.0] - 2025-01-09
+
+### 新增功能
+- 📱 完整的 TripMuse 應用 UI 與底部導航
+- 🎨 採用 Material 3 設計的完整主題系統：
+  - 品牌色彩和視覺識別
+  - 亮色和暗色主題支援
+  - 一致的間距、圓角和陰影常數
+  - 自訂組件主題（AppBar、卡片、按鈕等）
+- 🏠 美觀設計的首頁：
+  - 漸層背景的 SliverAppBar
+  - 建立新行程的快速操作卡片
+  - 帶狀態指示器的最近行程列表
+  - 便於存取的浮動操作按鈕
+- 🗺️ 具互動控制的地圖頁面：
+  - 漸層設計的地圖視圖佔位
+  - 頂部搜尋欄和圖層控制
+  - 右側位置和縮放控制
+  - 帶進度指示器的底部行程資訊卡片
+- ⚙️ 功能完整的設定頁面：
+  - 支援訪客模式的使用者資料區域
+  - 一般設定（語言、主題、貨幣）
+  - 地圖設定（樣式、位置追蹤、離線地圖）
+  - 通知偏好設定
+  - 資料和隱私控制
+  - 關於和說明區域
+- 🔄 使用 Riverpod 的狀態管理：
+  - 頁面導航狀態管理
+  - 儲存系統整合
+  - 錯誤處理和使用者回饋
+- 📱 響應式 UI 設計：
+  - 使用 PageView 的流暢頁面切換
+  - 一致的視覺回饋
+  - 帶開發指示器的佔位內容
+
+### 技術特色
+- ✨ Material 3 設計系統實作
+- 🎨 完整的主題架構
+- 📱 流暢切換的底部導航
+- 🔄 Riverpod 狀態管理整合
+- 🗄️ 儲存系統初始化和錯誤處理
+- 📐 一致間距的響應式設計
+- 🎯 模組化畫面架構
+
 ## [0.0.3] - 2025-01-09
 
 ### Added

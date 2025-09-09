@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_example/animated_route_example.dart';
 import 'package:mapbox_maps_example/animation_example.dart';
 import 'package:mapbox_maps_example/camera_example.dart';
@@ -113,7 +114,9 @@ class MapsDemo extends StatelessWidget {
                     subtitle: const Text('AI 智能旅行規劃應用'),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                        builder: (_) => const TripMuseApp(),
+                        builder: (_) => const ProviderScope(
+                          child: TripMuseApp(),
+                        ),
                       ),
                     ),
                   );

@@ -1,6 +1,6 @@
 # TripMuse 🧳
 
-**Version 0.0.3**
+**Version 0.1.0**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
@@ -30,7 +30,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.0.3** - Storage System Complete / 儲存系統完成
+**Version 0.1.0** - TripMuse App UI Complete / TripMuse 應用 UI 完成
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
@@ -44,7 +44,11 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **Offline-first sync service** / **離線優先同步服務**  
 ✅ **Repository pattern implementation** / **Repository 模式實作**  
 ✅ **Secure storage for sensitive data** / **敏感資料安全儲存**  
-🚧 TripMuse app UI development in progress / TripMuse 應用 UI 開發進行中 
+✅ **Complete TripMuse app UI** / **完成 TripMuse 應用 UI**  
+✅ **Bottom navigation with three screens** / **三個畫面的底部導航**  
+✅ **Material 3 theme system** / **Material 3 主題系統**  
+✅ **Riverpod state management** / **Riverpod 狀態管理**  
+🚧 User system and trip management in progress / 使用者系統和行程管理開發進行中 
 
 ## 🛠️ Tech Stack / 技術棧
 
