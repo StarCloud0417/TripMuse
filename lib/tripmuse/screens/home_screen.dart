@@ -181,7 +181,7 @@ class HomeScreen extends ConsumerWidget {
           Consumer(
             builder: (context, ref, child) {
               final recentTripsAsync = ref.watch(recentTripsProvider);
-              
+
               return recentTripsAsync.when(
                 data: (trips) {
                   if (trips.isEmpty) {
@@ -268,36 +268,62 @@ class HomeScreen extends ConsumerWidget {
                     child: Container(
                       height: 200,
                       decoration: BoxDecoration(
-                        color: TripMuseTheme.errorColor.withValues(alpha: 25.5),
+                        color: error.toString().contains('尚未初始化')
+                            ? TripMuseTheme.primaryColor.withValues(alpha: 25.5)
+                            : TripMuseTheme.errorColor.withValues(alpha: 25.5),
                         borderRadius: BorderRadius.circular(TripMuseRadius.lg),
                         border: Border.all(
-                          color: TripMuseTheme.errorColor.withValues(alpha: 76.5),
+                          color: error.toString().contains('尚未初始化')
+                              ? TripMuseTheme.primaryColor.withValues(alpha: 76.5)
+                              : TripMuseTheme.errorColor.withValues(alpha: 76.5),
                         ),
                       ),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.error_outline,
+                            Icon(
+                              error.toString().contains('尚未初始化')
+                                  ? Icons.hourglass_empty
+                                  : Icons.error_outline,
                               size: 48,
-                              color: TripMuseTheme.errorColor,
+                              color: error.toString().contains('尚未初始化')
+                                  ? TripMuseTheme.primaryColor
+                                  : TripMuseTheme.errorColor,
                             ),
                             const SizedBox(height: TripMuseSpacing.md),
-                            const Text(
-                              '載入行程時發生錯誤',
+                            Text(
+                              error.toString().contains('尚未初始化')
+                                  ? '系統初始化中...'
+                                  : '載入行程時發生錯誤',
                               style: TextStyle(
-                                color: TripMuseTheme.errorColor,
+                                color: error.toString().contains('尚未初始化')
+                                    ? TripMuseTheme.primaryColor
+                                    : TripMuseTheme.errorColor,
                                 fontSize: 16,
                               ),
                             ),
                             const SizedBox(height: TripMuseSpacing.sm),
-                            ElevatedButton(
-                              onPressed: () {
-                                ref.invalidate(recentTripsProvider);
-                              },
-                              child: const Text('重試'),
+                            Text(
+                              error.toString().contains('尚未初始化')
+                                  ? '請稍候，正在準備您的旅行資料'
+                                  : '請檢查網路連線或稍後再試',
+                              style: TextStyle(
+                                color: error.toString().contains('尚未初始化')
+                                    ? TripMuseTheme.primaryColor.withValues(alpha: 179.2)
+                                    : TripMuseTheme.errorColor.withValues(alpha: 179.2),
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
+                            const SizedBox(height: TripMuseSpacing.md),
+                            if (!error.toString().contains('尚未初始化'))
+                              ElevatedButton(
+                                onPressed: () {
+                                  ref.invalidate(recentTripsProvider);
+                                },
+                                child: const Text('重試'),
+                              ),
                           ],
                         ),
                       ),

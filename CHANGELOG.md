@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2025-01-09
+
+### Fixed
+- 🐛 Fixed unused imports in api_client_test.dart (Removed unused flutter/services.dart and mockito imports)
+- 🐛 Fixed unused local variables in api_client_test.dart (Removed unused apiClient and mockDio variables)
+- 🐛 Fixed unreachable switch default in api_client_test.dart (Removed unreachable default clause)
+- 🐛 Fixed unused field in tripmuse_app.dart (Removed _isStorageInitialized field)
+- 🐛 Fixed linting issues in trip_provider.dart (Resolved all code analysis warnings)
+
+### Technical
+- 🧹 Code cleanup and linting fixes across multiple files
+- 📝 Improved code quality and maintainability
+- ✅ All flutter analyze checks passing
+
+### 中文
+- 🐛 修復 api_client_test.dart 中的未使用匯入 (移除未使用的 flutter/services.dart 和 mockito 匯入)
+- 🐛 修復 api_client_test.dart 中的未使用區域變數 (移除未使用的 apiClient 和 mockDio 變數)
+- 🐛 修復 api_client_test.dart 中的不可達 switch 預設值 (移除不可達的 default 子句)
+- 🐛 修復 tripmuse_app.dart 中的未使用欄位 (移除 _isStorageInitialized 欄位)
+- 🐛 修復 trip_provider.dart 中的程式碼品質問題 (解決所有程式碼分析警告)
+
+### 技術改進
+- 🧹 程式碼清理和多個檔案的 linting 修復
+- 📝 提升程式碼品質和可維護性
+- ✅ 所有 flutter analyze 檢查通過
+
 ## [0.1.3] - 2025-01-09
 
 ### Added

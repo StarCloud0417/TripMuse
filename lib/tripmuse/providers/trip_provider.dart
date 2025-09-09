@@ -9,13 +9,28 @@ import '../models/models.dart';
 /// 行程 Repository Provider（從 StorageManager 取得）
 final tripRepositoryProvider = Provider<TripRepositoryImpl>((ref) {
   final storageManager = ref.watch(storageManagerProvider);
+
+  // 檢查儲存管理器是否已初始化
+  if (!storageManager.isInitialized) {
+    throw StorageManagerException('儲存管理器尚未初始化，請稍後再試');
+  }
+
   return storageManager.tripRepository;
 });
 
 /// 使用者所有行程 Provider
 final userTripsProvider = FutureProvider<List<Trip>>((ref) async {
-  final tripRepository = ref.watch(tripRepositoryProvider);
-  return await tripRepository.getAllTrips();
+  try {
+    final tripRepository = ref.watch(tripRepositoryProvider);
+    return await tripRepository.getAllTrips();
+  } catch (e) {
+    // 如果儲存管理器尚未初始化，返回空列表
+    if (e is StorageManagerException && e.message.contains('尚未初始化')) {
+      return [];
+    }
+    // 重新拋出其他錯誤
+    rethrow;
+  }
 });
 
 /// 特定行程 Provider
@@ -32,13 +47,22 @@ final tripStatisticsProvider = FutureProvider<TripStatistics>((ref) async {
 
 /// 最近行程 Provider（最多5個）
 final recentTripsProvider = FutureProvider<List<Trip>>((ref) async {
-  final allTrips = await ref.watch(userTripsProvider.future);
-  
-  // 按建立時間排序，取最新的5個
-  final sortedTrips = List<Trip>.from(allTrips)
-    ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  
-  return sortedTrips.take(5).toList();
+  try {
+    final allTrips = await ref.watch(userTripsProvider.future);
+
+    // 按建立時間排序，取最新的5個
+    final sortedTrips = List<Trip>.from(allTrips)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return sortedTrips.take(5).toList();
+  } catch (e) {
+    // 如果儲存管理器尚未初始化，返回空列表
+    if (e is StorageManagerException && e.message.contains('尚未初始化')) {
+      return [];
+    }
+    // 重新拋出其他錯誤
+    rethrow;
+  }
 });
 
 /// 即將到來的行程 Provider

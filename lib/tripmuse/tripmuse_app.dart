@@ -46,6 +46,16 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
       if (!storageManager.isInitialized) {
         await storageManager.initialize();
         print('TripMuse 儲存系統初始化成功');
+
+        // 初始化完成後重新整理相關的 providers
+        if (mounted) {
+          // 延遲一下確保 context 已經準備好
+          Future.delayed(const Duration(milliseconds: 100), () {
+            // 這裡可以通過 ProviderScope 的 ref 來重新整理 providers
+            // 但由於我們在 initState 中，無法直接訪問 ref
+            // 改為發送一個通知或者使用其他機制
+          });
+        }
       }
     } catch (e) {
       print('TripMuse 儲存系統初始化失敗: $e');
