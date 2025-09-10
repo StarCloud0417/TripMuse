@@ -347,23 +347,15 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
       });
     }
 
-    // 嘗試從 Secret Manager 或環境變數獲取 Google Places API Key
-    let placesApiKey;
-    try {
-      placesApiKey = await getSecret('google-places-api-key');
-      logger.info('Using Google Places API key from Secret Manager');
-    } catch (secretError) {
-      logger.warn('Failed to get Places API key from Secret Manager, trying environment variable:', secretError.message);
-      placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
-      if (!placesApiKey) {
-        logger.error('Google Places API key not found in Secret Manager or environment variables');
-        return res.status(500).json({
-          success: false,
-          error: 'Google Places API key not configured',
-          message: 'Please configure GOOGLE_PLACES_API_KEY in environment variables or GCP Secret Manager'
-        });
-      }
-      logger.info('Using Google Places API key from environment variable');
+    // 從環境變數獲取 Google Places API Key
+    const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!placesApiKey) {
+      logger.error('GOOGLE_PLACES_API_KEY environment variable is required');
+      return res.status(500).json({
+        success: false,
+        error: 'Google Places API key not configured',
+        message: 'Please configure GOOGLE_PLACES_API_KEY in environment variables'
+      });
     }
     
     let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${placesApiKey}`;
@@ -446,7 +438,11 @@ app.get('/api/v1/map/config', authenticateUser, async (req, res) => {
 // 輔助函數：使用 Places API 補強地點資訊
 async function enhanceTripWithPlacesAPI(tripData) {
   try {
-    const placesApiKey = await getSecret('google-places-api-key');
+    const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!placesApiKey) {
+      logger.warn('GOOGLE_PLACES_API_KEY not available, skipping place enhancement');
+      return tripData;
+    }
     
     for (const day of tripData.days) {
       for (const activity of day.activities) {
