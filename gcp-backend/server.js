@@ -347,7 +347,24 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
       });
     }
 
-    const placesApiKey = await getSecret('google-places-api-key');
+    // 嘗試從 Secret Manager 或環境變數獲取 Google Places API Key
+    let placesApiKey;
+    try {
+      placesApiKey = await getSecret('google-places-api-key');
+      logger.info('Using Google Places API key from Secret Manager');
+    } catch (secretError) {
+      logger.warn('Failed to get Places API key from Secret Manager, trying environment variable:', secretError.message);
+      placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
+      if (!placesApiKey) {
+        logger.error('Google Places API key not found in Secret Manager or environment variables');
+        return res.status(500).json({
+          success: false,
+          error: 'Google Places API key not configured',
+          message: 'Please configure GOOGLE_PLACES_API_KEY in environment variables or GCP Secret Manager'
+        });
+      }
+      logger.info('Using Google Places API key from environment variable');
+    }
     
     let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${placesApiKey}`;
     
@@ -355,11 +372,19 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
       url += `&location=${location}&radius=${radius}`;
     }
 
+    logger.info(`Making Places API request: ${url.replace(placesApiKey, '***API_KEY***')}`);
+
     const response = await axios.get(url);
     const data = response.data;
 
+    logger.info(`Places API response status: ${data.status}, results count: ${data.results ? data.results.length : 0}`);
+
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      throw new Error(`Places API error: ${data.status}`);
+      logger.error(`Places API error: ${data.status}`, {
+        error_message: data.error_message,
+        url: url.replace(placesApiKey, '***API_KEY***')
+      });
+      throw new Error(`Places API error: ${data.status} - ${data.error_message || 'Unknown error'}`);
     }
 
     const places = data.results.map(place => ({
