@@ -11,7 +11,7 @@ class ApiConfig {
   
   // 請求設定
   static const Duration connectTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 60);
+  static const Duration receiveTimeout = Duration(minutes: 3); // 增加到 3 分鐘給 LLM 處理
   static const Duration sendTimeout = Duration(seconds: 30);
   
   // 開發模式設定

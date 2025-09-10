@@ -59,9 +59,24 @@ class Place with _$Place {
     int? priceLevel,
     List<String>? types,
     List<PlacePhoto>? photos,
+    PlaceOpeningHours? openingHours,
+    String? website,
+    String? phoneNumber,
   }) = _Place;
 
   factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
+}
+
+// 地點營業時間
+@freezed
+class PlaceOpeningHours with _$PlaceOpeningHours {
+  const factory PlaceOpeningHours({
+    required bool openNow,
+    List<String>? weekdayText,
+  }) = _PlaceOpeningHours;
+
+  factory PlaceOpeningHours.fromJson(Map<String, dynamic> json) =>
+      _$PlaceOpeningHoursFromJson(json);
 }
 
 // 地點位置

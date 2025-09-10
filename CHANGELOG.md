@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2025-09-10
+
+### Added
+- 🗺️ **Google Places API 整合** - 實作完整的 Google Places API 資料補強功能 (Implemented complete Google Places API data enhancement)
+- 📍 **地點詳細資訊獲取** - 自動獲取地點的照片、評分、地址等詳細資訊 (Automatic retrieval of place photos, ratings, addresses)
+- 🧭 **地理座標補齊** - 實作地理座標驗證和自動補齊機制 (Implemented geographic coordinate validation and auto-completion)
+- 🖼️ **地點照片整合** - 整合地點照片參考和顯示功能 (Integrated place photo references and display)
+
+### Fixed
+- 🐛 **語法錯誤修復** - 修復 server.js 中的註釋語法錯誤 (Fixed comment syntax error in server.js)
+- 🔧 **API Key 管理** - 統一 Google Places API Key 的獲取方式 (Unified Google Places API key retrieval method)
+- 🛠️ **部署配置** - 更新 Cloud Run 部署配置以包含 Places API (Updated Cloud Run deployment configuration for Places API)
+
+### Enhanced
+- 📊 **資料豐富度** - 大幅提升行程資料的詳細程度和準確性 (Significantly improved trip data richness and accuracy)
+- 🎯 **使用者體驗** - 提供更詳細的地點資訊和視覺內容 (Enhanced user experience with detailed place information and visuals)
+- ⚡ **API 效能** - 優化 Places API 調用和快取機制 (Optimized Places API calls and caching mechanisms)
+
+### Technical
+- 🔗 **Places API 客戶端** - 實作專用的 Places API 服務客戶端 (Implemented dedicated Places API service client)
+- 📏 **API 限制處理** - 實作 API 速率限制和錯誤處理機制 (Implemented API rate limiting and error handling)
+- 🧪 **整合測試** - 添加 Places API 整合的測試覆蓋 (Added test coverage for Places API integration)
+
+### 中文
+- 🗺️ **Google Places API 整合** - 實作完整的 Google Places API 資料補強功能
+- 📍 **地點詳細資訊獲取** - 自動獲取地點的照片、評分、地址等詳細資訊
+- 🧭 **地理座標補齊** - 實作地理座標驗證和自動補齊機制
+- 🖼️ **地點照片整合** - 整合地點照片參考和顯示功能
+
+### 技術改進
+- 🔧 **語法錯誤修復** - 修復 server.js 中的註釋語法錯誤
+- 🔧 **API Key 管理** - 統一 Google Places API Key 的獲取方式
+- 🛠️ **部署配置** - 更新 Cloud Run 部署配置以包含 Places API
+
+### 檔案變更
+- 修改: `gcp-backend/server.js` - 修復語法錯誤並優化 Places API 整合
+- 修改: `gcp-backend/.env` - 添加 GOOGLE_PLACES_API_KEY 配置
+- 修改: `gcp-backend/deploy.ps1` - 更新部署腳本包含 Places API secret
+- 新增: `lib/tripmuse/services/places_service.dart` - Places API 服務
+- 新增: `lib/tripmuse/utils/` - 工具函數目錄
+- 新增: `test/places_api_test.dart` - Places API 測試
+- 新增: `test/coordinate_validator_test.dart` - 座標驗證測試
+
 ## [0.1.5] - 2025-09-10
 
 ### Fixed

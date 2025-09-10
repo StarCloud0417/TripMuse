@@ -733,6 +733,9 @@ mixin _$Place {
   int? get priceLevel => throw _privateConstructorUsedError;
   List<String>? get types => throw _privateConstructorUsedError;
   List<PlacePhoto>? get photos => throw _privateConstructorUsedError;
+  PlaceOpeningHours? get openingHours => throw _privateConstructorUsedError;
+  String? get website => throw _privateConstructorUsedError;
+  String? get phoneNumber => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -752,9 +755,13 @@ abstract class $PlaceCopyWith<$Res> {
       double? rating,
       int? priceLevel,
       List<String>? types,
-      List<PlacePhoto>? photos});
+      List<PlacePhoto>? photos,
+      PlaceOpeningHours? openingHours,
+      String? website,
+      String? phoneNumber});
 
   $PlaceLocationCopyWith<$Res> get location;
+  $PlaceOpeningHoursCopyWith<$Res>? get openingHours;
 }
 
 /// @nodoc
@@ -778,6 +785,9 @@ class _$PlaceCopyWithImpl<$Res, $Val extends Place>
     Object? priceLevel = freezed,
     Object? types = freezed,
     Object? photos = freezed,
+    Object? openingHours = freezed,
+    Object? website = freezed,
+    Object? phoneNumber = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -812,6 +822,18 @@ class _$PlaceCopyWithImpl<$Res, $Val extends Place>
           ? _value.photos
           : photos // ignore: cast_nullable_to_non_nullable
               as List<PlacePhoto>?,
+      openingHours: freezed == openingHours
+          ? _value.openingHours
+          : openingHours // ignore: cast_nullable_to_non_nullable
+              as PlaceOpeningHours?,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      phoneNumber: freezed == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -820,6 +842,18 @@ class _$PlaceCopyWithImpl<$Res, $Val extends Place>
   $PlaceLocationCopyWith<$Res> get location {
     return $PlaceLocationCopyWith<$Res>(_value.location, (value) {
       return _then(_value.copyWith(location: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $PlaceOpeningHoursCopyWith<$Res>? get openingHours {
+    if (_value.openingHours == null) {
+      return null;
+    }
+
+    return $PlaceOpeningHoursCopyWith<$Res>(_value.openingHours!, (value) {
+      return _then(_value.copyWith(openingHours: value) as $Val);
     });
   }
 }
@@ -839,10 +873,15 @@ abstract class _$$PlaceImplCopyWith<$Res> implements $PlaceCopyWith<$Res> {
       double? rating,
       int? priceLevel,
       List<String>? types,
-      List<PlacePhoto>? photos});
+      List<PlacePhoto>? photos,
+      PlaceOpeningHours? openingHours,
+      String? website,
+      String? phoneNumber});
 
   @override
   $PlaceLocationCopyWith<$Res> get location;
+  @override
+  $PlaceOpeningHoursCopyWith<$Res>? get openingHours;
 }
 
 /// @nodoc
@@ -864,6 +903,9 @@ class __$$PlaceImplCopyWithImpl<$Res>
     Object? priceLevel = freezed,
     Object? types = freezed,
     Object? photos = freezed,
+    Object? openingHours = freezed,
+    Object? website = freezed,
+    Object? phoneNumber = freezed,
   }) {
     return _then(_$PlaceImpl(
       id: null == id
@@ -898,6 +940,18 @@ class __$$PlaceImplCopyWithImpl<$Res>
           ? _value._photos
           : photos // ignore: cast_nullable_to_non_nullable
               as List<PlacePhoto>?,
+      openingHours: freezed == openingHours
+          ? _value.openingHours
+          : openingHours // ignore: cast_nullable_to_non_nullable
+              as PlaceOpeningHours?,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      phoneNumber: freezed == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -913,7 +967,10 @@ class _$PlaceImpl implements _Place {
       this.rating,
       this.priceLevel,
       final List<String>? types,
-      final List<PlacePhoto>? photos})
+      final List<PlacePhoto>? photos,
+      this.openingHours,
+      this.website,
+      this.phoneNumber})
       : _types = types,
         _photos = photos;
 
@@ -953,8 +1010,15 @@ class _$PlaceImpl implements _Place {
   }
 
   @override
+  final PlaceOpeningHours? openingHours;
+  @override
+  final String? website;
+  @override
+  final String? phoneNumber;
+
+  @override
   String toString() {
-    return 'Place(id: $id, name: $name, address: $address, location: $location, rating: $rating, priceLevel: $priceLevel, types: $types, photos: $photos)';
+    return 'Place(id: $id, name: $name, address: $address, location: $location, rating: $rating, priceLevel: $priceLevel, types: $types, photos: $photos, openingHours: $openingHours, website: $website, phoneNumber: $phoneNumber)';
   }
 
   @override
@@ -971,7 +1035,12 @@ class _$PlaceImpl implements _Place {
             (identical(other.priceLevel, priceLevel) ||
                 other.priceLevel == priceLevel) &&
             const DeepCollectionEquality().equals(other._types, _types) &&
-            const DeepCollectionEquality().equals(other._photos, _photos));
+            const DeepCollectionEquality().equals(other._photos, _photos) &&
+            (identical(other.openingHours, openingHours) ||
+                other.openingHours == openingHours) &&
+            (identical(other.website, website) || other.website == website) &&
+            (identical(other.phoneNumber, phoneNumber) ||
+                other.phoneNumber == phoneNumber));
   }
 
   @JsonKey(ignore: true)
@@ -985,7 +1054,10 @@ class _$PlaceImpl implements _Place {
       rating,
       priceLevel,
       const DeepCollectionEquality().hash(_types),
-      const DeepCollectionEquality().hash(_photos));
+      const DeepCollectionEquality().hash(_photos),
+      openingHours,
+      website,
+      phoneNumber);
 
   @JsonKey(ignore: true)
   @override
@@ -1010,7 +1082,10 @@ abstract class _Place implements Place {
       final double? rating,
       final int? priceLevel,
       final List<String>? types,
-      final List<PlacePhoto>? photos}) = _$PlaceImpl;
+      final List<PlacePhoto>? photos,
+      final PlaceOpeningHours? openingHours,
+      final String? website,
+      final String? phoneNumber}) = _$PlaceImpl;
 
   factory _Place.fromJson(Map<String, dynamic> json) = _$PlaceImpl.fromJson;
 
@@ -1031,8 +1106,180 @@ abstract class _Place implements Place {
   @override
   List<PlacePhoto>? get photos;
   @override
+  PlaceOpeningHours? get openingHours;
+  @override
+  String? get website;
+  @override
+  String? get phoneNumber;
+  @override
   @JsonKey(ignore: true)
   _$$PlaceImplCopyWith<_$PlaceImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PlaceOpeningHours _$PlaceOpeningHoursFromJson(Map<String, dynamic> json) {
+  return _PlaceOpeningHours.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PlaceOpeningHours {
+  bool get openNow => throw _privateConstructorUsedError;
+  List<String>? get weekdayText => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PlaceOpeningHoursCopyWith<PlaceOpeningHours> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PlaceOpeningHoursCopyWith<$Res> {
+  factory $PlaceOpeningHoursCopyWith(
+          PlaceOpeningHours value, $Res Function(PlaceOpeningHours) then) =
+      _$PlaceOpeningHoursCopyWithImpl<$Res, PlaceOpeningHours>;
+  @useResult
+  $Res call({bool openNow, List<String>? weekdayText});
+}
+
+/// @nodoc
+class _$PlaceOpeningHoursCopyWithImpl<$Res, $Val extends PlaceOpeningHours>
+    implements $PlaceOpeningHoursCopyWith<$Res> {
+  _$PlaceOpeningHoursCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? openNow = null,
+    Object? weekdayText = freezed,
+  }) {
+    return _then(_value.copyWith(
+      openNow: null == openNow
+          ? _value.openNow
+          : openNow // ignore: cast_nullable_to_non_nullable
+              as bool,
+      weekdayText: freezed == weekdayText
+          ? _value.weekdayText
+          : weekdayText // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PlaceOpeningHoursImplCopyWith<$Res>
+    implements $PlaceOpeningHoursCopyWith<$Res> {
+  factory _$$PlaceOpeningHoursImplCopyWith(_$PlaceOpeningHoursImpl value,
+          $Res Function(_$PlaceOpeningHoursImpl) then) =
+      __$$PlaceOpeningHoursImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({bool openNow, List<String>? weekdayText});
+}
+
+/// @nodoc
+class __$$PlaceOpeningHoursImplCopyWithImpl<$Res>
+    extends _$PlaceOpeningHoursCopyWithImpl<$Res, _$PlaceOpeningHoursImpl>
+    implements _$$PlaceOpeningHoursImplCopyWith<$Res> {
+  __$$PlaceOpeningHoursImplCopyWithImpl(_$PlaceOpeningHoursImpl _value,
+      $Res Function(_$PlaceOpeningHoursImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? openNow = null,
+    Object? weekdayText = freezed,
+  }) {
+    return _then(_$PlaceOpeningHoursImpl(
+      openNow: null == openNow
+          ? _value.openNow
+          : openNow // ignore: cast_nullable_to_non_nullable
+              as bool,
+      weekdayText: freezed == weekdayText
+          ? _value._weekdayText
+          : weekdayText // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PlaceOpeningHoursImpl implements _PlaceOpeningHours {
+  const _$PlaceOpeningHoursImpl(
+      {required this.openNow, final List<String>? weekdayText})
+      : _weekdayText = weekdayText;
+
+  factory _$PlaceOpeningHoursImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PlaceOpeningHoursImplFromJson(json);
+
+  @override
+  final bool openNow;
+  final List<String>? _weekdayText;
+  @override
+  List<String>? get weekdayText {
+    final value = _weekdayText;
+    if (value == null) return null;
+    if (_weekdayText is EqualUnmodifiableListView) return _weekdayText;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  String toString() {
+    return 'PlaceOpeningHours(openNow: $openNow, weekdayText: $weekdayText)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PlaceOpeningHoursImpl &&
+            (identical(other.openNow, openNow) || other.openNow == openNow) &&
+            const DeepCollectionEquality()
+                .equals(other._weekdayText, _weekdayText));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, openNow, const DeepCollectionEquality().hash(_weekdayText));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PlaceOpeningHoursImplCopyWith<_$PlaceOpeningHoursImpl> get copyWith =>
+      __$$PlaceOpeningHoursImplCopyWithImpl<_$PlaceOpeningHoursImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PlaceOpeningHoursImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PlaceOpeningHours implements PlaceOpeningHours {
+  const factory _PlaceOpeningHours(
+      {required final bool openNow,
+      final List<String>? weekdayText}) = _$PlaceOpeningHoursImpl;
+
+  factory _PlaceOpeningHours.fromJson(Map<String, dynamic> json) =
+      _$PlaceOpeningHoursImpl.fromJson;
+
+  @override
+  bool get openNow;
+  @override
+  List<String>? get weekdayText;
+  @override
+  @JsonKey(ignore: true)
+  _$$PlaceOpeningHoursImplCopyWith<_$PlaceOpeningHoursImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

@@ -56,6 +56,8 @@ const _$ActivityCategoryEnumMap = {
   ActivityCategory.culture: 'culture',
   ActivityCategory.nature: 'nature',
   ActivityCategory.shopping: 'shopping',
+  ActivityCategory.outdoor: 'outdoor',
+  ActivityCategory.transportation: 'transportation',
 };
 
 const _$ActivityPriorityEnumMap = {

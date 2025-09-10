@@ -8,7 +8,9 @@ enum ActivityCategory {
   sightseeing('觀光'),
   culture('文化'),
   nature('自然'),
-  shopping('購物');
+  shopping('購物'),
+  outdoor('戶外'),
+  transportation('交通');
 
   const ActivityCategory(this.displayName);
   final String displayName;

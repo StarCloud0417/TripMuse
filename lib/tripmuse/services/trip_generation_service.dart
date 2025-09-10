@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:crypto/crypto.dart';
 import '../models/models.dart';
 import 'api_client.dart';
+import 'places_service.dart';
 
 /// 行程生成階段
 enum TripGenerationPhase {
@@ -83,6 +84,7 @@ class CacheItem<T> {
 /// 5. 錯誤處理和重試機制
 class TripGenerationService {
   final ApiClient _apiClient;
+  final PlacesService _placesService;
   final Map<String, CacheItem<Trip>> _tripCache = {};
   final Map<String, CacheItem<UserPreferenceAnalysis>> _preferenceCache = {};
   
@@ -91,7 +93,7 @@ class TripGenerationService {
   static const Duration _preferenceCacheTTL = Duration(hours: 6);
   static const int _maxCacheSize = 50;
 
-  TripGenerationService(this._apiClient);
+  TripGenerationService(this._apiClient, this._placesService);
 
   /// 生成完整行程（兩階段處理）
   /// 
@@ -314,43 +316,36 @@ ${request.description}
 
   /// 補強行程的地點詳細資訊
   Future<Trip> _enhanceTripWithPlaceDetails(Trip trip) async {
-    final enhancedDays = <DayPlan>[];
+    try {
+      // 使用 PlacesService 進行批量補強
+      return await _placesService.enhanceTripWithPlaceData(trip);
+    } catch (e) {
+      print('⚠️ 使用 PlacesService 補強失敗，使用備用方案: $e');
+      
+      // 備用方案：使用原有的簡單補強邏輯
+      final enhancedDays = <DayPlan>[];
 
-    for (final day in trip.days) {
-      final enhancedActivities = <Activity>[];
+      for (final day in trip.days) {
+        final enhancedActivities = <Activity>[];
 
-      for (final activity in day.activities) {
-        try {
-          // 如果活動沒有詳細地址或評分，嘗試搜尋補強
-          if (activity.address == null || activity.rating == null) {
-            final places = await _apiClient.searchPlaces(
-              '${activity.name} ${trip.destination.name}',
+        for (final activity in day.activities) {
+          try {
+            final enhancedActivity = await _placesService.enhanceActivityWithPlaceData(
+              activity,
+              trip.destination.name,
             );
-
-            if (places.isNotEmpty) {
-              final place = places.first;
-              final enhancedActivity = activity.copyWith(
-                address: activity.address ?? place.address,
-                rating: activity.rating ?? place.rating,
-                placeId: activity.placeId ?? place.id,
-              );
-              enhancedActivities.add(enhancedActivity);
-            } else {
-              enhancedActivities.add(activity);
-            }
-          } else {
+            enhancedActivities.add(enhancedActivity);
+          } catch (e) {
+            // 如果補強失敗，使用原始活動
             enhancedActivities.add(activity);
           }
-        } catch (e) {
-          // 如果補強失敗，使用原始活動
-          enhancedActivities.add(activity);
         }
+
+        enhancedDays.add(day.copyWith(activities: enhancedActivities));
       }
 
-      enhancedDays.add(day.copyWith(activities: enhancedActivities));
+      return trip.copyWith(days: enhancedDays);
     }
-
-    return trip.copyWith(days: enhancedDays);
   }
 
   /// 驗證和增強行程
@@ -487,7 +482,8 @@ ${request.description}
 /// Riverpod Provider
 final tripGenerationServiceProvider = Provider<TripGenerationService>((ref) {
   final apiClient = ref.read(apiClientProvider);
-  return TripGenerationService(apiClient);
+  final placesService = ref.read(placesServiceProvider);
+  return TripGenerationService(apiClient, placesService);
 });
 
 /// 行程生成進度 Provider

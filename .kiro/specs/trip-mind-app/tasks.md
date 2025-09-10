@@ -120,16 +120,18 @@
 
 - [ ] 4. 實作行程生成服務
 
-
-
-
   - 建立 TripGenerationService 處理 AI 行程生成
   - 實作兩階段 LLM 請求（偏好分析 + 行程生成）
   - 建立請求快取機制避免重複呼叫
   - 實作 JSON Schema 驗證和錯誤處理
   - _Requirements: 2.2, 2.3, 2.4, 2.6, 10.4_
 
-- [ ] 4.1 整合 Google Places API 資料補強
+- [x] 4.1 整合 Google Places API 資料補強
+
+
+
+
+
   - 實作 Places API 客戶端取得地點詳細資訊
   - 建立地理座標驗證和補齊機制
   - 實作地點照片和評分資料獲取

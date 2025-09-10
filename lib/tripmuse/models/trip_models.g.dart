@@ -85,6 +85,12 @@ _$PlaceImpl _$$PlaceImplFromJson(Map<String, dynamic> json) => _$PlaceImpl(
       photos: (json['photos'] as List<dynamic>?)
           ?.map((e) => PlacePhoto.fromJson(e as Map<String, dynamic>))
           .toList(),
+      openingHours: json['openingHours'] == null
+          ? null
+          : PlaceOpeningHours.fromJson(
+              json['openingHours'] as Map<String, dynamic>),
+      website: json['website'] as String?,
+      phoneNumber: json['phoneNumber'] as String?,
     );
 
 Map<String, dynamic> _$$PlaceImplToJson(_$PlaceImpl instance) =>
@@ -97,6 +103,25 @@ Map<String, dynamic> _$$PlaceImplToJson(_$PlaceImpl instance) =>
       'priceLevel': instance.priceLevel,
       'types': instance.types,
       'photos': instance.photos,
+      'openingHours': instance.openingHours,
+      'website': instance.website,
+      'phoneNumber': instance.phoneNumber,
+    };
+
+_$PlaceOpeningHoursImpl _$$PlaceOpeningHoursImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PlaceOpeningHoursImpl(
+      openNow: json['openNow'] as bool,
+      weekdayText: (json['weekdayText'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+    );
+
+Map<String, dynamic> _$$PlaceOpeningHoursImplToJson(
+        _$PlaceOpeningHoursImpl instance) =>
+    <String, dynamic>{
+      'openNow': instance.openNow,
+      'weekdayText': instance.weekdayText,
     };
 
 _$PlaceLocationImpl _$$PlaceLocationImplFromJson(Map<String, dynamic> json) =>

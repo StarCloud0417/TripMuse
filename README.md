@@ -1,6 +1,6 @@
 # TripMuse 🧳
 
-**Version 0.1.4**
+**Version 0.1.6**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
@@ -30,7 +30,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.1.4** - API Testing Features Added / 新增 API 測試功能
+**Version 0.1.6** - Google Places API Integration Completed / Google Places API 整合完成
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
@@ -48,6 +48,12 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **Bottom navigation with three screens** / **三個畫面的底部導航**  
 ✅ **Material 3 theme system** / **Material 3 主題系統**  
 ✅ **Riverpod state management** / **Riverpod 狀態管理**  
+✅ **AI Trip Generation with Gemini API** / **使用 Gemini API 的 AI 行程生成**  
+✅ **GCP Cloud Run backend deployment** / **GCP Cloud Run 後端部署**  
+✅ **Complete API integration and testing** / **完整 API 整合和測試**  
+✅ **Google Places API data enhancement** / **Google Places API 資料補強**  
+✅ **Geographic coordinate validation** / **地理座標驗證**  
+✅ **Place photos and ratings integration** / **地點照片和評分整合**  
 ✅ **Complete API client and network layer** / **完整的 API 客戶端和網路層**  
 ✅ **Code quality improvements and linting fixes** / **程式碼品質提升和 linting 修復**  
 ✅ **User system with Guest mode** / **使用者系統與訪客模式**  
@@ -169,6 +175,20 @@ lib/
 ```
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.1.6 (2025-09-10)
+- 🗺️ **Google Places API 整合** | Complete Google Places API integration for enhanced trip data
+- 📍 **地點資料補強** | Automatic place details, photos, and ratings enrichment
+- 🧭 **地理座標驗證** | Geographic coordinate validation and auto-completion
+- 🖼️ **地點照片整合** | Place photo references and display integration
+- 🔧 **後端語法修復** | Fixed server.js syntax errors and optimized Places API calls
+- 🚀 **部署配置更新** | Updated Cloud Run deployment with Places API secrets
+
+### v0.1.5 (2025-09-10)
+- 🐛 **JSON 解析修復** | Fixed Flutter JSON parsing errors and model serialization
+- 🔧 **資料模型優化** | Enhanced data model type safety and default value handling
+- 📊 **序列化效能提升** | Optimized JSON serialization and deserialization performance
+- 🛡️ **錯誤處理改善** | Improved error handling and user feedback
 
 ### v0.1.4 (2025-01-09)
 - 🧪 **API 測試功能** | Complete API testing screen with real-time monitoring

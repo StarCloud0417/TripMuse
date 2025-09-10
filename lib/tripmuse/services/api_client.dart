@@ -185,6 +185,45 @@ class ApiClient {
     }
   }
 
+  // 取得地點詳細資訊
+  Future<Place?> getPlaceDetails(String placeId) async {
+    try {
+      print('📍 Getting place details: $placeId');
+      
+      final response = await _dio.get(
+        '/api/v1/places/details',
+        queryParameters: {'place_id': placeId},
+      );
+
+      if (response.data['success'] == true && response.data['place'] != null) {
+        return Place.fromJson(response.data['place']);
+      } else {
+        return null;
+      }
+    } on DioException catch (e) {
+      print('⚠️ Failed to get place details: ${e.message}');
+      return null;
+    }
+  }
+
+  // 取得地點照片 URL
+  String getPlacePhotoUrl(String photoReference, {int maxWidth = 400, int? maxHeight}) {
+    final queryParams = <String, String>{
+      'reference': photoReference,
+      'maxwidth': maxWidth.toString(),
+    };
+    
+    if (maxHeight != null) {
+      queryParams['maxheight'] = maxHeight.toString();
+    }
+    
+    final queryString = queryParams.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+    
+    return '${ApiConfig.baseUrl}/api/v1/places/photo?$queryString';
+  }
+
   // 取得地圖配置
   Future<MapConfig> getMapConfig() async {
     try {

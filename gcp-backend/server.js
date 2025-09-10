@@ -409,6 +409,98 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
   }
 });
 
+// 地點詳細資訊 API
+app.get('/api/v1/places/details', authenticateUser, async (req, res) => {
+  try {
+    const { place_id } = req.query;
+    
+    if (!place_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Place ID is required'
+      });
+    }
+
+    const placesApiKey = await getSecret('google-places-api-key');
+    
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&fields=place_id,name,formatted_address,geometry,rating,price_level,types,photos,opening_hours,website,formatted_phone_number&key=${placesApiKey}`;
+
+    const response = await axios.get(url);
+    const data = response.data;
+
+    if (data.status !== 'OK') {
+      throw new Error(`Places API error: ${data.status}`);
+    }
+
+    const place = data.result;
+    const placeDetails = {
+      id: place.place_id,
+      name: place.name,
+      address: place.formatted_address,
+      location: place.geometry.location,
+      rating: place.rating,
+      priceLevel: place.price_level,
+      types: place.types,
+      photos: place.photos ? place.photos.slice(0, 5).map(photo => ({
+        reference: photo.photo_reference,
+        width: photo.width,
+        height: photo.height
+      })) : [],
+      openingHours: place.opening_hours ? {
+        openNow: place.opening_hours.open_now,
+        weekdayText: place.opening_hours.weekday_text
+      } : null,
+      website: place.website,
+      phoneNumber: place.formatted_phone_number
+    };
+
+    res.json({
+      success: true,
+      place: placeDetails
+    });
+
+  } catch (error) {
+    logger.error('Place details failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get place details',
+      message: error.message
+    });
+  }
+});
+
+// 地點照片 API
+app.get('/api/v1/places/photo', authenticateUser, async (req, res) => {
+  try {
+    const { reference, maxwidth = 400, maxheight } = req.query;
+    
+    if (!reference) {
+      return res.status(400).json({
+        success: false,
+        error: 'Photo reference is required'
+      });
+    }
+
+    const placesApiKey = await getSecret('google-places-api-key');
+    
+    let url = `https://maps.googleapis.com/maps/api/place/photo?photoreference=${reference}&key=${placesApiKey}`;
+    
+    if (maxwidth) url += `&maxwidth=${maxwidth}`;
+    if (maxheight) url += `&maxheight=${maxheight}`;
+
+    // 重定向到 Google 照片 URL
+    res.redirect(url);
+
+  } catch (error) {
+    logger.error('Place photo failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get place photo',
+      message: error.message
+    });
+  }
+});
+
 // 地圖配置 API
 app.get('/api/v1/map/config', authenticateUser, async (req, res) => {
   try {
@@ -435,7 +527,62 @@ app.get('/api/v1/map/config', authenticateUser, async (req, res) => {
   }
 });
 
-// 輔助函數：使用 Places API 補強地點資訊
+// 清理和驗證活動類別
+function cleanActivityCategory(category) {
+  if (!category || typeof category !== 'string') {
+    return 'sightseeing'; // 預設值
+  }
+
+  // 移除空白字符並轉小寫
+  const cleaned = category.trim().toLowerCase();
+
+  // 如果包含逗號，取第一個值
+  const firstCategory = cleaned.split(',')[0].trim();
+
+  // 修正常見的拼寫錯誤
+  const categoryMap = {
+    'food': 'food',
+    '美食': 'food',
+    'sightseeing': 'sightseeing',
+    '觀光': 'sightseeing',
+    '景點': 'sightseeing',
+    'culture': 'culture',
+    '文化': 'culture',
+    '歷史': 'culture',
+    'nature': 'nature',
+    '自然': 'nature',
+    'natuure': 'nature', // 修正拼寫錯誤
+    'shopping': 'shopping',
+    '購物': 'shopping',
+    'outdoor': 'outdoor',
+    '戶外': 'outdoor',
+    'transportation': 'transportation',
+    '交通': 'transportation'
+  };
+
+  return categoryMap[firstCategory] || 'sightseeing'; // 如果找不到匹配，返回預設值
+}
+
+// 清理和驗證活動優先級
+function cleanActivityPriority(priority) {
+  if (!priority || typeof priority !== 'string') {
+    return 'medium'; // 預設值
+  }
+
+  const cleaned = priority.trim().toLowerCase();
+  const priorityMap = {
+    'high': 'high',
+    '高': 'high',
+    'medium': 'medium',
+    '中': 'medium',
+    'low': 'low',
+    '低': 'low'
+  };
+
+  return priorityMap[cleaned] || 'medium'; // 如果找不到匹配，返回預設值
+}
+
+// 使用 Google Places API 補強行程地點資訊
 async function enhanceTripWithPlacesAPI(tripData) {
   try {
     const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
@@ -446,6 +593,10 @@ async function enhanceTripWithPlacesAPI(tripData) {
     
     for (const day of tripData.days) {
       for (const activity of day.activities) {
+        // 清理和驗證活動數據
+        activity.category = cleanActivityCategory(activity.category);
+        activity.priority = cleanActivityPriority(activity.priority);
+        
         // 如果沒有座標，嘗試搜尋
         if (!activity.lat || !activity.lng) {
           try {
@@ -503,3 +654,97 @@ app.listen(port, () => {
   logger.info(`TripMuse API server running on port ${port}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
+
+// 計算兩點間距離 (公里)
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371; // 地球半徑 (公里)
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// 處理 Places API 錯誤
+function handlePlacesApiError(res, status, errorMessage) {
+  logger.error(`Places API error: ${status} - ${errorMessage}`);
+  
+  switch (status) {
+    case 'ZERO_RESULTS':
+      return res.status(404).json({
+        success: false,
+        error: 'NO_RESULTS',
+        message: '找不到符合條件的地點'
+      });
+      
+    case 'OVER_QUERY_LIMIT':
+      return res.status(429).json({
+        success: false,
+        error: 'QUOTA_EXCEEDED',
+        message: 'Places API 配額已用盡，請稍後再試',
+        retryAfter: 3600 // 建議 1 小時後重試
+      });
+      
+    case 'REQUEST_DENIED':
+      return res.status(403).json({
+        success: false,
+        error: 'ACCESS_DENIED',
+        message: 'Places API 存取被拒絕，請檢查 API 金鑰設定'
+      });
+      
+    case 'INVALID_REQUEST':
+      return res.status(400).json({
+        success: false,
+        error: 'INVALID_REQUEST',
+        message: '請求參數無效'
+      });
+      
+    case 'NOT_FOUND':
+      return res.status(404).json({
+        success: false,
+        error: 'NOT_FOUND',
+        message: '指定的地點不存在'
+      });
+      
+    default:
+      return res.status(500).json({
+        success: false,
+        error: 'PLACES_API_ERROR',
+        message: errorMessage || `Places API 錯誤: ${status}`
+      });
+  }
+}
+
+// Places API 請求重試機制
+async function makeRetryableRequest(url, maxRetries = 3) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await axios.get(url, {
+        timeout: 10000, // 10 秒超時
+      });
+      
+      return response.data;
+    } catch (error) {
+      lastError = error;
+      
+      // 如果是網路錯誤且還有重試機會
+      if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt - 1) * 1000; // 指數退避
+          logger.warn(`Request failed (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+      }
+      
+      // 其他錯誤直接拋出
+      throw error;
+    }
+  }
+  
+  throw lastError;
+}
