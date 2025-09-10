@@ -20,10 +20,10 @@ class Activity with _$Activity {
     required String description,
     
     /// 緯度座標
-    required double lat,
+    @Default(0.0) double lat,
     
     /// 經度座標
-    required double lng,
+    @Default(0.0) double lng,
     
     /// 開始時間 (HH:mm 格式)
     required String timeFrom,

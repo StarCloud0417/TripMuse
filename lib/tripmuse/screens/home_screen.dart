@@ -11,6 +11,7 @@ import '../widgets/widgets.dart';
 import 'create_trip_screen.dart';
 import 'trip_list_screen.dart';
 import 'api_test_screen.dart';
+import 'trip_generation_test_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -123,6 +124,66 @@ class HomeScreen extends ConsumerWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     '測試 GCP 後端 API 連線和功能',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: TripMuseTheme.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              color: TripMuseTheme.textSecondary,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: TripMuseSpacing.md),
+                  
+                  // 行程生成測試按鈕
+                  Card(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TripGenerationTestScreen(),
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                      child: Padding(
+                        padding: const EdgeInsets.all(TripMuseSpacing.lg),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(TripMuseSpacing.md),
+                              decoration: BoxDecoration(
+                                color: Colors.purple.withValues(alpha: 25),
+                                borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                              ),
+                              child: const Icon(
+                                Icons.auto_awesome,
+                                color: Colors.purple,
+                                size: 32,
+                              ),
+                            ),
+                            const SizedBox(width: TripMuseSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '行程生成測試',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '測試兩階段 AI 行程生成服務',
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: TripMuseTheme.textSecondary,
                                     ),

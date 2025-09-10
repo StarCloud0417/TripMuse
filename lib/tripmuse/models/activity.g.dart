@@ -25,9 +25,9 @@ _$ActivityImpl _$$ActivityImplFromJson(Map<String, dynamic> json) =>
           const [],
       placeId: json['placeId'] as String?,
       address: json['address'] as String?,
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      rating: (json['rating'] as num?)?.toDouble(),
       suggestedDurationMinutes:
-          (json['suggestedDurationMinutes'] as num?)?.toInt() ?? 60,
+          (json['suggestedDurationMinutes'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$ActivityImplToJson(_$ActivityImpl instance) =>

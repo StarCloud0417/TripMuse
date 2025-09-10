@@ -7,6 +7,7 @@ export 'api_client.dart';
 export 'api_service.dart';
 export 'network_service.dart';
 export 'trip_api_service_impl.dart';
+export 'trip_generation_service.dart';
 
 // 儲存服務
 export 'storage/storage_service.dart';

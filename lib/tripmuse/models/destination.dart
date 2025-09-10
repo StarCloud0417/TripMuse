@@ -19,10 +19,10 @@ class Destination with _$Destination {
     required String country,
     
     /// 緯度座標
-    required double lat,
+    @Default(0.0) double lat,
     
     /// 經度座標
-    required double lng,
+    @Default(0.0) double lng,
     
     /// Google Places ID
     String? placeId,

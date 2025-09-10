@@ -254,8 +254,8 @@ class _$DestinationImpl implements _Destination {
       {required this.name,
       required this.city,
       required this.country,
-      required this.lat,
-      required this.lng,
+      this.lat = 0.0,
+      this.lng = 0.0,
       this.placeId,
       this.fullAddress,
       this.timezone,
@@ -281,10 +281,12 @@ class _$DestinationImpl implements _Destination {
 
   /// 緯度座標
   @override
+  @JsonKey()
   final double lat;
 
   /// 經度座標
   @override
+  @JsonKey()
   final double lng;
 
   /// Google Places ID
@@ -381,8 +383,8 @@ abstract class _Destination implements Destination {
       {required final String name,
       required final String city,
       required final String country,
-      required final double lat,
-      required final double lng,
+      final double lat,
+      final double lng,
       final String? placeId,
       final String? fullAddress,
       final String? timezone,

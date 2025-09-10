@@ -139,7 +139,16 @@ class ApiClient {
 
       if (response.data['success'] == true) {
         final tripData = response.data['trip'];
-        return Trip.fromJson(tripData);
+        print('📋 Trip data received: ${tripData.toString().substring(0, 200)}...');
+        
+        try {
+          return Trip.fromJson(tripData);
+        } catch (parseError, stackTrace) {
+          print('❌ JSON parsing error: $parseError');
+          print('Stack trace: $stackTrace');
+          print('Raw trip data: $tripData');
+          throw ApiException('JSON 解析失敗: $parseError');
+        }
       } else {
         throw ServerException(response.data['error'] ?? '行程生成失敗');
       }

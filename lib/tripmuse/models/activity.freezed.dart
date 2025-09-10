@@ -328,8 +328,8 @@ class _$ActivityImpl implements _Activity {
       {required this.id,
       required this.name,
       required this.description,
-      required this.lat,
-      required this.lng,
+      this.lat = 0.0,
+      this.lng = 0.0,
       required this.timeFrom,
       required this.timeTo,
       required this.category,
@@ -360,10 +360,12 @@ class _$ActivityImpl implements _Activity {
 
   /// 緯度座標
   @override
+  @JsonKey()
   final double lat;
 
   /// 經度座標
   @override
+  @JsonKey()
   final double lng;
 
   /// 開始時間 (HH:mm 格式)
@@ -493,8 +495,8 @@ abstract class _Activity implements Activity {
       {required final String id,
       required final String name,
       required final String description,
-      required final double lat,
-      required final double lng,
+      final double lat,
+      final double lng,
       required final String timeFrom,
       required final String timeTo,
       required final ActivityCategory category,

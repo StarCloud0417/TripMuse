@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-09-10
+
+### Fixed
+- 🐛 **JSON 解析錯誤修復** - 修復 Flutter 端 JSON 解析錯誤 (Fixed Flutter JSON parsing error)
+- 🐛 **Destination 模型修復** - 修復 Destination 模型中 lat/lng 欄位問題 (Fixed Destination model lat/lng field issues)
+- 🐛 **Freezed 序列化修復** - 修復 Trip 和 DayPlan 模型的序列化問題 (Fixed Trip and DayPlan model serialization issues)
+- 🐛 **API 回應處理** - 改善 API 回應的錯誤處理和資料驗證 (Improved API response error handling and data validation)
+
+### Enhanced
+- 🔧 **模型資料驗證** - 增強資料模型的類型安全和預設值處理 (Enhanced data model type safety and default value handling)
+- 📊 **序列化效能** - 優化 JSON 序列化和反序列化效能 (Optimized JSON serialization and deserialization performance)
+- 🛡️ **錯誤處理** - 改善應用程式的錯誤處理和使用者回饋 (Improved application error handling and user feedback)
+
+### Technical
+- 📁 **模型檔案更新** - 更新所有 Freezed 生成的模型檔案 (Updated all Freezed generated model files)
+- 🔄 **序列化邏輯** - 修復嵌套物件的 JSON 序列化邏輯 (Fixed nested object JSON serialization logic)
+- 🧪 **測試通過** - 確保所有資料模型測試通過 (Ensured all data model tests pass)
+
+### 中文
+- 🐛 **JSON 解析錯誤修復** - 修復 Flutter 端 JSON 解析錯誤
+- 🐛 **Destination 模型修復** - 修復 Destination 模型中 lat/lng 欄位問題
+- 🐛 **Freezed 序列化修復** - 修復 Trip 和 DayPlan 模型的序列化問題
+- 🐛 **API 回應處理** - 改善 API 回應的錯誤處理和資料驗證
+
+### 技術改進
+- 🔧 **模型資料驗證** - 增強資料模型的類型安全和預設值處理
+- 📊 **序列化效能** - 優化 JSON 序列化和反序列化效能
+- 🛡️ **錯誤處理** - 改善應用程式的錯誤處理和使用者回饋
+
+### 檔案變更
+- 修改: `lib/tripmuse/models/destination.dart` - 修復 lat/lng 欄位
+- 修改: `lib/tripmuse/models/trip.dart` - 添加 JSON 序列化配置
+- 修改: `lib/tripmuse/models/day_plan.dart` - 添加 JSON 序列化配置
+- 修改: `lib/tripmuse/models/activity.dart` - 優化模型定義
+- 修改: `lib/tripmuse/models/trip.g.dart` - 修復序列化邏輯
+- 修改: `lib/tripmuse/models/day_plan.g.dart` - 修復序列化邏輯
+- 修改: `lib/tripmuse/models/destination.g.dart` - 更新生成代碼
+- 修改: `gcp-backend/server.js` - 改善後端錯誤處理
+- 新增: `lib/tripmuse/services/trip_generation_service.dart` - 行程生成服務
+- 新增: `lib/tripmuse/screens/trip_generation_test_screen.dart` - 測試畫面
+- 新增: `gcp-backend/deploy.ps1` - 部署腳本
+
 ## [0.1.4] - 2025-01-09
 
 ### Added

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import 'api_client.dart';
+import 'trip_generation_service.dart';
 
 // 行程生成狀態
 enum TripGenerationState {
@@ -42,17 +43,26 @@ class TripGenerationResult {
 // 行程生成服務
 class TripService {
   final ApiClient _apiClient;
+  final TripGenerationService _generationService;
 
-  TripService(this._apiClient);
+  TripService(this._apiClient, this._generationService);
 
-  // 生成行程
-  Future<Trip> generateTrip(TripRequest request) async {
+  // 生成行程（使用增強的生成服務）
+  Future<Trip> generateTrip(
+    TripRequest request, {
+    Function(TripGenerationProgress)? onProgress,
+    bool useCache = true,
+  }) async {
     try {
       // 驗證請求資料
       _validateTripRequest(request);
       
-      // 呼叫 API 生成行程
-      final trip = await _apiClient.generateTrip(request);
+      // 使用增強的生成服務
+      final trip = await _generationService.generateTrip(
+        request,
+        onProgress: onProgress,
+        useCache: useCache,
+      );
       
       // 驗證回應資料
       _validateTripResponse(trip);
@@ -61,6 +71,11 @@ class TripService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  // 簡化的生成行程方法（向後相容）
+  Future<Trip> generateTripSimple(TripRequest request) async {
+    return await generateTrip(request);
   }
 
   // 搜尋地點
@@ -178,7 +193,8 @@ class TripGenerationNotifier extends StateNotifier<TripGenerationResult> {
 // Riverpod Providers
 final tripServiceProvider = Provider<TripService>((ref) {
   final apiClient = ref.read(apiClientProvider);
-  return TripService(apiClient);
+  final generationService = ref.read(tripGenerationServiceProvider);
+  return TripService(apiClient, generationService);
 });
 
 final tripGenerationProvider =
