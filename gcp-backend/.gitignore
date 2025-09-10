@@ -1,0 +1,57 @@
+# 環境變數檔案 (包含敏感資訊)
+.env
+.env.local
+.env.production
+
+# Node.js 依賴
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 應用程式日誌
+logs/
+*.log
+
+# 運行時資料
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# 覆蓋率報告
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output/
+
+# 依賴目錄
+jspm_packages/
+
+# 快取目錄
+.cache/
+.parcel-cache/
+
+# 編譯輸出
+dist/
+build/
+
+# 備份檔案
+*.backup
+*.bak
+*~
+
+# IDE 檔案
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS 檔案
+.DS_Store
+Thumbs.db
+
+# 臨時檔案
+tmp/
+temp/
