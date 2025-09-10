@@ -7,11 +7,7 @@ import '../services/services.dart';
 
 /// API 客戶端 Provider
 final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient(
-    baseUrl: 'https://api.tripmuse.app', // TODO: 從環境變數讀取
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 30),
-  );
+  return ApiClient();
 });
 
 /// 行程 API 服務 Provider

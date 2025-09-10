@@ -10,6 +10,7 @@ import '../providers/providers.dart';
 import '../widgets/widgets.dart';
 import 'create_trip_screen.dart';
 import 'trip_list_screen.dart';
+import 'api_test_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -80,6 +81,66 @@ class HomeScreen extends ConsumerWidget {
                     '快速開始',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
+                  const SizedBox(height: TripMuseSpacing.md),
+                  
+                  // API 測試按鈕
+                  Card(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ApiTestScreen(),
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                      child: Padding(
+                        padding: const EdgeInsets.all(TripMuseSpacing.lg),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(TripMuseSpacing.md),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(alpha: 25),
+                                borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                              ),
+                              child: const Icon(
+                                Icons.api,
+                                color: Colors.green,
+                                size: 32,
+                              ),
+                            ),
+                            const SizedBox(width: TripMuseSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'API 測試',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '測試 GCP 後端 API 連線和功能',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: TripMuseTheme.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              color: TripMuseTheme.textSecondary,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
                   const SizedBox(height: TripMuseSpacing.md),
                   
                   // 建立新行程按鈕

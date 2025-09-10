@@ -38,11 +38,11 @@ abstract class TripRepository {
 
 /// 行程 Repository 實作
 class TripRepositoryImpl implements TripRepository {
-  final HiveStorageService _localStorage;
+  final StorageService _localStorage;
   final SyncService _syncService;
   
   TripRepositoryImpl({
-    required HiveStorageService localStorage,
+    required StorageService localStorage,
     required SyncService syncService,
   }) : _localStorage = localStorage,
        _syncService = syncService;

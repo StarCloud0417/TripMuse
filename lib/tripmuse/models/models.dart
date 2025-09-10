@@ -7,9 +7,11 @@ export 'trip.dart';
 export 'day_plan.dart';
 export 'activity.dart';
 export 'destination.dart';
-export 'trip_request.dart';
 export 'user.dart';
 export 'user_preference_analysis.dart';
+
+// Trip 相關模型
+export 'trip_models.dart';
 
 // 列舉類型
 export 'enums.dart';

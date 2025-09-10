@@ -53,19 +53,22 @@ class MockHiveStorageService implements StorageService {
     return [..._storage.keys, ..._trips.keys];
   }
   
-  // Trip 相關方法
+  @override
   Future<List<Trip>> getAllTrips() async {
     return _trips.values.toList();
   }
   
+  @override
   Future<void> saveTrip(Trip trip) async {
     _trips[trip.id] = trip;
   }
   
+  @override
   Future<Trip?> getTrip(String tripId) async {
     return _trips[tripId];
   }
   
+  @override
   Future<void> deleteTrip(String tripId) async {
     _trips.remove(tripId);
   }

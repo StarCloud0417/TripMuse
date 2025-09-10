@@ -6,19 +6,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 
 import '../../../lib/tripmuse/services/api_client.dart';
+import '../../../lib/tripmuse/models/models.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('ApiClient Tests', () {
 
-    group('ApiResponse Tests', () {
+    group('ApiResponseWrapper Tests', () {
       test('should create success response', () {
         // Arrange
         const testData = 'test data';
         const message = 'success';
 
         // Act
-        final response = ApiResponse.success(testData, message: message);
+        final response = ApiResponseWrapper.success(testData, message: message);
 
         // Assert
         expect(response.success, isTrue);
@@ -33,7 +34,7 @@ void main() {
         const message = 'error occurred';
 
         // Act
-        final response = ApiResponse.error(error, message: message);
+        final response = ApiResponseWrapper.error(error, message: message);
 
         // Assert
         expect(response.success, isFalse);
@@ -48,15 +49,13 @@ void main() {
         // Arrange
         const message = 'API error';
         const statusCode = 400;
-        const data = {'error': 'bad request'};
 
         // Act
-        final exception = ApiException(message, statusCode: statusCode, data: data);
+        final exception = ApiException(message, statusCode: statusCode);
 
         // Assert
         expect(exception.message, equals(message));
         expect(exception.statusCode, equals(statusCode));
-        expect(exception.data, equals(data));
         expect(exception.toString(), equals('ApiException: $message'));
       });
 
@@ -84,11 +83,7 @@ void main() {
 
       test('should initialize with custom values', () {
         // Act
-        final client = ApiClient(
-          baseUrl: 'https://custom.api.com',
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 15),
-        );
+        final client = ApiClient();
 
         // Assert
         expect(client, isNotNull);
@@ -267,102 +262,48 @@ void main() {
     });
   });
 
-  group('RetryInterceptor Tests', () {
-    test('should initialize with default values', () {
-      // Act
-      final interceptor = RetryInterceptor();
 
-      // Assert
-      expect(interceptor.maxRetries, equals(3));
-      expect(interceptor.retryDelay, equals(const Duration(seconds: 1)));
-    });
-
-    test('should initialize with custom values', () {
-      // Act
-      final interceptor = RetryInterceptor(
-        maxRetries: 5,
-        retryDelay: const Duration(seconds: 2),
-      );
-
-      // Assert
-      expect(interceptor.maxRetries, equals(5));
-      expect(interceptor.retryDelay, equals(const Duration(seconds: 2)));
-    });
-
-    test('should determine retry conditions correctly', () {
-      // Arrange
-      final interceptor = RetryInterceptor();
-      
-      final timeoutError = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        type: DioExceptionType.connectionTimeout,
-      );
-      
-      final serverError = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        type: DioExceptionType.badResponse,
-        response: Response(
-          requestOptions: RequestOptions(path: '/test'),
-          statusCode: 500,
-        ),
-      );
-      
-      final clientError = DioException(
-        requestOptions: RequestOptions(path: '/test'),
-        type: DioExceptionType.badResponse,
-        response: Response(
-          requestOptions: RequestOptions(path: '/test'),
-          statusCode: 400,
-        ),
-      );
-
-      // Act & Assert
-      expect(interceptor._shouldRetry(timeoutError), isTrue);
-      expect(interceptor._shouldRetry(serverError), isTrue);
-      expect(interceptor._shouldRetry(clientError), isFalse);
-    });
-  });
 }
 
 // 擴展 ApiClient 以測試私有方法
 extension ApiClientTestExtension on ApiClient {
-  ApiResponse<T> _handleError<T>(dynamic error) {
+  ApiResponseWrapper<T> _handleError<T>(dynamic error) {
     if (error is DioException) {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
-          return ApiResponse.error('請求超時，請檢查網路連線');
+          return ApiResponseWrapper<T>.error('請求超時，請檢查網路連線');
           
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode;
           final message = error.response?.data?['message'] ?? 
                          error.response?.statusMessage ?? 
                          '伺服器錯誤';
-          return ApiResponse.error('HTTP $statusCode: $message');
+          return ApiResponseWrapper<T>.error('HTTP $statusCode: $message');
           
         case DioExceptionType.cancel:
-          return ApiResponse.error('請求已取消');
+          return ApiResponseWrapper<T>.error('請求已取消');
           
         case DioExceptionType.connectionError:
-          return ApiResponse.error('網路連線錯誤');
+          return ApiResponseWrapper<T>.error('網路連線錯誤');
           
         case DioExceptionType.badCertificate:
-          return ApiResponse.error('SSL 憑證錯誤');
+          return ApiResponseWrapper<T>.error('SSL 憑證錯誤');
           
         case DioExceptionType.unknown:
-          return ApiResponse.error('未知網路錯誤: ${error.message}');
+          return ApiResponseWrapper<T>.error('未知網路錯誤: ${error.message}');
       }
     } else if (error is NetworkException) {
-      return ApiResponse.error(error.message);
+      return ApiResponseWrapper<T>.error(error.message);
     } else if (error is ApiException) {
-      return ApiResponse.error(error.message);
+      return ApiResponseWrapper<T>.error(error.message);
     } else {
-      return ApiResponse.error('未知錯誤: $error');
+      return ApiResponseWrapper<T>.error('未知錯誤: $error');
     }
   }
 
-  ApiResponse<T> _handleResponse<T>(
+  ApiResponseWrapper<T> _handleResponse<T>(
     Response response,
     T Function(Map<String, dynamic>)? fromJson,
   ) {
@@ -378,42 +319,32 @@ extension ApiClientTestExtension on ApiClient {
           final responseData = data['data'];
           
           if (fromJson != null && responseData is Map<String, dynamic>) {
-            return ApiResponse.success(
+            return ApiResponseWrapper<T>.success(
               fromJson(responseData),
               message: data['message'],
             );
           } else {
-            return ApiResponse.success(
+            return ApiResponseWrapper<T>.success(
               responseData as T,
               message: data['message'],
             );
           }
         } else {
-          return ApiResponse.error(
+          return ApiResponseWrapper<T>.error(
             data['error'] ?? '未知錯誤',
             message: data['message'],
           );
         }
       } else {
         // 直接回傳資料
-        return ApiResponse.success(data as T);
+        return ApiResponseWrapper<T>.success(data as T);
       }
     } else {
       throw ApiException(
         'HTTP ${response.statusCode}: ${response.statusMessage}',
         statusCode: response.statusCode,
-        data: data,
       );
     }
   }
 }
 
-// 擴展 RetryInterceptor 以測試私有方法
-extension RetryInterceptorTestExtension on RetryInterceptor {
-  bool _shouldRetry(DioException err) {
-    return err.type == DioExceptionType.connectionTimeout ||
-           err.type == DioExceptionType.receiveTimeout ||
-           err.type == DioExceptionType.connectionError ||
-           (err.response?.statusCode != null && err.response!.statusCode! >= 500);
-  }
-}

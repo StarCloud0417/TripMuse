@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
+import '../providers/providers.dart';
 
 class CreateTripScreen extends ConsumerStatefulWidget {
   const CreateTripScreen({super.key});
@@ -779,27 +780,33 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     try {
       // 建立 TripRequest
       final tripRequest = _buildTripRequest();
-      
-      // 驗證請求
-      if (!tripRequest.isValid) {
-        throw Exception('請求資料不完整或無效');
+
+      // 驗證請求 - 檢查基本欄位是否已填寫
+      if (tripRequest.destination.isEmpty || tripRequest.description.isEmpty) {
+        throw Exception('請填寫目的地和行程描述');
       }
       
-      // TODO: 實作 AI 行程生成服務
-      // 目前模擬生成過程
-      await Future.delayed(const Duration(seconds: 3));
+      // 呼叫 AI 行程生成服務
+      final tripResponse = await ref.read(tripApiServiceProvider).generateTrip(tripRequest);
       
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('🎉 行程生成成功！\n目的地：${tripRequest.destination.name}\n天數：${tripRequest.durationDescription}'),
-            backgroundColor: TripMuseTheme.successColor,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+      if (tripResponse.success && tripResponse.data != null) {
+        // 儲存生成的行程
+        await ref.read(tripRepositoryProvider).saveTrip(tripResponse.data!);
         
-        // TODO: 導航到行程詳情頁面
-        Navigator.pop(context);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('🎉 行程生成成功！\n目的地：${tripResponse.data!.destination.city}\n天數：${tripResponse.data!.days.length} 天'),
+              backgroundColor: TripMuseTheme.successColor,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          
+          // 導航回到行程列表頁面
+          Navigator.pop(context);
+        }
+      } else {
+        throw Exception(tripResponse.message ?? '行程生成失敗');
       }
     } catch (e) {
       if (mounted) {
@@ -820,28 +827,17 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
   }
   
   TripRequest _buildTripRequest() {
-    final now = DateTime.now();
-    final startDate = now.add(const Duration(days: 7)); // 預設一週後
-    final endDate = startDate.add(Duration(days: _days - 1));
-    
     final destinationText = _destinationController.text;
     return TripRequest(
-      requestId: 'req_${now.millisecondsSinceEpoch}',
-      timestamp: now,
-      destination: _selectedDestination ?? Destination(
-        name: destinationText,
-        city: destinationText,
-        country: '未知',
-        lat: 0.0,
-        lng: 0.0,
-      ),
+      destination: destinationText,
       days: _days,
-      startDate: startDate,
-      endDate: endDate,
-      travelDescription: _descriptionController.text,
-      budget: _budgetRange,
-      groupSize: _groupSize,
-      locale: 'zh-TW',
+      description: _descriptionController.text,
+      preferences: TripPreferences(
+        budget: _budgetRange.name.toLowerCase(),
+        pace: 'medium',
+        interests: [],
+        companions: _groupSize,
+      ),
     );
   }
 }

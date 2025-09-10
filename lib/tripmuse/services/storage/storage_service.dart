@@ -32,6 +32,18 @@ abstract class StorageService {
   
   /// 取得所有 keys
   Future<List<String>> getAllKeys();
+  
+  /// 取得所有行程
+  Future<List<Trip>> getAllTrips();
+  
+  /// 根據 ID 取得行程
+  Future<Trip?> getTrip(String id);
+  
+  /// 儲存行程
+  Future<void> saveTrip(Trip trip);
+  
+  /// 刪除行程
+  Future<void> deleteTrip(String id);
 }
 
 /// 安全儲存服務介面（用於敏感資料）

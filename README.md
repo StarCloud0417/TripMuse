@@ -30,7 +30,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.1.4** - Code Quality Improvements / 程式碼品質提升
+**Version 0.1.4** - API Testing Features Added / 新增 API 測試功能
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
@@ -60,6 +60,11 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **Network status monitoring** / **網路狀態監控**  
 ✅ **Authentication interceptor** / **認證攔截器**  
 ✅ **Standardized API response format** / **標準化 API 回應格式**  
+✅ **🧪 API Testing Features** / **🧪 API 測試功能**  
+✅ **🔍 Real-time API Health Monitoring** / **🔍 即時 API 健康監控**  
+✅ **🎯 Trip Generation Testing** / **🎯 行程生成測試**  
+✅ **🗺️ Place Search Testing** / **🗺️ 地點搜尋測試**  
+✅ **⚙️ Map Configuration Testing** / **⚙️ 地圖配置測試**  
 🚧 AI trip generation service in progress / AI 行程生成服務開發進行中 
 
 ## 🛠️ Tech Stack / 技術棧
@@ -111,6 +116,43 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 2. Select "🧳 TripMuse App" from the main menu / 從主選單選擇 "🧳 TripMuse App"
 3. Start exploring TripMuse features / 開始探索 TripMuse 功能
 
+## 🧪 API Testing Features / API 測試功能
+
+TripMuse 現在包含完整的 API 測試功能，讓您能夠輕鬆測試和驗證所有 API 端點的功能。
+
+### 🔍 API Health Monitoring / API 健康監控
+- **即時狀態檢查**: 實時監控 API 服務的健康狀態
+- **視覺化指示器**: 清晰的狀態指示器顯示服務是否正常運作
+- **錯誤診斷**: 詳細的錯誤訊息幫助快速定位問題
+
+### 🎯 Trip Generation Testing / 行程生成測試
+- **互動式測試介面**: 直觀的輸入介面測試行程生成功能
+- **即時進度追蹤**: 測試過程中顯示生成進度百分比
+- **結果驗證**: 完整顯示生成的行程資料結構
+
+### 🗺️ Place Search Testing / 地點搜尋測試
+- **關鍵字搜尋**: 測試地點搜尋 API 的功能
+- **結果展示**: 以清單形式展示搜尋結果
+- **詳細資訊**: 顯示地點的評分、地址等資訊
+
+### ⚙️ Map Configuration Testing / 地圖配置測試
+- **配置驗證**: 測試地圖配置 API 的回應
+- **權杖管理**: 驗證 MapBox 存取權杖的配置
+- **設定檢查**: 確認地圖的縮放限制和中心點設定
+
+### 📱 Testing Interface / 測試介面
+- **Material Design**: 現代化的 Material 3 設計風格
+- **響應式佈局**: 適配不同螢幕尺寸的響應式設計
+- **即時回饋**: 操作後立即顯示結果和狀態
+- **錯誤處理**: 友好的錯誤提示和恢復機制
+
+### 🚀 How to Access / 如何存取
+1. 在應用中導航到 API 測試頁面
+2. 選擇要測試的功能模組
+3. 輸入必要的測試參數
+4. 點擊測試按鈕開始驗證
+5. 查看即時結果和狀態回饋
+
 ## 🏗️ Project Structure / 專案結構
 
 ```
@@ -127,6 +169,15 @@ lib/
 ```
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.1.4 (2025-01-09)
+- 🧪 **API 測試功能** | Complete API testing screen with real-time monitoring
+- 🔍 **API 健康檢查** | Real-time API health status monitoring
+- 🎯 **行程生成測試** | Trip generation testing with progress indicators
+- 🗺️ **地點搜尋測試** | Place search testing functionality
+- ⚙️ **地圖配置測試** | Map configuration testing capabilities
+- 📱 **測試 UI 介面** | Intuitive testing interface with instant feedback
+- 🔄 **即時狀態更新** | Real-time status updates during testing
 
 ### v0.1.3 (2025-01-09)
 - 🌐 **完整 API 架構** | Complete API client and network layer architecture

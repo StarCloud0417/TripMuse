@@ -12,89 +12,71 @@ class TripApiServiceImpl implements TripApiService {
   final ApiClient _apiClient;
 
   @override
-  Future<ApiResponse<Trip>> generateTrip(TripRequest request) async {
+  Future<ApiResponseWrapper<Trip>> generateTrip(TripRequest request) async {
     try {
-      // 驗證請求
-      if (!request.isValid) {
-        return ApiResponse.error('請求資料無效');
-      }
-
-      // 發送 API 請求
-      final response = await _apiClient.post<Map<String, dynamic>>(
-        '/api/v1/trips/generate',
-        data: request.toApiRequest(),
+      final trip = await _apiClient.generateTrip(request);
+      return ApiResponseWrapper.success(trip, message: '行程生成成功');
+    } catch (e) {
+      return ApiResponseWrapper.error(
+        e.toString(),
+        message: '行程生成失敗'
       );
+    }
+  }
 
-      if (response.success && response.data != null) {
-        // 解析回應資料
-        final tripData = response.data!;
+  @override
+  Future<ApiResponseWrapper<Trip>> getTrip(String tripId) async {
+    try {
+      final response = await _apiClient.get('/api/v1/trips/$tripId');
+      if (response['success'] == true) {
+        final tripData = response['trip'];
         final trip = Trip.fromJson(tripData);
-        
-        return ApiResponse.success(trip, message: response.message);
+        return ApiResponseWrapper.success(trip, message: '取得行程成功');
       } else {
-        return ApiResponse.error(response.error ?? '生成行程失敗');
+        return ApiResponseWrapper.error(response['error'] ?? '取得行程失敗');
       }
     } catch (e) {
-      return ApiResponse.error('生成行程時發生錯誤: $e');
+      return ApiResponseWrapper.error('取得行程時發生錯誤: $e');
     }
   }
 
   @override
-  Future<ApiResponse<Trip>> getTrip(String tripId) async {
+  Future<ApiResponseWrapper<Trip>> updateTrip(Trip trip) async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        '/api/v1/trips/$tripId',
-      );
-
-      if (response.success && response.data != null) {
-        final trip = Trip.fromJson(response.data!);
-        return ApiResponse.success(trip);
-      } else {
-        return ApiResponse.error(response.error ?? '取得行程失敗');
-      }
-    } catch (e) {
-      return ApiResponse.error('取得行程時發生錯誤: $e');
-    }
-  }
-
-  @override
-  Future<ApiResponse<Trip>> updateTrip(Trip trip) async {
-    try {
-      final response = await _apiClient.put<Map<String, dynamic>>(
+      final response = await _apiClient.put(
         '/api/v1/trips/${trip.id}',
         data: trip.toJson(),
       );
 
-      if (response.success && response.data != null) {
-        final updatedTrip = Trip.fromJson(response.data!);
-        return ApiResponse.success(updatedTrip);
+      if (response['success'] == true) {
+        final tripData = response['trip'];
+        final updatedTrip = Trip.fromJson(tripData);
+        return ApiResponseWrapper.success(updatedTrip, message: '更新行程成功');
       } else {
-        return ApiResponse.error(response.error ?? '更新行程失敗');
+        return ApiResponseWrapper.error(response['error'] ?? '更新行程失敗');
       }
     } catch (e) {
-      return ApiResponse.error('更新行程時發生錯誤: $e');
+      return ApiResponseWrapper.error('更新行程時發生錯誤: $e');
     }
   }
 
   @override
-  Future<ApiResponse<void>> deleteTrip(String tripId) async {
+  Future<ApiResponseWrapper<void>> deleteTrip(String tripId) async {
     try {
-      final response = await _apiClient.delete<void>(
-        '/api/v1/trips/$tripId',
-      );
+      final response = await _apiClient.delete('/api/v1/trips/$tripId');
 
-      if (response.success) {
-        return ApiResponse.success(null, message: '行程已刪除');
+      if (response['success'] == true) {
+        return ApiResponseWrapper.success(null, message: '行程已刪除');
       } else {
-        return ApiResponse.error(response.error ?? '刪除行程失敗');
+        return ApiResponseWrapper.error(response['error'] ?? '刪除行程失敗');
       }
     } catch (e) {
-      return ApiResponse.error('刪除行程時發生錯誤: $e');
+      return ApiResponseWrapper.error('刪除行程時發生錯誤: $e');
     }
   }
 
   @override
-  Future<ApiResponse<List<Trip>>> getUserTrips({
+  Future<ApiResponseWrapper<List<Trip>>> getUserTrips({
     int? limit,
     int? offset,
     String? status,
@@ -105,23 +87,24 @@ class TripApiServiceImpl implements TripApiService {
       if (offset != null) queryParameters['offset'] = offset;
       if (status != null) queryParameters['status'] = status;
 
-      final response = await _apiClient.get<List<dynamic>>(
+      final response = await _apiClient.get(
         '/api/v1/trips',
         queryParameters: queryParameters,
       );
 
-      if (response.success && response.data != null) {
-        final trips = response.data!
+      if (response['success'] == true) {
+        final tripsData = response['trips'] as List;
+        final trips = tripsData
             .cast<Map<String, dynamic>>()
             .map((json) => Trip.fromJson(json))
             .toList();
-        
-        return ApiResponse.success(trips);
+
+        return ApiResponseWrapper.success(trips, message: '取得行程列表成功');
       } else {
-        return ApiResponse.error(response.error ?? '取得行程列表失敗');
+        return ApiResponseWrapper.error(response['error'] ?? '取得行程列表失敗');
       }
     } catch (e) {
-      return ApiResponse.error('取得行程列表時發生錯誤: $e');
+      return ApiResponseWrapper.error('取得行程列表時發生錯誤: $e');
     }
   }
 }

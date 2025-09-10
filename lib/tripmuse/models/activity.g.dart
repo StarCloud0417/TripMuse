@@ -11,8 +11,8 @@ _$ActivityImpl _$$ActivityImplFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
-      lat: (json['lat'] as num).toDouble(),
-      lng: (json['lng'] as num).toDouble(),
+      lat: (json['lat'] as num?)?.toDouble() ?? 0.0,
+      lng: (json['lng'] as num?)?.toDouble() ?? 0.0,
       timeFrom: json['timeFrom'] as String,
       timeTo: json['timeTo'] as String,
       category: $enumDecode(_$ActivityCategoryEnumMap, json['category']),
@@ -25,9 +25,9 @@ _$ActivityImpl _$$ActivityImplFromJson(Map<String, dynamic> json) =>
           const [],
       placeId: json['placeId'] as String?,
       address: json['address'] as String?,
-      rating: (json['rating'] as num?)?.toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       suggestedDurationMinutes:
-          (json['suggestedDurationMinutes'] as num?)?.toInt(),
+          (json['suggestedDurationMinutes'] as num?)?.toInt() ?? 60,
     );
 
 Map<String, dynamic> _$$ActivityImplToJson(_$ActivityImpl instance) =>

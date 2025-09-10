@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.4] - 2025-01-09
 
+### Added
+- 🧪 **API 測試功能** - 新增完整的 API 測試畫面 (Added comprehensive API testing screen)
+- 🔍 **API 健康檢查** - 實時檢查 API 服務狀態 (Real-time API health monitoring)
+- 🎯 **行程生成測試** - 測試行程生成功能 (Trip generation testing functionality)
+- 🗺️ **地點搜尋測試** - 測試地點搜尋 API (Place search testing functionality)
+- ⚙️ **地圖配置測試** - 測試地圖配置 API (Map configuration testing functionality)
+- 📱 **測試 UI 介面** - 直觀的測試介面和即時回饋 (Intuitive testing UI with real-time feedback)
+- 🔄 **即時狀態更新** - 測試過程中顯示進度指示器 (Real-time status updates with progress indicators)
+
+### Enhanced
+- 🏗️ **服務架構優化** - 重構服務層以支援測試功能 (Refactored service layer to support testing features)
+- 📊 **錯誤處理改善** - 增強測試場景的錯誤處理 (Enhanced error handling for testing scenarios)
+- 🎨 **UI/UX 改善** - 優化測試介面的使用者體驗 (Improved UI/UX for testing interface)
+
+### Technical
+- 📁 **新檔案結構** - 新增測試相關的服務和模型檔案 (New file structure for testing-related services and models)
+- 🔧 **API 配置服務** - 新增 API 配置管理服務 (Added API configuration management service)
+- 📋 **測試資料模型** - 新增測試專用的資料模型 (Added test-specific data models)
+
+### 中文
+- 🧪 **API 測試功能** - 新增完整的 API 測試畫面
+- 🔍 **API 健康檢查** - 實時檢查 API 服務狀態
+- 🎯 **行程生成測試** - 測試行程生成功能
+- 🗺️ **地點搜尋測試** - 測試地點搜尋 API
+- ⚙️ **地圖配置測試** - 測試地圖配置 API
+- 📱 **測試 UI 介面** - 直觀的測試介面和即時回饋
+- 🔄 **即時狀態更新** - 測試過程中顯示進度指示器
+
+### 技術改進
+- 🏗️ **服務架構優化** - 重構服務層以支援測試功能
+- 📊 **錯誤處理改善** - 增強測試場景的錯誤處理
+- 🎨 **UI/UX 改善** - 優化測試介面的使用者體驗
+
 ### Fixed
 - 🐛 Fixed unused imports in api_client_test.dart (Removed unused flutter/services.dart and mockito imports)
 - 🐛 Fixed unused local variables in api_client_test.dart (Removed unused apiClient and mockDio variables)

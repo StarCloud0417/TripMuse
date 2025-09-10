@@ -8,7 +8,7 @@ part of 'day_plan.dart';
 
 _$DayPlanImpl _$$DayPlanImplFromJson(Map<String, dynamic> json) =>
     _$DayPlanImpl(
-      dayIndex: (json['dayIndex'] as num).toInt(),
+      dayIndex: (json['dayIndex'] as num?)?.toInt() ?? 1,
       date: DateTime.parse(json['date'] as String),
       theme: json['theme'] as String,
       activities: (json['activities'] as List<dynamic>?)

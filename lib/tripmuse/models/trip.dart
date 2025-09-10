@@ -6,10 +6,112 @@ import 'user_preference_analysis.dart';
 part 'trip.freezed.dart';
 part 'trip.g.dart';
 
+/// 自定義 JSON 轉換器
+class TripJsonConverter implements JsonConverter<Trip, Map<String, dynamic>> {
+  const TripJsonConverter();
+
+  @override
+  Trip fromJson(Map<String, dynamic> json) {
+    return Trip(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      destination: Destination.fromJson(json['destination'] as Map<String, dynamic>),
+      days: (json['days'] as List<dynamic>?)
+          ?.map((e) => DayPlan.fromJson(e as Map<String, dynamic>))
+          .toList() ?? const [],
+      preferenceAnalysis: json['preferenceAnalysis'] == null
+          ? null
+          : UserPreferenceAnalysis.fromJson(json['preferenceAnalysis'] as Map<String, dynamic>),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      userId: json['userId'] as String?,
+      generatedBy: json['generatedBy'] as String?,
+      status: TripStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => TripStatus.draft,
+      ),
+      notes: json['notes'] as String?,
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      sharingSettings: json['sharingSettings'] == null
+          ? null
+          : TripSharingSettings.fromJson(json['sharingSettings'] as Map<String, dynamic>),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson(Trip trip) {
+    return {
+      'id': trip.id,
+      'title': trip.title,
+      'destination': {
+        'name': trip.destination.name,
+        'city': trip.destination.city,
+        'country': trip.destination.country,
+        'lat': trip.destination.lat,
+        'lng': trip.destination.lng,
+        'placeId': trip.destination.placeId,
+        'fullAddress': trip.destination.fullAddress,
+        'timezone': trip.destination.timezone,
+        'currencyCode': trip.destination.currencyCode,
+        'languageCode': trip.destination.languageCode,
+        'photos': trip.destination.photos,
+      },
+      'days': trip.days.map((day) => {
+        'dayIndex': day.dayIndex,
+        'date': day.date.toIso8601String(),
+        'theme': day.theme,
+        'activities': day.activities.map((activity) => {
+          'id': activity.id,
+          'name': activity.name,
+          'description': activity.description,
+          'lat': activity.lat,
+          'lng': activity.lng,
+          'timeFrom': activity.timeFrom,
+          'timeTo': activity.timeTo,
+          'category': activity.category.name,
+          'priority': activity.priority.name,
+          'estimatedCost': activity.estimatedCost,
+          'tips': activity.tips,
+          'placeId': activity.placeId,
+          'address': activity.address,
+          'rating': activity.rating,
+          'suggestedDurationMinutes': activity.suggestedDurationMinutes,
+        }).toList(),
+        'notes': day.notes,
+        'estimatedTotalCost': day.estimatedTotalCost,
+      }).toList(),
+      'preferenceAnalysis': trip.preferenceAnalysis == null ? null : {
+        'primaryFocus': trip.preferenceAnalysis!.primaryFocus,
+        'travelPace': trip.preferenceAnalysis!.travelPace.name,
+        'interests': trip.preferenceAnalysis!.interests,
+        'avoidances': trip.preferenceAnalysis!.avoidances,
+        'mood': trip.preferenceAnalysis!.mood,
+        'keywords': trip.preferenceAnalysis!.keywords,
+        'confidence': trip.preferenceAnalysis!.confidence,
+        'analyzedAt': trip.preferenceAnalysis!.analyzedAt?.toIso8601String(),
+      },
+      'createdAt': trip.createdAt.toIso8601String(),
+      'updatedAt': trip.updatedAt.toIso8601String(),
+      'userId': trip.userId,
+      'generatedBy': trip.generatedBy,
+      'status': trip.status.name,
+      'notes': trip.notes,
+      'isFavorite': trip.isFavorite,
+      'sharingSettings': trip.sharingSettings == null ? null : {
+        'isEnabled': trip.sharingSettings!.isEnabled,
+        'shareToken': trip.sharingSettings!.shareToken,
+        'expiresAt': trip.sharingSettings!.expiresAt?.toIso8601String(),
+        'createdAt': trip.sharingSettings!.createdAt?.toIso8601String(),
+      },
+    };
+  }
+}
+
 /// 行程資料模型
 ///
 /// 代表完整的旅行行程，包含目的地、每日計畫和使用者偏好分析
 @freezed
+@JsonSerializable(converters: [TripJsonConverter()])
 class Trip with _$Trip {
   const factory Trip({
     /// 行程唯一識別碼
@@ -52,7 +154,11 @@ class Trip with _$Trip {
     TripSharingSettings? sharingSettings,
   }) = _Trip;
 
-  factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
+  /// 自定義 fromJson 方法使用 TripJsonConverter
+  factory Trip.fromJson(Map<String, dynamic> json) => TripJsonConverter().fromJson(json);
+
+  /// 自定義 toJson 方法使用 TripJsonConverter
+  Map<String, dynamic> toJson() => TripJsonConverter().toJson(this);
 }
 
 /// 行程狀態

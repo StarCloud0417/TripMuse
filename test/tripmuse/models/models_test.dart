@@ -180,29 +180,29 @@ void main() {
       );
 
       final request = TripRequest(
-        requestId: 'test-request-1',
-        timestamp: DateTime.now(),
-        destination: destination,
+        destination: destination.name,
         days: 3,
-        startDate: DateTime(2025, 10, 1),
-        endDate: DateTime(2025, 10, 3),
-        travelDescription: '我想要一趟放鬆的美食之旅',
-        budget: BudgetRange.mid,
-        groupSize: 2,
-        travelStyle: TravelStyle.leisure,
+        description: '我想要一趟放鬆的美食之旅',
+        preferences: TripPreferences(
+          budget: 'mid',
+          pace: 'slow',
+          interests: ['food', 'culture'],
+          companions: 2,
+        ),
       );
 
-      // 測試驗證
-      expect(request.isValid, isTrue);
-      expect(request.durationDescription, equals('3 天'));
-      expect(request.groupDescription, equals('雙人旅行'));
-      expect(request.budgetDescription, equals('中等'));
+      // 測試基本屬性
+      expect(request.destination, equals('台北'));
+      expect(request.days, equals(3));
+      expect(request.description, contains('美食之旅'));
+      expect(request.preferences?.budget, equals('mid'));
+      expect(request.preferences?.companions, equals(2));
 
-      // 測試 API 請求格式轉換
-      final apiRequest = request.toApiRequest();
-      expect(apiRequest['tripRequest']['destination']['name'], equals('台北'));
-      expect(apiRequest['tripRequest']['duration']['days'], equals(3));
-      expect(apiRequest['tripRequest']['travelDescription'], contains('美食之旅'));
+      // 測試 JSON 序列化
+      final json = request.toJson();
+      expect(json['destination'], equals('台北'));
+      expect(json['days'], equals(3));
+      expect(json['description'], contains('美食之旅'));
     });
 
     test('Enum 類型應該有正確的顯示名稱', () {

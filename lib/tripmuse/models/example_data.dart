@@ -143,18 +143,15 @@ class ExampleData {
 
   /// 建立範例行程請求
   static TripRequest get taipeiTripRequest => TripRequest(
-    requestId: 'taipei-request-example',
-    timestamp: DateTime(2025, 1, 7, 10, 0),
-    userId: 'user-123',
-    destination: taipeiDestination,
+    destination: taipeiDestination.name,
     days: 3,
-    startDate: DateTime(2025, 10, 1),
-    endDate: DateTime(2025, 10, 3),
-    travelDescription: '我想要一趟放鬆的美食之旅，希望能品嚐當地特色小吃和傳統料理，不要太趕行程，喜歡慢慢體驗當地文化',
-    budget: BudgetRange.mid,
-    groupSize: 2,
-    travelStyle: TravelStyle.leisure,
-    locale: 'zh-TW',
+    description: '我想要一趟放鬆的美食之旅，希望能品嚐當地特色小吃和傳統料理，不要太趕行程，喜歡慢慢體驗當地文化',
+    preferences: TripPreferences(
+      budget: 'mid',
+      pace: 'slow',
+      interests: ['food', 'culture'],
+      companions: 2,
+    ),
   );
 
   /// 建立文化愛好者的偏好分析
