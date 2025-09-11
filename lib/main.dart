@@ -31,6 +31,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 // TripMuse 新增 import
 import 'tripmuse/tripmuse_app.dart';
+import 'tripmuse/services/services.dart';
 
 import 'full_map_example.dart';
 import 'location_example.dart';
@@ -168,8 +169,29 @@ class MapsDemo extends StatelessWidget {
   }
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MapboxOptions.setAccessToken(MapsDemo.ACCESS_TOKEN);
+  
+  // 初始化 TripMuse 儲存系統
+  await _initializeTripMuseStorage();
+  
   runApp(MaterialApp(home: MapsDemo()));
+}
+
+/// 初始化 TripMuse 儲存系統
+Future<void> _initializeTripMuseStorage() async {
+  try {
+    // 導入 TripMuse 的 StorageManager
+    final storageManager = StorageManager.instance;
+    
+    if (!storageManager.isInitialized) {
+      print('🔄 在應用啟動時初始化 TripMuse 儲存系統...');
+      await storageManager.initialize();
+      print('✅ TripMuse 儲存系統在應用啟動時初始化成功');
+    }
+  } catch (e) {
+    print('❌ 在應用啟動時初始化 TripMuse 儲存系統失敗: $e');
+    // 不阻止應用啟動，但記錄錯誤
+  }
 }

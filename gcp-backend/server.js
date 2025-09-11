@@ -40,9 +40,9 @@ const secretClient = new SecretManagerServiceClient();
 // 初始化 Firebase Admin（如果有服務帳戶金鑰）
 try {
   admin.initializeApp();
-  logger.info('Firebase Admin initialized successfully');
+  logger.info('Firebase Admin 初始化成功');
 } catch (error) {
-  logger.warn('Firebase Admin initialization failed:', error.message);
+  logger.warn('Firebase Admin 初始化失敗:', error.message);
 }
 
 // 中介軟體
@@ -84,8 +84,8 @@ async function getSecret(secretName) {
     secretsCache.set(secretName, secretValue);
     return secretValue;
   } catch (error) {
-    logger.error(`Failed to get secret ${secretName}:`, error);
-    throw new Error(`Secret ${secretName} not found`);
+    logger.error(`獲取 secret ${secretName} 失敗:`, error);
+    throw new Error(`Secret ${secretName} 不存在`);
   }
 }
 
@@ -96,7 +96,7 @@ async function authenticateUser(req, res, next) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ 
         success: false, 
-        error: 'No valid authorization header' 
+        error: '無效的授權標頭' 
       });
     }
 
@@ -113,10 +113,10 @@ async function authenticateUser(req, res, next) {
     req.user = decodedToken;
     next();
   } catch (error) {
-    logger.error('Authentication failed:', error);
+    logger.error('認證失敗:', error);
     res.status(401).json({ 
       success: false, 
-      error: 'Invalid authentication token' 
+      error: '無效的認證令牌' 
     });
   }
 }
@@ -151,7 +151,7 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
     if (error) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid request data',
+        error: '請求資料無效',
         details: error.details
       });
     }
@@ -159,7 +159,7 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
     const { destination, days, description, preferences = {} } = value;
     const userId = req.user.uid;
 
-    logger.info('Generating trip', { userId, destination, days });
+    logger.info('正在生成行程', { userId, destination, days });
 
     // 建立 Gemini 模型
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -256,16 +256,16 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
       }
       
       // 記錄清理後的文字長度以便調試
-      logger.info('Cleaned response length:', cleanedText.length);
+      logger.info('清理後回應長度:', cleanedText.length);
       
       tripData = JSON.parse(cleanedText);
     } catch (parseError) {
-      logger.error('Failed to parse LLM response:', parseError.message);
-      logger.error('Raw response preview:', generatedText.substring(0, 200) + '...');
-      logger.error('Cleaned text preview:', cleanedText ? cleanedText.substring(0, 200) + '...' : 'null');
+      logger.error('LLM 回應解析失敗:', parseError.message);
+      logger.error('原始回應預覽:', generatedText.substring(0, 200) + '...');
+      logger.error('清理後文字預覽:', cleanedText ? cleanedText.substring(0, 200) + '...' : 'null');
       
       // 如果解析失敗，返回預設的行程結構
-      logger.warn('Using fallback trip structure due to parsing failure');
+      logger.warn('由於解析失敗，使用備用行程結構');
       tripData = {
         title: `${destination} 探索之旅`,
         destination: {
@@ -314,7 +314,7 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
     enhancedTrip.createdAt = new Date().toISOString();
     enhancedTrip.updatedAt = new Date().toISOString();
 
-    logger.info('Trip generated successfully', { 
+    logger.info('行程生成成功', { 
       userId, 
       tripId: enhancedTrip.id,
       activitiesCount: enhancedTrip.days.reduce((sum, day) => sum + day.activities.length, 0)
@@ -326,10 +326,10 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Trip generation failed:', error);
+    logger.error('行程生成失敗:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to generate trip',
+      error: '行程生成失敗',
       message: error.message
     });
   }
@@ -343,18 +343,18 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
     if (!query) {
       return res.status(400).json({
         success: false,
-        error: 'Query parameter is required'
+        error: '查詢參數為必填'
       });
     }
 
     // 從環境變數獲取 Google Places API Key
     const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!placesApiKey) {
-      logger.error('GOOGLE_PLACES_API_KEY environment variable is required');
+      logger.error('GOOGLE_PLACES_API_KEY 環境變數為必填');
       return res.status(500).json({
         success: false,
-        error: 'Google Places API key not configured',
-        message: 'Please configure GOOGLE_PLACES_API_KEY in environment variables'
+        error: 'Google Places API 金鑰未配置',
+        message: '請在環境變數中配置 GOOGLE_PLACES_API_KEY'
       });
     }
     
@@ -364,19 +364,19 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
       url += `&location=${location}&radius=${radius}`;
     }
 
-    logger.info(`Making Places API request: ${url.replace(placesApiKey, '***API_KEY***')}`);
+    logger.info(`發送 Places API 請求: ${url.replace(placesApiKey, '***API_KEY***')}`);
 
     const response = await axios.get(url);
     const data = response.data;
 
-    logger.info(`Places API response status: ${data.status}, results count: ${data.results ? data.results.length : 0}`);
+    logger.info(`Places API 回應狀態: ${data.status}, 結果數量: ${data.results ? data.results.length : 0}`);
 
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      logger.error(`Places API error: ${data.status}`, {
+      logger.error(`Places API 錯誤: ${data.status}`, {
         error_message: data.error_message,
         url: url.replace(placesApiKey, '***API_KEY***')
       });
-      throw new Error(`Places API error: ${data.status} - ${data.error_message || 'Unknown error'}`);
+      throw new Error(`Places API 錯誤: ${data.status} - ${data.error_message || '未知錯誤'}`);
     }
 
     const places = data.results.map(place => ({
@@ -400,10 +400,10 @@ app.get('/api/v1/places/search', authenticateUser, async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Places search failed:', error);
+    logger.error('地點搜尋失敗:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to search places',
+      error: '地點搜尋失敗',
       message: error.message
     });
   }
@@ -417,7 +417,7 @@ app.get('/api/v1/places/details', authenticateUser, async (req, res) => {
     if (!place_id) {
       return res.status(400).json({
         success: false,
-        error: 'Place ID is required'
+        error: '地點 ID 為必填'
       });
     }
 
@@ -429,7 +429,7 @@ app.get('/api/v1/places/details', authenticateUser, async (req, res) => {
     const data = response.data;
 
     if (data.status !== 'OK') {
-      throw new Error(`Places API error: ${data.status}`);
+      throw new Error(`Places API 錯誤: ${data.status}`);
     }
 
     const place = data.result;
@@ -460,10 +460,10 @@ app.get('/api/v1/places/details', authenticateUser, async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Place details failed:', error);
+    logger.error('地點詳情獲取失敗:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get place details',
+      error: '獲取地點詳情失敗',
       message: error.message
     });
   }
@@ -519,27 +519,27 @@ app.get('/api/v1/map/config', authenticateUser, async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Failed to get map config:', error);
+    logger.error('獲取地圖配置失敗:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get map configuration'
+      error: '獲取地圖配置失敗'
     });
   }
 });
 
-// 清理和驗證活動類別
+// Clean and validate activity category
 function cleanActivityCategory(category) {
   if (!category || typeof category !== 'string') {
-    return 'sightseeing'; // 預設值
+    return 'sightseeing'; // Default value
   }
 
-  // 移除空白字符並轉小寫
+  // Remove whitespace and convert to lowercase
   const cleaned = category.trim().toLowerCase();
 
-  // 如果包含逗號，取第一個值
+  // If contains comma, take first value
   const firstCategory = cleaned.split(',')[0].trim();
 
-  // 修正常見的拼寫錯誤
+  // Fix common spelling errors
   const categoryMap = {
     'food': 'food',
     '美食': 'food',
@@ -551,7 +551,7 @@ function cleanActivityCategory(category) {
     '歷史': 'culture',
     'nature': 'nature',
     '自然': 'nature',
-    'natuure': 'nature', // 修正拼寫錯誤
+    'natuure': 'nature', // Fix spelling error
     'shopping': 'shopping',
     '購物': 'shopping',
     'outdoor': 'outdoor',
@@ -560,13 +560,13 @@ function cleanActivityCategory(category) {
     '交通': 'transportation'
   };
 
-  return categoryMap[firstCategory] || 'sightseeing'; // 如果找不到匹配，返回預設值
+  return categoryMap[firstCategory] || 'sightseeing'; // Return default if no match found
 }
 
-// 清理和驗證活動優先級
+// Clean and validate activity priority
 function cleanActivityPriority(priority) {
   if (!priority || typeof priority !== 'string') {
-    return 'medium'; // 預設值
+    return 'medium'; // Default value
   }
 
   const cleaned = priority.trim().toLowerCase();
@@ -579,7 +579,7 @@ function cleanActivityPriority(priority) {
     '低': 'low'
   };
 
-  return priorityMap[cleaned] || 'medium'; // 如果找不到匹配，返回預設值
+  return priorityMap[cleaned] || 'medium'; // Return default if no match found
 }
 
 // 使用 Google Places API 補強行程地點資訊
@@ -587,7 +587,7 @@ async function enhanceTripWithPlacesAPI(tripData) {
   try {
     const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!placesApiKey) {
-      logger.warn('GOOGLE_PLACES_API_KEY not available, skipping place enhancement');
+      logger.warn('GOOGLE_PLACES_API_KEY 不可用，跳過地點增強');
       return tripData;
     }
     
@@ -620,13 +620,13 @@ async function enhanceTripWithPlacesAPI(tripData) {
               }
             }
           } catch (placeError) {
-            logger.warn(`Failed to enhance place ${activity.name}:`, placeError.message);
+            logger.warn(`增強地點 ${activity.name} 失敗:`, placeError.message);
           }
         }
       }
     }
   } catch (error) {
-    logger.error('Failed to enhance trip with Places API:', error);
+    logger.error('使用 Places API 補強行程失敗:', error);
   }
   
   return tripData;
@@ -634,10 +634,10 @@ async function enhanceTripWithPlacesAPI(tripData) {
 
 // 錯誤處理中介軟體
 app.use((error, req, res, next) => {
-  logger.error('Unhandled error:', error);
+  logger.error('未處理的錯誤:', error);
   res.status(500).json({
     success: false,
-    error: 'Internal server error'
+    error: '內部服務器錯誤'
   });
 });
 
@@ -645,14 +645,14 @@ app.use((error, req, res, next) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'Endpoint not found'
+    error: '端點不存在'
   });
 });
 
 // 啟動伺服器
 app.listen(port, () => {
-  logger.info(`TripMuse API server running on port ${port}`);
-  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`TripMuse API 服務器運行在端口 ${port}`);
+  logger.info(`環境: ${process.env.NODE_ENV || 'development'}`);
 });
 
 // 計算兩點間距離 (公里)

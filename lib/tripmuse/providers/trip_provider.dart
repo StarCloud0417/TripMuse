@@ -6,17 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/services.dart';
 import '../models/models.dart';
 
-/// 行程 Repository Provider（從 StorageManager 取得）
-final tripRepositoryProvider = Provider<TripRepositoryImpl>((ref) {
-  final storageManager = ref.watch(storageManagerProvider);
-
-  // 檢查儲存管理器是否已初始化
-  if (!storageManager.isInitialized) {
-    throw StorageManagerException('儲存管理器尚未初始化，請稍後再試');
-  }
-
-  return storageManager.tripRepository;
-});
+// 注意：tripRepositoryProvider 已在 storage_manager.dart 中定義，這裡不需要重複定義
 
 /// 使用者所有行程 Provider
 final userTripsProvider = FutureProvider<List<Trip>>((ref) async {
@@ -194,9 +184,18 @@ class FavoriteTripNotifier extends StateNotifier<Set<String>> {
   
   /// 載入收藏的行程 ID
   Future<void> _loadFavorites() async {
-    // TODO: 從本地儲存載入收藏列表
-    // 暫時使用空集合
-    state = <String>{};
+    try {
+      final storageManager = StorageManager.instance;
+      if (storageManager.isInitialized) {
+        final favoriteIds = await storageManager.hiveStorage.retrieve<List<String>>('favorite_trips') ?? <String>[];
+        state = Set<String>.from(favoriteIds);
+      } else {
+        state = <String>{};
+      }
+    } catch (e) {
+      print('載入收藏列表失敗: $e');
+      state = <String>{};
+    }
   }
   
   /// 切換收藏狀態
@@ -209,7 +208,15 @@ class FavoriteTripNotifier extends StateNotifier<Set<String>> {
     }
     state = newState;
     
-    // TODO: 儲存到本地儲存
+    // 儲存到本地儲存
+    try {
+      final storageManager = StorageManager.instance;
+      if (storageManager.isInitialized) {
+        await storageManager.hiveStorage.store('favorite_trips', newState.toList());
+      }
+    } catch (e) {
+      print('儲存收藏列表失敗: $e');
+    }
   }
   
   /// 檢查是否為收藏

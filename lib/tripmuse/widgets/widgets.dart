@@ -3,3 +3,7 @@
 /// 提供所有自訂 Widget 的統一匯入點
 
 export 'trip_card.dart';
+export 'trip_generation_progress_widget.dart';
+export 'trip_generation_settings_widget.dart';
+export 'trip_generation_error_widget.dart';
+export 'simple_progress_dialog.dart';

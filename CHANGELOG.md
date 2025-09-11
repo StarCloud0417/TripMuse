@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2025-01-11
+
+### Fixed
+- 🐛 **儲存系統初始化問題** - 修復 StorageManager 初始化時序問題 (Fixed StorageManager initialization timing issues)
+- 🔧 **行程儲存錯誤** - 解決行程生成後無法儲存的問題 (Resolved trip saving failures after generation)
+- 🗄️ **Provider 作用域問題** - 修復不同 ProviderScope 間的實例共享問題 (Fixed instance sharing between different ProviderScopes)
+- 📱 **應用啟動初始化** - 在應用啟動時就初始化儲存系統 (Initialize storage system at app startup)
+- 🔄 **Widget 生命週期** - 修復 Widget 銷毀後使用 ref 的錯誤 (Fixed using ref after widget disposal)
+
+### Enhanced
+- ⚡ **儲存系統穩定性** - 大幅提升儲存系統的穩定性和可靠性 (Significantly improved storage system stability and reliability)
+- 🎯 **錯誤處理改善** - 增強儲存相關的錯誤處理和使用者回饋 (Enhanced storage-related error handling and user feedback)
+- 📊 **初始化日誌** - 添加詳細的初始化過程日誌記錄 (Added detailed initialization process logging)
+- 🔍 **除錯資訊** - 提供更清晰的除錯資訊和狀態追蹤 (Provided clearer debugging information and status tracking)
+
+### Added
+- ✅ **收藏功能實作** - 完成行程收藏功能的本地儲存實作 (Completed local storage implementation for trip favorites feature)
+- 💾 **自動儲存檢查** - 在儲存前自動檢查並初始化 StorageManager (Automatic StorageManager initialization check before saving)
+- 🔄 **容錯機制** - 添加儲存失敗時的容錯和重試機制 (Added fault tolerance and retry mechanism for storage failures)
+
+### Technical
+- 🏗️ **架構優化** - 重構儲存系統初始化架構 (Refactored storage system initialization architecture)
+- 📦 **依賴管理** - 優化 Riverpod Provider 的依賴管理 (Optimized Riverpod Provider dependency management)
+- 🧪 **測試改善** - 更新相關測試以反映架構變更 (Updated related tests to reflect architecture changes)
+- 🔧 **程式碼清理** - 移除未使用的程式碼和改善程式碼品質 (Removed unused code and improved code quality)
+
+### 中文
+- 🐛 **儲存系統初始化問題** - 修復 StorageManager 初始化時序問題
+- 🔧 **行程儲存錯誤** - 解決行程生成後無法儲存的問題
+- 🗄️ **Provider 作用域問題** - 修復不同 ProviderScope 間的實例共享問題
+- 📱 **應用啟動初始化** - 在應用啟動時就初始化儲存系統
+- 🔄 **Widget 生命週期** - 修復 Widget 銷毀後使用 ref 的錯誤
+
+### 技術改進
+- ⚡ **儲存系統穩定性** - 大幅提升儲存系統的穩定性和可靠性
+- 🎯 **錯誤處理改善** - 增強儲存相關的錯誤處理和使用者回饋
+- 📊 **初始化日誌** - 添加詳細的初始化過程日誌記錄
+- 🔍 **除錯資訊** - 提供更清晰的除錯資訊和狀態追蹤
+
+### 檔案變更
+- 修改: `lib/main.dart` - 在應用啟動時初始化 StorageManager
+- 修改: `lib/tripmuse/tripmuse_app.dart` - 簡化儲存系統檢查邏輯
+- 修改: `lib/tripmuse/screens/create_trip_screen.dart` - 修復 ProviderScope 問題和儲存邏輯
+- 修改: `lib/tripmuse/providers/trip_provider.dart` - 完成收藏功能的本地儲存實作
+- 修改: `lib/tripmuse/widgets/simple_progress_dialog.dart` - 改善 JSON 解析錯誤處理
+- 修改: `lib/tripmuse/models/activity.dart` - 修復可選欄位的處理
+
 ## [0.1.6] - 2025-09-10
 
 ### Added

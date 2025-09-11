@@ -330,8 +330,8 @@ class _$ActivityImpl implements _Activity {
       required this.description,
       this.lat = 0.0,
       this.lng = 0.0,
-      required this.timeFrom,
-      required this.timeTo,
+      this.timeFrom = '09:00',
+      this.timeTo = '10:00',
       required this.category,
       required this.priority,
       this.estimatedCost,
@@ -370,10 +370,12 @@ class _$ActivityImpl implements _Activity {
 
   /// 開始時間 (HH:mm 格式)
   @override
+  @JsonKey()
   final String timeFrom;
 
   /// 結束時間 (HH:mm 格式)
   @override
+  @JsonKey()
   final String timeTo;
 
   /// 活動類別
@@ -497,8 +499,8 @@ abstract class _Activity implements Activity {
       required final String description,
       final double lat,
       final double lng,
-      required final String timeFrom,
-      required final String timeTo,
+      final String timeFrom,
+      final String timeTo,
       required final ActivityCategory category,
       required final ActivityPriority priority,
       final String? estimatedCost,

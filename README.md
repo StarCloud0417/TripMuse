@@ -1,6 +1,6 @@
 # TripMuse 🧳
 
-**Version 0.1.6**
+**Version 0.1.7**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
@@ -30,7 +30,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.1.6** - Google Places API Integration Completed / Google Places API 整合完成
+**Version 0.1.7** - Storage System Stability Improvements / 儲存系統穩定性改善
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
@@ -71,7 +71,10 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **🎯 Trip Generation Testing** / **🎯 行程生成測試**  
 ✅ **🗺️ Place Search Testing** / **🗺️ 地點搜尋測試**  
 ✅ **⚙️ Map Configuration Testing** / **⚙️ 地圖配置測試**  
-🚧 AI trip generation service in progress / AI 行程生成服務開發進行中 
+✅ **💾 Storage System Stability** / **💾 儲存系統穩定性**  
+✅ **🔧 Trip Saving Functionality** / **🔧 行程儲存功能**  
+✅ **⭐ Trip Favorites Feature** / **⭐ 行程收藏功能**  
+🚧 AI trip generation service optimization / AI 行程生成服務優化進行中 
 
 ## 🛠️ Tech Stack / 技術棧
 
@@ -175,6 +178,14 @@ lib/
 ```
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.1.7 (2025-01-11)
+- 🐛 **儲存系統修復** | Fixed critical StorageManager initialization timing issues
+- 💾 **行程儲存穩定** | Resolved trip saving failures and improved reliability
+- 🔧 **Provider 作用域** | Fixed ProviderScope instance sharing problems
+- 📱 **啟動初始化** | Initialize storage system at app startup for better stability
+- ⭐ **收藏功能完成** | Completed trip favorites feature with local storage
+- 🔄 **容錯機制** | Added fault tolerance and retry mechanisms
 
 ### v0.1.6 (2025-09-10)
 - 🗺️ **Google Places API 整合** | Complete Google Places API integration for enhanced trip data

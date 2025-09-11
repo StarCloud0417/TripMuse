@@ -7,7 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../widgets/trip_card.dart';
-import '../providers/trip_provider.dart';
+import '../providers/providers.dart';
+import '../services/services.dart';
 import 'create_trip_screen.dart';
 
 class TripListScreen extends ConsumerStatefulWidget {

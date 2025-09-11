@@ -26,10 +26,10 @@ class Activity with _$Activity {
     @Default(0.0) double lng,
     
     /// 開始時間 (HH:mm 格式)
-    required String timeFrom,
+    @Default('09:00') String timeFrom,
     
     /// 結束時間 (HH:mm 格式)
-    required String timeTo,
+    @Default('10:00') String timeTo,
     
     /// 活動類別
     required ActivityCategory category,

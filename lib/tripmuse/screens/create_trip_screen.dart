@@ -1,11 +1,14 @@
 /// TripMuse 建立行程頁面
-/// 
+///
 /// 提供使用者輸入旅行資訊和描述，生成個人化行程的介面
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
+import '../widgets/simple_progress_dialog.dart';
+import '../widgets/debug_progress_dialog.dart';
+import '../services/services.dart';
 import '../providers/providers.dart';
 
 class CreateTripScreen extends ConsumerStatefulWidget {
@@ -19,21 +22,36 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
   final _formKey = GlobalKey<FormState>();
   final _destinationController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   int _days = 3;
   int _groupSize = 2;
   BudgetRange _budgetRange = BudgetRange.mid;
   bool _isGenerating = false;
-  
+
   // 目的地搜尋相關
   List<Destination> _destinationSuggestions = [];
   Destination? _selectedDestination;
-  
+
+  @override
+  void initState() {
+    super.initState();
+    // 添加監聽器來監聽控制器變化
+    _destinationController.addListener(_updateFormState);
+    _descriptionController.addListener(_updateFormState);
+  }
+
   @override
   void dispose() {
+    // 移除監聽器
+    _destinationController.removeListener(_updateFormState);
+    _descriptionController.removeListener(_updateFormState);
     _destinationController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  void _updateFormState() {
+    setState(() {});
   }
 
   @override
@@ -45,7 +63,6 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -55,32 +72,48 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
             children: [
               // 頁面標題和描述
               _buildHeader(),
-              
+
               const SizedBox(height: TripMuseSpacing.xl),
-              
+
               // 目的地選擇
               _buildDestinationSection(),
-              
+
               const SizedBox(height: TripMuseSpacing.xl),
-              
+
               // 日期和天數設定
               _buildDateSection(),
-              
+
               const SizedBox(height: TripMuseSpacing.xl),
-              
+
               // 旅行描述
               _buildDescriptionSection(),
-              
+
               const SizedBox(height: TripMuseSpacing.xl),
-              
+
               // 選擇性設定
               _buildOptionalSettings(),
-              
+
               const SizedBox(height: TripMuseSpacing.xxl),
-              
+
               // 生成按鈕
               _buildGenerateButton(),
-              
+
+              const SizedBox(height: TripMuseSpacing.md),
+
+              // 除錯按鈕
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _showDebugDialog,
+                  icon: const Icon(Icons.bug_report),
+                  label: const Text('🔍 除錯測試'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.orange,
+                    side: const BorderSide(color: Colors.orange),
+                  ),
+                ),
+              ),
+
               const SizedBox(height: TripMuseSpacing.xl),
             ],
           ),
@@ -88,7 +121,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
     );
   }
-  
+
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,31 +129,29 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
         Text(
           '✈️ 開始規劃你的旅程',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: TripMuseTheme.textPrimary,
-          ),
+                fontWeight: FontWeight.bold,
+                color: TripMuseTheme.textPrimary,
+              ),
         ),
-        
         const SizedBox(height: TripMuseSpacing.sm),
-        
         Text(
           '告訴我們你想要的旅行體驗，我們將為你量身打造完美的行程',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: TripMuseTheme.textSecondary,
-          ),
+                color: TripMuseTheme.textSecondary,
+              ),
         ),
       ],
     );
   }
-  
+
   Widget _buildDestinationSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('🌍 目的地', '你想去哪裡旅行？'),
-        
+
         const SizedBox(height: TripMuseSpacing.md),
-        
+
         // 目的地輸入框
         TextFormField(
           controller: _destinationController,
@@ -161,7 +192,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
             return null;
           },
         ),
-        
+
         // 已選擇的目的地顯示
         if (_selectedDestination != null) ...[
           const SizedBox(height: TripMuseSpacing.md),
@@ -170,7 +201,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ],
     );
   }
-  
+
   Widget _buildSelectedDestination() {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
@@ -213,21 +244,21 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
     );
   }
-  
+
   Widget _buildDateSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('📅 旅行時間', '設定你的旅行日期'),
-        
+
         const SizedBox(height: TripMuseSpacing.md),
-        
+
         // 天數選擇器
         _buildDaysSelector(),
       ],
     );
   }
-  
+
   Widget _buildDaysSelector() {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
@@ -258,9 +289,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               ),
             ],
           ),
-          
           const SizedBox(height: TripMuseSpacing.md),
-          
           Slider(
             value: _days.toDouble(),
             min: 1,
@@ -273,7 +302,6 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               });
             },
           ),
-          
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -297,20 +325,20 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
     );
   }
-  
+
   Widget _buildDescriptionSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('✨ 旅行描述', '描述你想要的旅行體驗'),
-        
+
         const SizedBox(height: TripMuseSpacing.md),
-        
+
         // 範例提示
         _buildExamplePrompts(),
-        
+
         const SizedBox(height: TripMuseSpacing.md),
-        
+
         // 描述輸入框
         TextFormField(
           controller: _descriptionController,
@@ -342,7 +370,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ],
     );
   }
-  
+
   Widget _buildExamplePrompts() {
     final examples = [
       '🍜 放鬆的美食之旅',
@@ -352,7 +380,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       '🎒 冒險刺激的戶外活動',
       '🛍️ 購物和城市探索',
     ];
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -364,9 +392,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
             color: TripMuseTheme.textSecondary,
           ),
         ),
-        
         const SizedBox(height: TripMuseSpacing.sm),
-        
         Wrap(
           spacing: TripMuseSpacing.sm,
           runSpacing: TripMuseSpacing.sm,
@@ -401,26 +427,26 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ],
     );
   }
-  
+
   Widget _buildOptionalSettings() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('⚙️ 其他設定', '選擇性設定（可跳過）'),
-        
+
         const SizedBox(height: TripMuseSpacing.md),
-        
+
         // 旅伴數量
         _buildGroupSizeSelector(),
-        
+
         const SizedBox(height: TripMuseSpacing.lg),
-        
+
         // 預算範圍
         _buildBudgetSelector(),
       ],
     );
   }
-  
+
   Widget _buildGroupSizeSelector() {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
@@ -458,9 +484,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               ),
             ],
           ),
-          
           const SizedBox(height: TripMuseSpacing.md),
-          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [1, 2, 3, 4, 5, 6].map((size) {
@@ -505,7 +529,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
     );
   }
-  
+
   Widget _buildBudgetSelector() {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
@@ -534,9 +558,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               ),
             ],
           ),
-          
           const SizedBox(height: TripMuseSpacing.md),
-          
           Column(
             children: BudgetRange.values.map((budget) {
               final isSelected = _budgetRange == budget;
@@ -568,7 +590,9 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
                         color: isSelected
                             ? TripMuseTheme.primaryColor
                             : TripMuseTheme.textSecondary,
@@ -581,7 +605,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                           color: isSelected
                               ? TripMuseTheme.primaryColor
                               : TripMuseTheme.textPrimary,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -594,12 +619,12 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
     );
   }
-  
+
   Widget _buildGenerateButton() {
     final isFormValid = _destinationController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty &&
         _descriptionController.text.length >= 10;
-    
+
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -656,7 +681,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
     );
   }
-  
+
   Widget _buildSectionTitle(String title, String subtitle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -680,13 +705,13 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ],
     );
   }
-  
+
   // 事件處理方法
   void _onDestinationChanged(String value) {
     setState(() {
       _selectedDestination = null;
     });
-    
+
     if (value.isNotEmpty) {
       _searchDestinations(value);
     } else {
@@ -695,7 +720,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       });
     }
   }
-  
+
   void _searchDestinations(String query) {
     // TODO: 整合 Google Places API
     // 目前使用模擬資料
@@ -729,7 +754,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
         lng: 100.5018,
       ),
     ];
-    
+
     setState(() {
       _destinationSuggestions = mockDestinations
           .where((dest) =>
@@ -738,94 +763,151 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               dest.country.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
-    
+
     // 如果找到完全匹配的目的地，自動選擇
     final exactMatch = mockDestinations.firstWhere(
       (dest) => dest.name.toLowerCase() == query.toLowerCase(),
       orElse: () => mockDestinations.first,
     );
-    
+
     if (exactMatch.name.toLowerCase() == query.toLowerCase()) {
       setState(() {
         _selectedDestination = exactMatch;
       });
     }
   }
-  
+
   void _addExampleToDescription(String example) {
     final currentText = _descriptionController.text;
-    final cleanExample = example.replaceAll(RegExp(r'^[🍜🏛️🌸👨‍👩‍👧‍👦🎒🛍️]\\s*'), '');
-    
+    final cleanExample =
+        example.replaceAll(RegExp(r'^[🍜🏛️🌸👨‍👩‍👧‍👦🎒🛍️]\\s*'), '');
+
     if (currentText.isEmpty) {
       _descriptionController.text = '我想要$cleanExample';
     } else {
       _descriptionController.text = '$currentText，還有$cleanExample';
     }
-    
+
     // 移動游標到文字末尾
     _descriptionController.selection = TextSelection.fromPosition(
       TextPosition(offset: _descriptionController.text.length),
     );
   }
-  
+
   Future<void> _generateTrip() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    
-    setState(() {
-      _isGenerating = true;
-    });
-    
-    try {
-      // 建立 TripRequest
-      final tripRequest = _buildTripRequest();
 
-      // 驗證請求 - 檢查基本欄位是否已填寫
-      if (tripRequest.destination.isEmpty || tripRequest.description.isEmpty) {
-        throw Exception('請填寫目的地和行程描述');
-      }
-      
-      // 呼叫 AI 行程生成服務
-      final tripResponse = await ref.read(tripApiServiceProvider).generateTrip(tripRequest);
-      
-      if (tripResponse.success && tripResponse.data != null) {
-        // 儲存生成的行程
-        await ref.read(tripRepositoryProvider).saveTrip(tripResponse.data!);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('🎉 行程生成成功！\n目的地：${tripResponse.data!.destination.city}\n天數：${tripResponse.data!.days.length} 天'),
-              backgroundColor: TripMuseTheme.successColor,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-          
-          // 導航回到行程列表頁面
-          Navigator.pop(context);
-        }
-      } else {
-        throw Exception(tripResponse.message ?? '行程生成失敗');
-      }
-    } catch (e) {
-      if (mounted) {
+    // 建立 TripRequest
+    final tripRequest = _buildTripRequest();
+
+    // 驗證請求 - 檢查基本欄位是否已填寫
+    if (tripRequest.destination.isEmpty || tripRequest.description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ 請填寫目的地和行程描述'),
+          backgroundColor: TripMuseTheme.errorColor,
+        ),
+      );
+      return;
+    }
+
+    // 顯示進度對話框
+    if (mounted) {
+      final result = await showDialog<Trip>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => ProviderScope(
+          child: SimpleProgressDialog(
+            request: tripRequest,
+            onSuccess: (trip) async {
+              // 儲存生成的行程到本地
+              try {
+                // 確保 StorageManager 已初始化
+                final storageManager = StorageManager.instance;
+                if (!storageManager.isInitialized) {
+                  print('🔄 StorageManager 尚未初始化，正在初始化...');
+                  await storageManager.initialize();
+                  print('✅ StorageManager 初始化完成');
+                }
+                
+                final tripRepository = ref.read(tripRepositoryProvider);
+                await tripRepository.saveTrip(trip);
+                print('✅ 行程已儲存到本地: ${trip.id}');
+                
+                // 刷新相關的 Provider 以更新 UI
+                ref.invalidate(userTripsProvider);
+                ref.invalidate(recentTripsProvider);
+                ref.read(tripNotifierProvider.notifier).refresh();
+                
+              } catch (e) {
+                print('⚠️ 儲存行程失敗: $e');
+                // 顯示錯誤提示給用戶
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('儲存行程失敗: $e'),
+                      backgroundColor: TripMuseTheme.errorColor,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
+            },
+            onError: (error) {
+              // 錯誤處理
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('❌ 生成行程失敗：$error'),
+                  backgroundColor: TripMuseTheme.errorColor,
+                  duration: const Duration(seconds: 5),
+                  action: SnackBarAction(
+                    label: '重試',
+                    textColor: Colors.white,
+                    onPressed: () => _generateTrip(),
+                  ),
+                ),
+              );
+            },
+            onCancel: () {
+              // 取消回調
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('行程生成已取消'),
+                  backgroundColor: TripMuseTheme.warningColor,
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      // 如果成功生成行程
+      if (result != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ 生成行程失敗：$e'),
-            backgroundColor: TripMuseTheme.errorColor,
+            content: Text(
+              '🎉 行程生成成功！\n目的地：${result.destination.city}\n天數：${result.days.length} 天',
+            ),
+            backgroundColor: TripMuseTheme.successColor,
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: '查看',
+              textColor: Colors.white,
+              onPressed: () {
+                // TODO: 導航到行程詳情頁面
+              },
+            ),
           ),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isGenerating = false;
-        });
+
+        // 導航回到行程列表頁面
+        Navigator.pop(context);
       }
     }
   }
-  
+
   TripRequest _buildTripRequest() {
     final destinationText = _destinationController.text;
     return TripRequest(
@@ -833,10 +915,55 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       days: _days,
       description: _descriptionController.text,
       preferences: TripPreferences(
-        budget: _budgetRange.name.toLowerCase(),
+        budget: _mapBudgetRangeToString(_budgetRange),
         pace: 'medium',
         interests: [],
         companions: _groupSize,
+      ),
+    );
+  }
+
+  String _mapBudgetRangeToString(BudgetRange budgetRange) {
+    switch (budgetRange) {
+      case BudgetRange.low:
+        return 'low';
+      case BudgetRange.mid:
+        return 'medium';
+      case BudgetRange.high:
+        return 'high';
+    }
+  }
+
+  void _showDebugDialog() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final tripRequest = _buildTripRequest();
+
+    showDialog(
+      context: context,
+      builder: (context) => ProviderScope(
+        child: DebugProgressDialog(
+          request: tripRequest,
+          onSuccess: (trip) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('🎉 除錯測試成功！${trip.title}'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+          onError: (error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('❌ 除錯測試失敗：$error'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
