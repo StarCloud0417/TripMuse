@@ -16,6 +16,9 @@ class UserPreferenceAnalysis with _$UserPreferenceAnalysis {
     /// 旅行節奏
     required TravelPace travelPace,
     
+    /// 預算範圍
+    required BudgetRange budgetRange,
+    
     /// 興趣列表
     @Default([]) List<String> interests,
     
@@ -35,8 +38,60 @@ class UserPreferenceAnalysis with _$UserPreferenceAnalysis {
     DateTime? analyzedAt,
   }) = _UserPreferenceAnalysis;
 
-  factory UserPreferenceAnalysis.fromJson(Map<String, dynamic> json) => 
-    _$UserPreferenceAnalysisFromJson(json);
+  factory UserPreferenceAnalysis.fromJson(Map<String, dynamic> json) {
+    // 自定義解析邏輯來處理未知的budgetRange值
+    BudgetRange budgetRange;
+    final budgetValue = json['budgetRange'] as String?;
+    switch (budgetValue?.toLowerCase()) {
+      case 'low':
+      case 'cheap':
+      case 'economy':
+      case 'budget':
+      case '經濟':
+        budgetRange = BudgetRange.low;
+        break;
+      case 'mid':
+      case 'medium':
+      case 'moderate':
+      case '中等':
+        budgetRange = BudgetRange.mid;
+        break;
+      case 'high':
+      case 'expensive':
+      case 'luxury':
+      case 'premium':
+      case '豪華':
+        budgetRange = BudgetRange.high;
+        break;
+      default:
+        // 對於未知值，使用mid作為預設值
+        budgetRange = BudgetRange.mid;
+        break;
+    }
+
+    return UserPreferenceAnalysis(
+      primaryFocus: json['primaryFocus'] as String,
+      travelPace: $enumDecode(_$TravelPaceEnumMap, json['travelPace']),
+      budgetRange: budgetRange,
+      interests: (json['interests'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      avoidances: (json['avoidances'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      mood: json['mood'] as String,
+      keywords: (json['keywords'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
+      analyzedAt: json['analyzedAt'] == null
+          ? null
+          : DateTime.parse(json['analyzedAt'] as String),
+    );
+  }
 }
 
 /// UserPreferenceAnalysis 擴展方法

@@ -141,12 +141,47 @@ class HiveStorageService implements StorageService {
   
   /// 取得所有行程
   Future<List<Trip>> getAllTrips() async {
-    return _tripsBox?.values.toList() ?? [];
+    print('🔍 HiveStorageService.getAllTrips() 被調用');
+    print('📦 _tripsBox 是否為 null: ${_tripsBox == null}');
+    
+    if (_tripsBox == null) {
+      print('⚠️ _tripsBox 為 null，返回空列表');
+      return [];
+    }
+    
+    final trips = _tripsBox!.values.toList();
+    print('📋 從 Hive 取得 ${trips.length} 個行程');
+    
+    // 打印每個行程的 ID
+    for (final trip in trips) {
+      print('  - 行程 ID: ${trip.id}, 標題: ${trip.title}');
+    }
+    
+    return trips;
   }
   
   /// 儲存行程
   Future<void> saveTrip(Trip trip) async {
-    await _tripsBox?.put(trip.id, trip);
+    print('💾 HiveStorageService.saveTrip() 被調用');
+    print('📦 _tripsBox 是否為 null: ${_tripsBox == null}');
+    print('🆔 行程 ID: ${trip.id}');
+    print('📝 行程標題: ${trip.title}');
+    
+    if (_tripsBox == null) {
+      print('⚠️ _tripsBox 為 null，無法儲存行程');
+      throw Exception('Trips box is not initialized');
+    }
+    
+    await _tripsBox!.put(trip.id, trip);
+    print('✅ 行程已儲存到 Hive');
+    
+    // 驗證儲存
+    final savedTrip = _tripsBox!.get(trip.id);
+    if (savedTrip != null) {
+      print('✅ 儲存驗證成功: ${savedTrip.title}');
+    } else {
+      print('❌ 儲存驗證失敗');
+    }
   }
   
   /// 取得行程

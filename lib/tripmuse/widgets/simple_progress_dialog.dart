@@ -13,7 +13,7 @@ import '../services/services.dart';
 class SimpleProgressDialog extends ConsumerStatefulWidget {
   final TripRequest request;
   final VoidCallback? onCancel;
-  final Function(Trip)? onSuccess;
+  final Future<void> Function(Trip)? onSuccess;
   final Function(String)? onError;
 
   const SimpleProgressDialog({
@@ -171,10 +171,21 @@ class _SimpleProgressDialogState extends ConsumerState<SimpleProgressDialog>
       _timeoutTimer?.cancel();
 
       // 延遲一下讓使用者看到完成動畫
-      Future.delayed(const Duration(milliseconds: 800), () {
+      Future.delayed(const Duration(milliseconds: 800), () async {
         if (mounted && !_hasError) {
-          widget.onSuccess?.call(trip);
-          Navigator.of(context).pop(trip);
+          // 等待 onSuccess 回調完成
+          if (widget.onSuccess != null) {
+            try {
+              await widget.onSuccess!(trip);
+            } catch (e) {
+              print('onSuccess 回調執行失敗: $e');
+            }
+          }
+          
+          // 只有在 widget 仍然 mounted 時才關閉 dialog
+          if (mounted) {
+            Navigator.of(context).pop(trip);
+          }
         }
       });
 

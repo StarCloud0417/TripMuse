@@ -555,9 +555,11 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
   }
   
   void _openTrip(Trip trip) {
-    // 開啟行程詳情 - 目前顯示提示訊息
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('開啟行程: ${trip.title}')),
+    // 開啟行程詳情頁面
+    Navigator.pushNamed(
+      context,
+      '/trip-detail',
+      arguments: trip,
     );
   }
   

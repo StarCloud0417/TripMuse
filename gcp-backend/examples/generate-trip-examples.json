@@ -1,0 +1,183 @@
+{
+  "description": "TripMuse Generate Trip API - Client Request Examples",
+  "version": "1.0.0",
+  "endpoint": "/api/v1/generate-trip",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <firebase-auth-token>"
+  },
+  "request-schema": {
+    "destination": "string (required, 1-100 chars)",
+    "days": "number (required, 1-30)",
+    "description": "string (required, 10-1000 chars)",
+    "preferences": {
+      "budget": "string (optional: 'low', 'medium', 'high')",
+      "pace": "string (optional: 'slow', 'medium', 'fast')",
+      "interests": "array of strings (optional)",
+      "companions": "number (optional, 1-20)"
+    }
+  },
+  "examples": [
+    {
+      "name": "Minimal Request",
+      "description": "最基本的請求，只包含必要欄位",
+      "request": {
+        "destination": "東京",
+        "days": 3,
+        "description": "我想去東京體驗日本文化"
+      }
+    },
+    {
+      "name": "Full Preferences",
+      "description": "包含所有偏好設定的完整請求",
+      "request": {
+        "destination": "巴黎",
+        "days": 5,
+        "description": "浪漫的巴黎之旅，希望能體驗法國美食、藝術和建築",
+        "preferences": {
+          "budget": "medium",
+          "pace": "slow",
+          "interests": ["藝術", "美食", "歷史", "購物"],
+          "companions": 2
+        }
+      }
+    },
+    {
+      "name": "Budget Conscious",
+      "description": "經濟型預算的請求",
+      "request": {
+        "destination": "曼谷",
+        "days": 4,
+        "description": "想體驗泰國的街頭美食和寺廟文化，預算有限",
+        "preferences": {
+          "budget": "low",
+          "pace": "medium",
+          "interests": ["美食", "文化", "寺廟", "市場"],
+          "companions": 1
+        }
+      }
+    },
+    {
+      "name": "Luxury Vacation",
+      "description": "豪華度假請求",
+      "request": {
+        "destination": "巴厘島",
+        "days": 7,
+        "description": "尋找完美的度假體驗，SPA、水療和私人海灘",
+        "preferences": {
+          "budget": "high",
+          "pace": "slow",
+          "interests": ["SPA", "海灘", "豪華度假村", "水上活動"],
+          "companions": 2
+        }
+      }
+    },
+    {
+      "name": "Adventure Trip",
+      "description": "冒險型旅行請求",
+      "request": {
+        "destination": "京都",
+        "days": 4,
+        "description": "探索京都的傳統文化和現代活力",
+        "preferences": {
+          "budget": "medium",
+          "pace": "fast",
+          "interests": ["文化", "歷史", "寺廟", "傳統工藝"],
+          "companions": 3
+        }
+      }
+    },
+    {
+      "name": "Solo Traveler",
+      "description": "單人旅行者請求",
+      "request": {
+        "destination": "阿姆斯特丹",
+        "days": 3,
+        "description": "獨自探索運河之城，體驗當地生活方式",
+        "preferences": {
+          "budget": "low",
+          "pace": "slow",
+          "interests": ["文化", "自行車", "美術館", "咖啡廳"],
+          "companions": 1
+        }
+      }
+    }
+  ],
+  "validation-rules": {
+    "destination": {
+      "required": true,
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "days": {
+      "required": true,
+      "type": "number",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "description": {
+      "required": true,
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1000
+    },
+    "preferences": {
+      "required": false,
+      "type": "object",
+      "properties": {
+        "budget": {
+          "enum": ["low", "medium", "high"]
+        },
+        "pace": {
+          "enum": ["slow", "medium", "fast"]
+        },
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "companions": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 20
+        }
+      }
+    }
+  },
+  "sample-responses": {
+    "success": {
+      "success": true,
+      "trip": {
+        "id": "trip-123",
+        "title": "東京文化探索之旅",
+        "destination": {
+          "name": "東京",
+          "country": "日本",
+          "city": "東京"
+        },
+        "days": []
+      },
+      "analysis": {
+        "primaryFocus": "文化體驗",
+        "travelPace": "medium",
+        "budgetRange": "medium",
+        "interests": ["寺廟", "傳統文化", "現代都市"],
+        "mood": "探索與發現"
+      }
+    },
+    "error": {
+      "success": false,
+      "error": "請求資料無效",
+      "details": [
+        {
+          "message": "\"days\" must be less than or equal to 30",
+          "path": ["days"],
+          "type": "number.max"
+        }
+      ]
+    }
+  }
+}

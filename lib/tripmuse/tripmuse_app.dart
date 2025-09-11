@@ -9,7 +9,9 @@ import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/trip_detail_screen.dart';
 import 'services/services.dart';
+import 'models/models.dart';
 
 /// 當前頁面索引 Provider
 final currentPageIndexProvider = StateProvider<int>((ref) => 0);
@@ -109,6 +111,12 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
         darkTheme: TripMuseTheme.darkTheme,
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
+        routes: {
+          '/trip-detail': (context) {
+            final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+            return TripDetailScreen(trip: trip);
+          },
+        },
         home: Scaffold(
           body: PageView(
             controller: _pageController,

@@ -134,6 +134,40 @@ const tripRequestSchema = Joi.object({
   }).optional()
 });
 
+// 統一活動類別為支持的值
+function normalizeActivityCategory(category) {
+  const categoryMap = {
+    'food': 'food',
+    'restaurant': 'food',
+    '美食': 'food',
+    'dining': 'food',
+    'sightseeing': 'sightseeing',
+    '景點': 'sightseeing',
+    'attraction': 'sightseeing',
+    'tourist': 'sightseeing',
+    'culture': 'culture',
+    '文化': 'culture',
+    'historical': 'culture',
+    'museum': 'culture',
+    'nature': 'nature',
+    '自然': 'nature',
+    'park': 'nature',
+    'outdoor': 'nature',
+    'shopping': 'shopping',
+    '購物': 'shopping',
+    'market': 'shopping',
+    'mall': 'shopping',
+    'outdoor': 'outdoor',
+    '戶外': 'outdoor',
+    'adventure': 'outdoor',
+    'transportation': 'transportation',
+    '交通': 'transportation',
+    'travel': 'transportation'
+  };
+
+  return categoryMap[category.toLowerCase()] || 'sightseeing'; // 預設值
+}
+
 // 健康檢查端點
 app.get('/health', (req, res) => {
   res.json({ 
@@ -210,6 +244,7 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
   "preferenceAnalysis": {
     "primaryFocus": "主要焦點",
     "travelPace": "medium",
+    "budgetRange": "mid",
     "interests": ["文化", "美食"],
     "avoidances": ["人潮"],
     "mood": "輕鬆愉快",
@@ -259,6 +294,24 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
       logger.info('清理後回應長度:', cleanedText.length);
       
       tripData = JSON.parse(cleanedText);
+      
+      // 統一活動類別
+      if (tripData.days && Array.isArray(tripData.days)) {
+        tripData.days.forEach(day => {
+          if (day.activities && Array.isArray(day.activities)) {
+            day.activities.forEach(activity => {
+              if (activity.category) {
+                activity.category = normalizeActivityCategory(activity.category);
+              }
+            });
+          }
+        });
+      }
+      
+      // 確保 preferenceAnalysis 有 budgetRange
+      if (tripData.preferenceAnalysis && !tripData.preferenceAnalysis.budgetRange) {
+        tripData.preferenceAnalysis.budgetRange = 'mid';
+      }
     } catch (parseError) {
       logger.error('LLM 回應解析失敗:', parseError.message);
       logger.error('原始回應預覽:', generatedText.substring(0, 200) + '...');
@@ -298,6 +351,7 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
         preferenceAnalysis: {
           primaryFocus: "城市探索",
           travelPace: "medium",
+          budgetRange: "mid",
           interests: ["文化", "美食"],
           mood: "輕鬆愉快"
         }
@@ -322,7 +376,8 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
 
     res.json({
       success: true,
-      trip: enhancedTrip
+      trip: enhancedTrip,
+      analysis: enhancedTrip.preferenceAnalysis
     });
 
   } catch (error) {
@@ -539,25 +594,36 @@ function cleanActivityCategory(category) {
   // If contains comma, take first value
   const firstCategory = cleaned.split(',')[0].trim();
 
-  // Fix common spelling errors
+  // Fix common spelling errors and expand mappings
   const categoryMap = {
     'food': 'food',
+    'restaurant': 'food',
     '美食': 'food',
+    'dining': 'food',
     'sightseeing': 'sightseeing',
     '觀光': 'sightseeing',
     '景點': 'sightseeing',
+    'attraction': 'sightseeing',
+    'tourist': 'sightseeing',
     'culture': 'culture',
     '文化': 'culture',
     '歷史': 'culture',
+    'historical': 'culture',
+    'museum': 'culture',
     'nature': 'nature',
     '自然': 'nature',
+    'park': 'nature',
     'natuure': 'nature', // Fix spelling error
     'shopping': 'shopping',
     '購物': 'shopping',
+    'market': 'shopping',
+    'mall': 'shopping',
     'outdoor': 'outdoor',
     '戶外': 'outdoor',
+    'adventure': 'outdoor',
     'transportation': 'transportation',
-    '交通': 'transportation'
+    '交通': 'transportation',
+    'travel': 'transportation'
   };
 
   return categoryMap[firstCategory] || 'sightseeing'; // Return default if no match found

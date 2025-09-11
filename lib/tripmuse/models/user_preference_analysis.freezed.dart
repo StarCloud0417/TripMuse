@@ -27,6 +27,9 @@ mixin _$UserPreferenceAnalysis {
   /// 旅行節奏
   TravelPace get travelPace => throw _privateConstructorUsedError;
 
+  /// 預算範圍
+  BudgetRange get budgetRange => throw _privateConstructorUsedError;
+
   /// 興趣列表
   List<String> get interests => throw _privateConstructorUsedError;
 
@@ -60,6 +63,7 @@ abstract class $UserPreferenceAnalysisCopyWith<$Res> {
   $Res call(
       {String primaryFocus,
       TravelPace travelPace,
+      BudgetRange budgetRange,
       List<String> interests,
       List<String> avoidances,
       String mood,
@@ -84,6 +88,7 @@ class _$UserPreferenceAnalysisCopyWithImpl<$Res,
   $Res call({
     Object? primaryFocus = null,
     Object? travelPace = null,
+    Object? budgetRange = null,
     Object? interests = null,
     Object? avoidances = null,
     Object? mood = null,
@@ -100,6 +105,10 @@ class _$UserPreferenceAnalysisCopyWithImpl<$Res,
           ? _value.travelPace
           : travelPace // ignore: cast_nullable_to_non_nullable
               as TravelPace,
+      budgetRange: null == budgetRange
+          ? _value.budgetRange
+          : budgetRange // ignore: cast_nullable_to_non_nullable
+              as BudgetRange,
       interests: null == interests
           ? _value.interests
           : interests // ignore: cast_nullable_to_non_nullable
@@ -140,6 +149,7 @@ abstract class _$$UserPreferenceAnalysisImplCopyWith<$Res>
   $Res call(
       {String primaryFocus,
       TravelPace travelPace,
+      BudgetRange budgetRange,
       List<String> interests,
       List<String> avoidances,
       String mood,
@@ -163,6 +173,7 @@ class __$$UserPreferenceAnalysisImplCopyWithImpl<$Res>
   $Res call({
     Object? primaryFocus = null,
     Object? travelPace = null,
+    Object? budgetRange = null,
     Object? interests = null,
     Object? avoidances = null,
     Object? mood = null,
@@ -179,6 +190,10 @@ class __$$UserPreferenceAnalysisImplCopyWithImpl<$Res>
           ? _value.travelPace
           : travelPace // ignore: cast_nullable_to_non_nullable
               as TravelPace,
+      budgetRange: null == budgetRange
+          ? _value.budgetRange
+          : budgetRange // ignore: cast_nullable_to_non_nullable
+              as BudgetRange,
       interests: null == interests
           ? _value._interests
           : interests // ignore: cast_nullable_to_non_nullable
@@ -213,6 +228,7 @@ class _$UserPreferenceAnalysisImpl implements _UserPreferenceAnalysis {
   const _$UserPreferenceAnalysisImpl(
       {required this.primaryFocus,
       required this.travelPace,
+      required this.budgetRange,
       final List<String> interests = const [],
       final List<String> avoidances = const [],
       required this.mood,
@@ -233,6 +249,10 @@ class _$UserPreferenceAnalysisImpl implements _UserPreferenceAnalysis {
   /// 旅行節奏
   @override
   final TravelPace travelPace;
+
+  /// 預算範圍
+  @override
+  final BudgetRange budgetRange;
 
   /// 興趣列表
   final List<String> _interests;
@@ -285,7 +305,7 @@ class _$UserPreferenceAnalysisImpl implements _UserPreferenceAnalysis {
 
   @override
   String toString() {
-    return 'UserPreferenceAnalysis(primaryFocus: $primaryFocus, travelPace: $travelPace, interests: $interests, avoidances: $avoidances, mood: $mood, keywords: $keywords, confidence: $confidence, analyzedAt: $analyzedAt)';
+    return 'UserPreferenceAnalysis(primaryFocus: $primaryFocus, travelPace: $travelPace, budgetRange: $budgetRange, interests: $interests, avoidances: $avoidances, mood: $mood, keywords: $keywords, confidence: $confidence, analyzedAt: $analyzedAt)';
   }
 
   @override
@@ -297,6 +317,8 @@ class _$UserPreferenceAnalysisImpl implements _UserPreferenceAnalysis {
                 other.primaryFocus == primaryFocus) &&
             (identical(other.travelPace, travelPace) ||
                 other.travelPace == travelPace) &&
+            (identical(other.budgetRange, budgetRange) ||
+                other.budgetRange == budgetRange) &&
             const DeepCollectionEquality()
                 .equals(other._interests, _interests) &&
             const DeepCollectionEquality()
@@ -315,6 +337,7 @@ class _$UserPreferenceAnalysisImpl implements _UserPreferenceAnalysis {
       runtimeType,
       primaryFocus,
       travelPace,
+      budgetRange,
       const DeepCollectionEquality().hash(_interests),
       const DeepCollectionEquality().hash(_avoidances),
       mood,
@@ -341,6 +364,7 @@ abstract class _UserPreferenceAnalysis implements UserPreferenceAnalysis {
   const factory _UserPreferenceAnalysis(
       {required final String primaryFocus,
       required final TravelPace travelPace,
+      required final BudgetRange budgetRange,
       final List<String> interests,
       final List<String> avoidances,
       required final String mood,
@@ -359,6 +383,10 @@ abstract class _UserPreferenceAnalysis implements UserPreferenceAnalysis {
 
   /// 旅行節奏
   TravelPace get travelPace;
+  @override
+
+  /// 預算範圍
+  BudgetRange get budgetRange;
   @override
 
   /// 興趣列表

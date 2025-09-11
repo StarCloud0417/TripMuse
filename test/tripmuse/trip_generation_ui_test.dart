@@ -579,6 +579,7 @@ Trip _createMockTrip() {
     preferenceAnalysis: const UserPreferenceAnalysis(
       primaryFocus: '美食探索',
       travelPace: TravelPace.slow,
+      budgetRange: BudgetRange.mid,
       interests: ['美食', '文化'],
       avoidances: [],
       mood: '探索新奇',

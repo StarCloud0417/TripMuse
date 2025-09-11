@@ -269,6 +269,7 @@ class TripGenerationService {
     return UserPreferenceAnalysis(
       primaryFocus: primaryFocus,
       travelPace: pace,
+      budgetRange: BudgetRange.mid, // 預設中等預算
       interests: interests.isNotEmpty ? interests : ['觀光', '美食'],
       avoidances: [],
       mood: '探索新奇',

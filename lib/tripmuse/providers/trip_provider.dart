@@ -11,22 +11,60 @@ import '../models/models.dart';
 /// 使用者所有行程 Provider
 final userTripsProvider = FutureProvider<List<Trip>>((ref) async {
   try {
-    final tripRepository = ref.watch(tripRepositoryProvider);
-    return await tripRepository.getAllTrips();
-  } catch (e) {
-    // 如果儲存管理器尚未初始化，返回空列表
-    if (e is StorageManagerException && e.message.contains('尚未初始化')) {
-      return [];
+    print('🔍 開始載入行程列表...');
+    
+    // 確保 StorageManager 已初始化
+    final storageManager = StorageManager.instance;
+    if (!storageManager.isInitialized) {
+      print('🔄 StorageManager 尚未初始化，正在初始化...');
+      await storageManager.initialize();
+      print('✅ StorageManager 初始化完成');
     }
-    // 重新拋出其他錯誤
+    
+    final tripRepository = storageManager.tripRepository;
+    final trips = await tripRepository.getAllTrips();
+    print('📋 成功載入 ${trips.length} 個行程');
+    
+    // 打印每個行程的基本信息
+    for (final trip in trips) {
+      print('  - ${trip.id}: ${trip.title}');
+    }
+    
+    return trips;
+  } catch (e, stackTrace) {
+    print('⚠️ 取得行程列表失敗: $e');
+    print('Stack trace: $stackTrace');
+    // 重新拋出錯誤，讓 UI 能夠顯示錯誤信息
     rethrow;
   }
 });
 
 /// 特定行程 Provider
 final tripProvider = FutureProvider.family<Trip?, String>((ref, tripId) async {
-  final tripRepository = ref.watch(tripRepositoryProvider);
-  return await tripRepository.getTripById(tripId);
+  try {
+    print('🔍 載入行程: $tripId');
+    
+    // 確保 StorageManager 已初始化
+    final storageManager = StorageManager.instance;
+    if (!storageManager.isInitialized) {
+      await storageManager.initialize();
+    }
+    
+    final tripRepository = storageManager.tripRepository;
+    final trip = await tripRepository.getTripById(tripId);
+    
+    if (trip != null) {
+      print('✅ 成功載入行程: ${trip.title}');
+    } else {
+      print('⚠️ 找不到行程: $tripId');
+    }
+    
+    return trip;
+  } catch (e, stackTrace) {
+    print('⚠️ 載入行程失敗: $e');
+    print('Stack trace: $stackTrace');
+    rethrow;
+  }
 });
 
 /// 行程統計 Provider

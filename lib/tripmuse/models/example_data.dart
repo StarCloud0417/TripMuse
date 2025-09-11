@@ -108,6 +108,7 @@ class ExampleData {
   static UserPreferenceAnalysis get foodLoverAnalysis => UserPreferenceAnalysis(
     primaryFocus: '美食體驗',
     travelPace: TravelPace.slow,
+    budgetRange: BudgetRange.mid,
     interests: const ['當地小吃', '傳統市場', '米其林餐廳', '夜市文化'],
     avoidances: const ['趕行程', '人擠人景點', '長時間排隊'],
     mood: '放鬆悠閒的美食探索',
@@ -158,6 +159,7 @@ class ExampleData {
   static UserPreferenceAnalysis get cultureLoverAnalysis => const UserPreferenceAnalysis(
     primaryFocus: '文化體驗',
     travelPace: TravelPace.medium,
+    budgetRange: BudgetRange.mid,
     interests: ['博物館', '歷史古蹟', '傳統建築', '藝術展覽'],
     avoidances: ['商業化景點', '過度觀光化'],
     mood: '深度文化探索',
@@ -169,6 +171,7 @@ class ExampleData {
   static UserPreferenceAnalysis get natureLoverAnalysis => const UserPreferenceAnalysis(
     primaryFocus: '自然體驗',
     travelPace: TravelPace.medium,
+    budgetRange: BudgetRange.mid,
     interests: ['登山健行', '自然景觀', '生態觀察', '戶外活動'],
     avoidances: ['室內活動', '都市景點'],
     mood: '親近自然的戶外探險',

@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2025-09-11
+
+### Fixed
+- 🐛 **JSON 解析錯誤修復** - 修復 Client 端解析 Server 回應時的格式不匹配問題 (Fixed JSON parsing errors when Client parses Server responses due to format mismatches)
+- 🔧 **budgetRange 欄位缺失** - 添加缺失的 budgetRange 欄位到 UserPreferenceAnalysis 模型 (Added missing budgetRange field to UserPreferenceAnalysis model)
+- 📊 **活動類別統一** - 統一活動類別映射，確保所有類別都符合 Client 端支持的值 (Unified activity category mapping to ensure all categories match Client-side supported values)
+- 🔄 **Server 回應格式** - 修復 Server 端回應格式，添加 analysis 欄位 (Fixed Server response format by adding analysis field)
+
+### Enhanced
+- ⚡ **靈活的 budgetRange 解析** - 實現靈活的 budgetRange 值解析，支持多種變體寫法 (Implemented flexible budgetRange parsing supporting multiple variant formats)
+- 🎯 **活動類別映射擴展** - 擴展活動類別映射，支持更多 LLM 生成的類別變體 (Extended activity category mapping to support more LLM-generated category variants)
+- 📝 **JSON 格式兼容性** - 大幅提升 Client-Server JSON 格式的兼容性 (Significantly improved Client-Server JSON format compatibility)
+
+### Added
+- ✅ **budgetRange 靈活解析** - 添加對 "cheap", "expensive", "luxury" 等 budgetRange 變體的支持 (Added support for budgetRange variants like "cheap", "expensive", "luxury")
+- 🔧 **活動類別自動映射** - 實現活動類別的自動映射和標準化 (Implemented automatic activity category mapping and normalization)
+- 📋 **API 範例文件** - 創建完整的 Client-Server API 請求範例文件 (Created comprehensive Client-Server API request example files)
+- 🧪 **JSON 解析測試** - 添加靈活 budgetRange 解析的單元測試 (Added unit tests for flexible budgetRange parsing)
+
+### Technical
+- 🏗️ **UserPreferenceAnalysis 模型** - 優化 UserPreferenceAnalysis 的 fromJson 方法 (Optimized UserPreferenceAnalysis fromJson method)
+- 🔧 **Server 端清理函數** - 更新 cleanActivityCategory 函數以支持更多映射 (Updated cleanActivityCategory function to support more mappings)
+- 📦 **範例文件結構** - 重新組織 gcp-backend/examples 目錄結構 (Reorganized gcp-backend/examples directory structure)
+- 🧪 **測試覆蓋率** - 增加 JSON 解析相關的測試覆蓋率 (Increased test coverage for JSON parsing related functionality)
+
+### 中文
+- 🐛 **JSON 解析錯誤修復** - 修復 Client 端解析 Server 回應時的格式不匹配問題
+- 🔧 **budgetRange 欄位缺失** - 添加缺失的 budgetRange 欄位到 UserPreferenceAnalysis 模型
+- 📊 **活動類別統一** - 統一活動類別映射，確保所有類別都符合 Client 端支持的值
+- 🔄 **Server 回應格式** - 修復 Server 端回應格式，添加 analysis 欄位
+
+### 技術改進
+- ⚡ **靈活的 budgetRange 解析** - 實現靈活的 budgetRange 值解析，支持多種變體寫法
+- 🎯 **活動類別映射擴展** - 擴展活動類別映射，支持更多 LLM 生成的類別變體
+- 📝 **JSON 格式兼容性** - 大幅提升 Client-Server JSON 格式的兼容性
+
+### 檔案變更
+- 修改: `lib/tripmuse/models/user_preference_analysis.dart` - 添加靈活的 budgetRange 解析邏輯
+- 修改: `gcp-backend/server.js` - 添加 budgetRange 欄位和活動類別映射
+- 修改: `gcp-backend/examples/generate-trip-examples.json` - 更新範例格式
+- 修改: `gcp-backend/examples/client-request-examples.json` - 新增完整 API 範例
+- 修改: `pubspec.yaml` - 版本號更新為 0.1.8
+- 新增: `gcp-backend/examples/README.md` - API 範例使用說明
+- 修改: `test/tripmuse/models/models_test.dart` - 添加 budgetRange 解析測試
+
 ## [0.1.7] - 2025-01-11
 
 ### Fixed

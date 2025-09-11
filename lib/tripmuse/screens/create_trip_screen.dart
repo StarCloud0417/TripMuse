@@ -818,7 +818,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       final result = await showDialog<Trip>(
         context: context,
         barrierDismissible: false,
-        builder: (context) => ProviderScope(
+        builder: (dialogContext) => ProviderScope(
           child: SimpleProgressDialog(
             request: tripRequest,
             onSuccess: (trip) async {
@@ -832,18 +832,35 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                   print('✅ StorageManager 初始化完成');
                 }
                 
-                final tripRepository = ref.read(tripRepositoryProvider);
+                // 直接使用 StorageManager 而不是通過 ref
+                final tripRepository = storageManager.tripRepository;
                 await tripRepository.saveTrip(trip);
                 print('✅ 行程已儲存到本地: ${trip.id}');
                 
-                // 刷新相關的 Provider 以更新 UI
-                ref.invalidate(userTripsProvider);
-                ref.invalidate(recentTripsProvider);
-                ref.read(tripNotifierProvider.notifier).refresh();
+                // SimpleProgressDialog 會在 onSuccess 完成後自動關閉
+                
+                // 使用原始 context 的 ref 來刷新 Provider
+                if (context.mounted) {
+                  ref.invalidate(userTripsProvider);
+                  ref.invalidate(recentTripsProvider);
+                  ref.read(tripNotifierProvider.notifier).refresh();
+                  
+                  // 顯示成功訊息
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('行程「${trip.title}」已成功儲存！'),
+                      backgroundColor: TripMuseTheme.successColor,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
                 
               } catch (e) {
                 print('⚠️ 儲存行程失敗: $e');
                 // 顯示錯誤提示給用戶
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

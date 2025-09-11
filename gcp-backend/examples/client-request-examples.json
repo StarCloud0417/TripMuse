@@ -1,0 +1,198 @@
+{
+  "description": "TripMuse Client to Server API Request Examples",
+  "version": "1.0.0",
+  "lastUpdated": "2025-09-11",
+  "examples": {
+    "generate-trip": {
+      "description": "生成旅行行程請求",
+      "method": "POST",
+      "endpoint": "/api/v1/generate-trip",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <firebase-auth-token>"
+      },
+      "examples": [
+        {
+          "name": "基本行程生成請求",
+          "request": {
+            "destination": "東京",
+            "days": 3,
+            "description": "我想去東京體驗日本文化，特別是傳統寺廟和現代都市的對比"
+          }
+        },
+        {
+          "name": "完整偏好設定請求",
+          "request": {
+            "destination": "巴黎",
+            "days": 5,
+            "description": "浪漫的巴黎之旅，希望能體驗法國美食、藝術和建築",
+            "preferences": {
+              "budget": "medium",
+              "pace": "slow",
+              "interests": ["藝術", "美食", "歷史", "購物"],
+              "companions": 2
+            }
+          }
+        },
+        {
+          "name": "經濟型預算請求",
+          "request": {
+            "destination": "曼谷",
+            "days": 4,
+            "description": "想體驗泰國的街頭美食和寺廟文化，預算有限",
+            "preferences": {
+              "budget": "low",
+              "pace": "medium",
+              "interests": ["美食", "文化", "寺廟", "市場"],
+              "companions": 1
+            }
+          }
+        },
+        {
+          "name": "豪華度假請求",
+          "request": {
+            "destination": "巴厘島",
+            "days": 7,
+            "description": "尋找完美的度假體驗，SPA、水療和私人海灘",
+            "preferences": {
+              "budget": "high",
+              "pace": "slow",
+              "interests": ["SPA", "海灘", "豪華度假村", "水上活動"],
+              "companions": 2
+            }
+          }
+        }
+      ]
+    },
+    "places-search": {
+      "description": "地點搜尋請求",
+      "method": "GET",
+      "endpoint": "/api/v1/places/search",
+      "headers": {
+        "Authorization": "Bearer <firebase-auth-token>"
+      },
+      "examples": [
+        {
+          "name": "基本地點搜尋",
+          "query": {
+            "q": "東京鐵塔",
+            "location": "35.6762,139.6503",
+            "radius": 5000
+          },
+          "url": "/api/v1/places/search?q=東京鐵塔&location=35.6762,139.6503&radius=5000"
+        },
+        {
+          "name": "餐廳搜尋",
+          "query": {
+            "q": "壽司餐廳",
+            "location": "35.6762,139.6503",
+            "radius": 10000
+          },
+          "url": "/api/v1/places/search?q=壽司餐廳&location=35.6762,139.6503&radius=10000"
+        }
+      ]
+    },
+    "places-details": {
+      "description": "地點詳細資訊請求",
+      "method": "GET",
+      "endpoint": "/api/v1/places/details",
+      "headers": {
+        "Authorization": "Bearer <firebase-auth-token>"
+      },
+      "examples": [
+        {
+          "name": "獲取地點詳細資訊",
+          "query": {
+            "place_id": "ChIJN1t_tDeuEmsRUsoyG83frY4"
+          },
+          "url": "/api/v1/places/details?place_id=ChIJN1t_tDeuEmsRUsoyG83frY4"
+        }
+      ]
+    },
+    "places-photo": {
+      "description": "地點照片請求",
+      "method": "GET",
+      "endpoint": "/api/v1/places/photo",
+      "headers": {
+        "Authorization": "Bearer <firebase-auth-token>"
+      },
+      "examples": [
+        {
+          "name": "獲取地點照片",
+          "query": {
+            "photo_reference": "ATJ83zhSSAt4ZYVF3U1_2YS6jB2X4",
+            "maxwidth": 400,
+            "maxheight": 400
+          },
+          "url": "/api/v1/places/photo?photo_reference=ATJ83zhSSAt4ZYVF3U1_2YS6jB2X4&maxwidth=400&maxheight=400"
+        }
+      ]
+    },
+    "map-config": {
+      "description": "地圖配置請求",
+      "method": "GET",
+      "endpoint": "/api/v1/map/config",
+      "headers": {
+        "Authorization": "Bearer <firebase-auth-token>"
+      },
+      "examples": [
+        {
+          "name": "獲取地圖配置",
+          "url": "/api/v1/map/config"
+        }
+      ]
+    },
+    "health-check": {
+      "description": "健康檢查請求",
+      "method": "GET",
+      "endpoint": "/health",
+      "examples": [
+        {
+          "name": "服務器健康檢查",
+          "url": "/health"
+        }
+      ]
+    }
+  },
+  "data-types": {
+    "budget-options": ["low", "medium", "high"],
+    "pace-options": ["slow", "medium", "fast"],
+    "common-interests": [
+      "美食", "文化", "歷史", "藝術", "自然", "冒險",
+      "購物", "夜生活", "SPA", "水上活動", "登山", "攝影"
+    ],
+    "supported-destinations": [
+      "東京", "巴黎", "曼谷", "巴厘島", "紐約", "倫敦",
+      "京都", "羅馬", "阿姆斯特丹", "柏林", "首爾", "新加坡"
+    ]
+  },
+  "error-responses": {
+    "validation-error": {
+      "success": false,
+      "error": "請求資料無效",
+      "details": [
+        {
+          "message": "\"destination\" is required",
+          "path": ["destination"],
+          "type": "any.required"
+        }
+      ]
+    },
+    "authentication-error": {
+      "success": false,
+      "error": "未授權的請求",
+      "message": "請提供有效的 Firebase 認證令牌"
+    },
+    "server-error": {
+      "success": false,
+      "error": "內部服務器錯誤",
+      "message": "請稍後再試"
+    }
+  },
+  "notes": {
+    "authentication": "所有 API 請求都需要 Firebase 認證令牌",
+    "rate-limits": "請注意 API 調用頻率限制",
+    "coordinates": "經緯度格式為 'latitude,longitude'",
+    "language": "支持中文和英文請求"
+  }
+}

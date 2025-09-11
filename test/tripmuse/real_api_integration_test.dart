@@ -98,7 +98,9 @@ void main() {
               home: Scaffold(
                 body: SimpleProgressDialog(
                   request: request,
-                  onSuccess: (trip) => resultTrip = trip,
+                  onSuccess: (trip) async {
+                    resultTrip = trip;
+                  },
                 ),
               ),
             ),

@@ -69,6 +69,7 @@ void main() {
         preferenceAnalysis: const UserPreferenceAnalysis(
           primaryFocus: '美食',
           travelPace: TravelPace.medium,
+          budgetRange: BudgetRange.mid,
           mood: '輕鬆',
           keywords: ['美食', '文化', '購物'],
         ),

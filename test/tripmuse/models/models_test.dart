@@ -149,6 +149,7 @@ void main() {
       final analysis = UserPreferenceAnalysis(
         primaryFocus: '美食體驗',
         travelPace: TravelPace.slow,
+        budgetRange: BudgetRange.mid,
         interests: ['當地小吃', '傳統市場', '文化體驗'],
         avoidances: ['人群', '趕行程'],
         mood: '放鬆悠閒',
@@ -167,6 +168,60 @@ void main() {
       // 測試摘要
       expect(analysis.preferenceSummary, contains('美食體驗'));
       expect(analysis.preferenceSummary, contains('放鬆'));
+    });
+
+    test('UserPreferenceAnalysis fromJson 應該靈活處理budgetRange值', () {
+      // 測試標準值
+      final json1 = {
+        'primaryFocus': '測試',
+        'travelPace': 'slow',
+        'budgetRange': 'mid',
+        'interests': [],
+        'avoidances': [],
+        'mood': '測試',
+        'keywords': [],
+      };
+      final analysis1 = UserPreferenceAnalysis.fromJson(json1);
+      expect(analysis1.budgetRange, equals(BudgetRange.mid));
+
+      // 測試變體值
+      final json2 = {
+        'primaryFocus': '測試',
+        'travelPace': 'slow',
+        'budgetRange': 'cheap', // 應該映射到low
+        'interests': [],
+        'avoidances': [],
+        'mood': '測試',
+        'keywords': [],
+      };
+      final analysis2 = UserPreferenceAnalysis.fromJson(json2);
+      expect(analysis2.budgetRange, equals(BudgetRange.low));
+
+      // 測試另一個變體
+      final json3 = {
+        'primaryFocus': '測試',
+        'travelPace': 'slow',
+        'budgetRange': 'luxury', // 應該映射到high
+        'interests': [],
+        'avoidances': [],
+        'mood': '測試',
+        'keywords': [],
+      };
+      final analysis3 = UserPreferenceAnalysis.fromJson(json3);
+      expect(analysis3.budgetRange, equals(BudgetRange.high));
+
+      // 測試未知值（應該使用預設值mid）
+      final json4 = {
+        'primaryFocus': '測試',
+        'travelPace': 'slow',
+        'budgetRange': 'unknown_value',
+        'interests': [],
+        'avoidances': [],
+        'mood': '測試',
+        'keywords': [],
+      };
+      final analysis4 = UserPreferenceAnalysis.fromJson(json4);
+      expect(analysis4.budgetRange, equals(BudgetRange.mid));
     });
 
     test('TripRequest 應該正確驗證和轉換', () {

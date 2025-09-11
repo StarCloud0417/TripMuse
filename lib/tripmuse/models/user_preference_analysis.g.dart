@@ -11,6 +11,7 @@ _$UserPreferenceAnalysisImpl _$$UserPreferenceAnalysisImplFromJson(
     _$UserPreferenceAnalysisImpl(
       primaryFocus: json['primaryFocus'] as String,
       travelPace: $enumDecode(_$TravelPaceEnumMap, json['travelPace']),
+      budgetRange: $enumDecode(_$BudgetRangeEnumMap, json['budgetRange']),
       interests: (json['interests'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -35,6 +36,7 @@ Map<String, dynamic> _$$UserPreferenceAnalysisImplToJson(
     <String, dynamic>{
       'primaryFocus': instance.primaryFocus,
       'travelPace': _$TravelPaceEnumMap[instance.travelPace]!,
+      'budgetRange': _$BudgetRangeEnumMap[instance.budgetRange]!,
       'interests': instance.interests,
       'avoidances': instance.avoidances,
       'mood': instance.mood,
@@ -47,4 +49,10 @@ const _$TravelPaceEnumMap = {
   TravelPace.slow: 'slow',
   TravelPace.medium: 'medium',
   TravelPace.fast: 'fast',
+};
+
+const _$BudgetRangeEnumMap = {
+  BudgetRange.low: 'low',
+  BudgetRange.mid: 'mid',
+  BudgetRange.high: 'high',
 };

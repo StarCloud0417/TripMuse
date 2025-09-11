@@ -20,14 +20,29 @@ User _$UserFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$User {
+  /// 使用者唯一識別碼
   String get id => throw _privateConstructorUsedError;
+
+  /// 使用者名稱
   String get name => throw _privateConstructorUsedError;
+
+  /// 電子郵件
   String get email => throw _privateConstructorUsedError;
-  bool get isGuest => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-  String? get googleId => throw _privateConstructorUsedError;
+
+  /// 頭像 URL
   String? get avatarUrl => throw _privateConstructorUsedError;
+
+  /// Google ID（如果是 Google 登入）
+  String? get googleId => throw _privateConstructorUsedError;
+
+  /// 是否為訪客模式
+  bool get isGuest => throw _privateConstructorUsedError;
+
+  /// 建立時間
+  DateTime get createdAt => throw _privateConstructorUsedError;
+
+  /// 更新時間
+  DateTime get updatedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,11 +58,11 @@ abstract class $UserCopyWith<$Res> {
       {String id,
       String name,
       String email,
+      String? avatarUrl,
+      String? googleId,
       bool isGuest,
       DateTime createdAt,
-      DateTime updatedAt,
-      String? googleId,
-      String? avatarUrl});
+      DateTime updatedAt});
 }
 
 /// @nodoc
@@ -66,11 +81,11 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? id = null,
     Object? name = null,
     Object? email = null,
+    Object? avatarUrl = freezed,
+    Object? googleId = freezed,
     Object? isGuest = null,
     Object? createdAt = null,
     Object? updatedAt = null,
-    Object? googleId = freezed,
-    Object? avatarUrl = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -85,6 +100,14 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
+      avatarUrl: freezed == avatarUrl
+          ? _value.avatarUrl
+          : avatarUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      googleId: freezed == googleId
+          ? _value.googleId
+          : googleId // ignore: cast_nullable_to_non_nullable
+              as String?,
       isGuest: null == isGuest
           ? _value.isGuest
           : isGuest // ignore: cast_nullable_to_non_nullable
@@ -97,14 +120,6 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      googleId: freezed == googleId
-          ? _value.googleId
-          : googleId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      avatarUrl: freezed == avatarUrl
-          ? _value.avatarUrl
-          : avatarUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 }
@@ -120,11 +135,11 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       {String id,
       String name,
       String email,
+      String? avatarUrl,
+      String? googleId,
       bool isGuest,
       DateTime createdAt,
-      DateTime updatedAt,
-      String? googleId,
-      String? avatarUrl});
+      DateTime updatedAt});
 }
 
 /// @nodoc
@@ -140,11 +155,11 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? email = null,
+    Object? avatarUrl = freezed,
+    Object? googleId = freezed,
     Object? isGuest = null,
     Object? createdAt = null,
     Object? updatedAt = null,
-    Object? googleId = freezed,
-    Object? avatarUrl = freezed,
   }) {
     return _then(_$UserImpl(
       id: null == id
@@ -159,6 +174,14 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
+      avatarUrl: freezed == avatarUrl
+          ? _value.avatarUrl
+          : avatarUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      googleId: freezed == googleId
+          ? _value.googleId
+          : googleId // ignore: cast_nullable_to_non_nullable
+              as String?,
       isGuest: null == isGuest
           ? _value.isGuest
           : isGuest // ignore: cast_nullable_to_non_nullable
@@ -171,14 +194,6 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      googleId: freezed == googleId
-          ? _value.googleId
-          : googleId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      avatarUrl: freezed == avatarUrl
-          ? _value.avatarUrl
-          : avatarUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -190,35 +205,51 @@ class _$UserImpl implements _User {
       {required this.id,
       required this.name,
       required this.email,
-      required this.isGuest,
-      required this.createdAt,
-      required this.updatedAt,
+      this.avatarUrl,
       this.googleId,
-      this.avatarUrl});
+      this.isGuest = false,
+      required this.createdAt,
+      required this.updatedAt});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
 
+  /// 使用者唯一識別碼
   @override
   final String id;
+
+  /// 使用者名稱
   @override
   final String name;
+
+  /// 電子郵件
   @override
   final String email;
-  @override
-  final bool isGuest;
-  @override
-  final DateTime createdAt;
-  @override
-  final DateTime updatedAt;
-  @override
-  final String? googleId;
+
+  /// 頭像 URL
   @override
   final String? avatarUrl;
 
+  /// Google ID（如果是 Google 登入）
+  @override
+  final String? googleId;
+
+  /// 是否為訪客模式
+  @override
+  @JsonKey()
+  final bool isGuest;
+
+  /// 建立時間
+  @override
+  final DateTime createdAt;
+
+  /// 更新時間
+  @override
+  final DateTime updatedAt;
+
   @override
   String toString() {
-    return 'User(id: $id, name: $name, email: $email, isGuest: $isGuest, createdAt: $createdAt, updatedAt: $updatedAt, googleId: $googleId, avatarUrl: $avatarUrl)';
+    return 'User(id: $id, name: $name, email: $email, avatarUrl: $avatarUrl, googleId: $googleId, isGuest: $isGuest, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -229,21 +260,21 @@ class _$UserImpl implements _User {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.email, email) || other.email == email) &&
+            (identical(other.avatarUrl, avatarUrl) ||
+                other.avatarUrl == avatarUrl) &&
+            (identical(other.googleId, googleId) ||
+                other.googleId == googleId) &&
             (identical(other.isGuest, isGuest) || other.isGuest == isGuest) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt) &&
-            (identical(other.googleId, googleId) ||
-                other.googleId == googleId) &&
-            (identical(other.avatarUrl, avatarUrl) ||
-                other.avatarUrl == avatarUrl));
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, email, isGuest,
-      createdAt, updatedAt, googleId, avatarUrl);
+  int get hashCode => Object.hash(runtimeType, id, name, email, avatarUrl,
+      googleId, isGuest, createdAt, updatedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -264,30 +295,46 @@ abstract class _User implements User {
       {required final String id,
       required final String name,
       required final String email,
-      required final bool isGuest,
-      required final DateTime createdAt,
-      required final DateTime updatedAt,
+      final String? avatarUrl,
       final String? googleId,
-      final String? avatarUrl}) = _$UserImpl;
+      final bool isGuest,
+      required final DateTime createdAt,
+      required final DateTime updatedAt}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
+
+  /// 使用者唯一識別碼
   String get id;
   @override
+
+  /// 使用者名稱
   String get name;
   @override
+
+  /// 電子郵件
   String get email;
   @override
-  bool get isGuest;
+
+  /// 頭像 URL
+  String? get avatarUrl;
   @override
-  DateTime get createdAt;
-  @override
-  DateTime get updatedAt;
-  @override
+
+  /// Google ID（如果是 Google 登入）
   String? get googleId;
   @override
-  String? get avatarUrl;
+
+  /// 是否為訪客模式
+  bool get isGuest;
+  @override
+
+  /// 建立時間
+  DateTime get createdAt;
+  @override
+
+  /// 更新時間
+  DateTime get updatedAt;
   @override
   @JsonKey(ignore: true)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>
@@ -300,13 +347,43 @@ UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserPreferences {
+  /// 偏好的語言
   String get language => throw _privateConstructorUsedError;
+
+  /// 主題設定
   String get theme => throw _privateConstructorUsedError;
+
+  /// 預設貨幣
   String get defaultCurrency => throw _privateConstructorUsedError;
+
+  /// 預設地圖樣式
   String get defaultMapStyle => throw _privateConstructorUsedError;
+
+  /// 偏好的旅行節奏
+  String get travelPace => throw _privateConstructorUsedError;
+
+  /// 偏好的預算範圍
+  String get budgetRange => throw _privateConstructorUsedError;
+
+  /// 偏好的旅行風格
+  String get travelStyle => throw _privateConstructorUsedError;
+
+  /// 是否啟用推播通知
   bool get enableNotifications => throw _privateConstructorUsedError;
+
+  /// 是否啟用位置追蹤
   bool get enableLocationTracking => throw _privateConstructorUsedError;
+
+  /// 是否啟用離線模式
   bool get enableOfflineMode => throw _privateConstructorUsedError;
+
+  /// 是否自動同步
+  bool get autoSync => throw _privateConstructorUsedError;
+
+  /// 建立時間
+  DateTime get createdAt => throw _privateConstructorUsedError;
+
+  /// 更新時間
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -326,9 +403,14 @@ abstract class $UserPreferencesCopyWith<$Res> {
       String theme,
       String defaultCurrency,
       String defaultMapStyle,
+      String travelPace,
+      String budgetRange,
+      String travelStyle,
       bool enableNotifications,
       bool enableLocationTracking,
       bool enableOfflineMode,
+      bool autoSync,
+      DateTime createdAt,
       DateTime updatedAt});
 }
 
@@ -349,9 +431,14 @@ class _$UserPreferencesCopyWithImpl<$Res, $Val extends UserPreferences>
     Object? theme = null,
     Object? defaultCurrency = null,
     Object? defaultMapStyle = null,
+    Object? travelPace = null,
+    Object? budgetRange = null,
+    Object? travelStyle = null,
     Object? enableNotifications = null,
     Object? enableLocationTracking = null,
     Object? enableOfflineMode = null,
+    Object? autoSync = null,
+    Object? createdAt = null,
     Object? updatedAt = null,
   }) {
     return _then(_value.copyWith(
@@ -371,6 +458,18 @@ class _$UserPreferencesCopyWithImpl<$Res, $Val extends UserPreferences>
           ? _value.defaultMapStyle
           : defaultMapStyle // ignore: cast_nullable_to_non_nullable
               as String,
+      travelPace: null == travelPace
+          ? _value.travelPace
+          : travelPace // ignore: cast_nullable_to_non_nullable
+              as String,
+      budgetRange: null == budgetRange
+          ? _value.budgetRange
+          : budgetRange // ignore: cast_nullable_to_non_nullable
+              as String,
+      travelStyle: null == travelStyle
+          ? _value.travelStyle
+          : travelStyle // ignore: cast_nullable_to_non_nullable
+              as String,
       enableNotifications: null == enableNotifications
           ? _value.enableNotifications
           : enableNotifications // ignore: cast_nullable_to_non_nullable
@@ -383,6 +482,14 @@ class _$UserPreferencesCopyWithImpl<$Res, $Val extends UserPreferences>
           ? _value.enableOfflineMode
           : enableOfflineMode // ignore: cast_nullable_to_non_nullable
               as bool,
+      autoSync: null == autoSync
+          ? _value.autoSync
+          : autoSync // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -404,9 +511,14 @@ abstract class _$$UserPreferencesImplCopyWith<$Res>
       String theme,
       String defaultCurrency,
       String defaultMapStyle,
+      String travelPace,
+      String budgetRange,
+      String travelStyle,
       bool enableNotifications,
       bool enableLocationTracking,
       bool enableOfflineMode,
+      bool autoSync,
+      DateTime createdAt,
       DateTime updatedAt});
 }
 
@@ -425,9 +537,14 @@ class __$$UserPreferencesImplCopyWithImpl<$Res>
     Object? theme = null,
     Object? defaultCurrency = null,
     Object? defaultMapStyle = null,
+    Object? travelPace = null,
+    Object? budgetRange = null,
+    Object? travelStyle = null,
     Object? enableNotifications = null,
     Object? enableLocationTracking = null,
     Object? enableOfflineMode = null,
+    Object? autoSync = null,
+    Object? createdAt = null,
     Object? updatedAt = null,
   }) {
     return _then(_$UserPreferencesImpl(
@@ -447,6 +564,18 @@ class __$$UserPreferencesImplCopyWithImpl<$Res>
           ? _value.defaultMapStyle
           : defaultMapStyle // ignore: cast_nullable_to_non_nullable
               as String,
+      travelPace: null == travelPace
+          ? _value.travelPace
+          : travelPace // ignore: cast_nullable_to_non_nullable
+              as String,
+      budgetRange: null == budgetRange
+          ? _value.budgetRange
+          : budgetRange // ignore: cast_nullable_to_non_nullable
+              as String,
+      travelStyle: null == travelStyle
+          ? _value.travelStyle
+          : travelStyle // ignore: cast_nullable_to_non_nullable
+              as String,
       enableNotifications: null == enableNotifications
           ? _value.enableNotifications
           : enableNotifications // ignore: cast_nullable_to_non_nullable
@@ -459,6 +588,14 @@ class __$$UserPreferencesImplCopyWithImpl<$Res>
           ? _value.enableOfflineMode
           : enableOfflineMode // ignore: cast_nullable_to_non_nullable
               as bool,
+      autoSync: null == autoSync
+          ? _value.autoSync
+          : autoSync // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -471,38 +608,89 @@ class __$$UserPreferencesImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserPreferencesImpl implements _UserPreferences {
   const _$UserPreferencesImpl(
-      {required this.language,
-      required this.theme,
-      required this.defaultCurrency,
-      required this.defaultMapStyle,
-      required this.enableNotifications,
-      required this.enableLocationTracking,
-      required this.enableOfflineMode,
+      {this.language = 'zh-TW',
+      this.theme = 'system',
+      this.defaultCurrency = 'TWD',
+      this.defaultMapStyle = 'standard',
+      this.travelPace = 'moderate',
+      this.budgetRange = 'medium',
+      this.travelStyle = 'balanced',
+      this.enableNotifications = true,
+      this.enableLocationTracking = true,
+      this.enableOfflineMode = true,
+      this.autoSync = true,
+      required this.createdAt,
       required this.updatedAt});
 
   factory _$UserPreferencesImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserPreferencesImplFromJson(json);
 
+  /// 偏好的語言
   @override
+  @JsonKey()
   final String language;
+
+  /// 主題設定
   @override
+  @JsonKey()
   final String theme;
+
+  /// 預設貨幣
   @override
+  @JsonKey()
   final String defaultCurrency;
+
+  /// 預設地圖樣式
   @override
+  @JsonKey()
   final String defaultMapStyle;
+
+  /// 偏好的旅行節奏
   @override
+  @JsonKey()
+  final String travelPace;
+
+  /// 偏好的預算範圍
+  @override
+  @JsonKey()
+  final String budgetRange;
+
+  /// 偏好的旅行風格
+  @override
+  @JsonKey()
+  final String travelStyle;
+
+  /// 是否啟用推播通知
+  @override
+  @JsonKey()
   final bool enableNotifications;
+
+  /// 是否啟用位置追蹤
   @override
+  @JsonKey()
   final bool enableLocationTracking;
+
+  /// 是否啟用離線模式
   @override
+  @JsonKey()
   final bool enableOfflineMode;
+
+  /// 是否自動同步
+  @override
+  @JsonKey()
+  final bool autoSync;
+
+  /// 建立時間
+  @override
+  final DateTime createdAt;
+
+  /// 更新時間
   @override
   final DateTime updatedAt;
 
   @override
   String toString() {
-    return 'UserPreferences(language: $language, theme: $theme, defaultCurrency: $defaultCurrency, defaultMapStyle: $defaultMapStyle, enableNotifications: $enableNotifications, enableLocationTracking: $enableLocationTracking, enableOfflineMode: $enableOfflineMode, updatedAt: $updatedAt)';
+    return 'UserPreferences(language: $language, theme: $theme, defaultCurrency: $defaultCurrency, defaultMapStyle: $defaultMapStyle, travelPace: $travelPace, budgetRange: $budgetRange, travelStyle: $travelStyle, enableNotifications: $enableNotifications, enableLocationTracking: $enableLocationTracking, enableOfflineMode: $enableOfflineMode, autoSync: $autoSync, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -517,12 +705,22 @@ class _$UserPreferencesImpl implements _UserPreferences {
                 other.defaultCurrency == defaultCurrency) &&
             (identical(other.defaultMapStyle, defaultMapStyle) ||
                 other.defaultMapStyle == defaultMapStyle) &&
+            (identical(other.travelPace, travelPace) ||
+                other.travelPace == travelPace) &&
+            (identical(other.budgetRange, budgetRange) ||
+                other.budgetRange == budgetRange) &&
+            (identical(other.travelStyle, travelStyle) ||
+                other.travelStyle == travelStyle) &&
             (identical(other.enableNotifications, enableNotifications) ||
                 other.enableNotifications == enableNotifications) &&
             (identical(other.enableLocationTracking, enableLocationTracking) ||
                 other.enableLocationTracking == enableLocationTracking) &&
             (identical(other.enableOfflineMode, enableOfflineMode) ||
                 other.enableOfflineMode == enableOfflineMode) &&
+            (identical(other.autoSync, autoSync) ||
+                other.autoSync == autoSync) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt));
   }
@@ -535,9 +733,14 @@ class _$UserPreferencesImpl implements _UserPreferences {
       theme,
       defaultCurrency,
       defaultMapStyle,
+      travelPace,
+      budgetRange,
+      travelStyle,
       enableNotifications,
       enableLocationTracking,
       enableOfflineMode,
+      autoSync,
+      createdAt,
       updatedAt);
 
   @JsonKey(ignore: true)
@@ -557,33 +760,74 @@ class _$UserPreferencesImpl implements _UserPreferences {
 
 abstract class _UserPreferences implements UserPreferences {
   const factory _UserPreferences(
-      {required final String language,
-      required final String theme,
-      required final String defaultCurrency,
-      required final String defaultMapStyle,
-      required final bool enableNotifications,
-      required final bool enableLocationTracking,
-      required final bool enableOfflineMode,
+      {final String language,
+      final String theme,
+      final String defaultCurrency,
+      final String defaultMapStyle,
+      final String travelPace,
+      final String budgetRange,
+      final String travelStyle,
+      final bool enableNotifications,
+      final bool enableLocationTracking,
+      final bool enableOfflineMode,
+      final bool autoSync,
+      required final DateTime createdAt,
       required final DateTime updatedAt}) = _$UserPreferencesImpl;
 
   factory _UserPreferences.fromJson(Map<String, dynamic> json) =
       _$UserPreferencesImpl.fromJson;
 
   @override
+
+  /// 偏好的語言
   String get language;
   @override
+
+  /// 主題設定
   String get theme;
   @override
+
+  /// 預設貨幣
   String get defaultCurrency;
   @override
+
+  /// 預設地圖樣式
   String get defaultMapStyle;
   @override
+
+  /// 偏好的旅行節奏
+  String get travelPace;
+  @override
+
+  /// 偏好的預算範圍
+  String get budgetRange;
+  @override
+
+  /// 偏好的旅行風格
+  String get travelStyle;
+  @override
+
+  /// 是否啟用推播通知
   bool get enableNotifications;
   @override
+
+  /// 是否啟用位置追蹤
   bool get enableLocationTracking;
   @override
+
+  /// 是否啟用離線模式
   bool get enableOfflineMode;
   @override
+
+  /// 是否自動同步
+  bool get autoSync;
+  @override
+
+  /// 建立時間
+  DateTime get createdAt;
+  @override
+
+  /// 更新時間
   DateTime get updatedAt;
   @override
   @JsonKey(ignore: true)

@@ -168,6 +168,7 @@ void main() {
           enableNotifications: false,
           enableLocationTracking: false,
           enableOfflineMode: true,
+          createdAt: now,
           updatedAt: now,
         );
         
