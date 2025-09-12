@@ -196,7 +196,7 @@ app.post('/api/v1/generate-trip', authenticateUser, async (req, res) => {
     logger.info('正在生成行程', { userId, destination, days });
 
     // 建立 Gemini 模型
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // 建構詳細的 prompt
     const prompt = `
