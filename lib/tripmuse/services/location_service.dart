@@ -228,12 +228,12 @@ class LocationService {
       }
 
       final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
+      try {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
         debugPrint('✅ 已開啟導航到: ${activity.name}');
         return true;
-      } else {
-        debugPrint('❌ 無法開啟導航應用');
+      } catch (e) {
+        debugPrint('❌ 無法開啟導航應用: $e');
         return false;
       }
     } catch (e) {

@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-09-12
+
+### Added
+- 🔍 **地圖搜索功能** - 新增完整的地點搜索功能，支援即時搜索和結果展示 (Added complete place search functionality with real-time search and results display)
+- 🧭 **導航功能整合** - 在搜索結果中整合導航功能，支援一鍵導航到選定地點 (Integrated navigation functionality in search results, support one-click navigation to selected places)
+
+### Fixed
+- 🐛 **導航啟動失敗** - 修復導航功能無法啟動的問題，替換棄用的canLaunchUrl函數 (Fixed navigation launch failure by replacing deprecated canLaunchUrl function)
+- 🔧 **導航異常處理** - 改善導航功能的異常處理，提供多層備用方案 (Improved navigation error handling with multiple fallback options)
+- 📱 **地圖應用相容性** - 增強與不同地圖應用的相容性，支援Google Maps、Apple Maps等 (Enhanced compatibility with different map applications)
+
+### Technical
+- 🔄 **URL啟動機制** - 更新URL啟動機制，使用新的launchUrl API (Updated URL launch mechanism using new launchUrl API)
+- 🛡️ **錯誤處理強化** - 強化錯誤處理機制，提供更清晰的錯誤訊息 (Strengthened error handling mechanism with clearer error messages)
+- 📋 **多平台支援** - 改善多平台導航支援，適配Android和iOS (Improved multi-platform navigation support for Android and iOS)
+
+### 中文
+- 🔍 **地圖搜索功能** - 新增完整的地點搜索功能，支援即時搜索和結果展示
+- 🧭 **導航功能整合** - 在搜索結果中整合導航功能，支援一鍵導航到選定地點
+
+### 問題修復
+- 🐛 **導航啟動失敗** - 修復導航功能無法啟動的問題，替換棄用的canLaunchUrl函數
+- 🔧 **導航異常處理** - 改善導航功能的異常處理，提供多層備用方案
+- 📱 **地圖應用相容性** - 增強與不同地圖應用的相容性，支援Google Maps、Apple Maps等
+
+### 技術改進
+- 🔄 **URL啟動機制** - 更新URL啟動機制，使用新的launchUrl API
+- 🛡️ **錯誤處理強化** - 強化錯誤處理機制，提供更清晰的錯誤訊息
+- 📋 **多平台支援** - 改善多平台導航支援，適配Android和iOS
+
+### 檔案變更
+- 修改: `lib/tripmuse/services/navigation_helper.dart` - 修復導航功能，替換canLaunchUrl
+- 修改: `lib/tripmuse/services/location_service.dart` - 修復openNavigation方法
+- 修改: `lib/tripmuse/screens/map_screen.dart` - 新增地圖搜索功能和導航整合
+
+## [0.2.0] - 2025-09-12
+
 ## [0.2.0] - 2025-09-12
 
 ### Added

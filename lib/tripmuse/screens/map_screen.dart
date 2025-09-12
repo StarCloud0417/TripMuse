@@ -8,6 +8,8 @@ import '../theme/app_theme.dart';
 import '../widgets/trip_map_widget.dart';
 import '../providers/trip_provider.dart';
 import '../models/models.dart';
+import '../services/navigation_helper.dart';
+import '../services/places_service.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -625,17 +627,158 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   /// 顯示搜尋對話框
   void _showSearchDialog() {
+    final TextEditingController searchController = TextEditingController();
+    List<Place> searchResults = [];
+    bool isSearching = false;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('搜尋功能'),
-        content: const Text('搜尋功能開發中，敬請期待！'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('確定'),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.search, color: TripMuseTheme.primaryColor),
+              const SizedBox(width: TripMuseSpacing.sm),
+              const Text('搜尋地點'),
+            ],
           ),
-        ],
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 搜尋輸入框
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: '輸入地點名稱...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              searchController.clear();
+                              setState(() {
+                                searchResults = [];
+                              });
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                    ),
+                  ),
+                  onChanged: (value) async {
+                    if (value.trim().isEmpty) {
+                      setState(() {
+                        searchResults = [];
+                        isSearching = false;
+                      });
+                      return;
+                    }
+
+                    setState(() {
+                      isSearching = true;
+                    });
+
+                    try {
+                      // 使用 PlacesService 搜尋地點
+                      final placesService = ref.read(placesServiceProvider);
+                      final results = await placesService.searchPlaces(
+                        value.trim(),
+                        maxResults: 10,
+                      );
+
+                      setState(() {
+                        searchResults = results;
+                        isSearching = false;
+                      });
+                    } catch (e) {
+                      setState(() {
+                        searchResults = [];
+                        isSearching = false;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('搜尋失敗: $e'),
+                          backgroundColor: TripMuseTheme.errorColor,
+                        ),
+                      );
+                    }
+                  },
+                ),
+
+                const SizedBox(height: TripMuseSpacing.md),
+
+                // 搜尋結果
+                if (isSearching)
+                  const Padding(
+                    padding: EdgeInsets.all(TripMuseSpacing.md),
+                    child: CircularProgressIndicator(),
+                  )
+                else if (searchResults.isNotEmpty)
+                  SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                      itemCount: searchResults.length,
+                      itemBuilder: (context, index) {
+                        final place = searchResults[index];
+                        return ListTile(
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: TripMuseTheme.primaryColor.withAlpha((0.1 * 255).round()),
+                              borderRadius: BorderRadius.circular(TripMuseRadius.sm),
+                            ),
+                            child: const Icon(
+                              Icons.place,
+                              color: TripMuseTheme.primaryColor,
+                            ),
+                          ),
+                          title: Text(
+                            place.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            place.address,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: TripMuseTheme.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          onTap: () {
+                            // 關閉搜尋對話框
+                            Navigator.of(dialogContext).pop();
+
+                            // 在地圖上顯示選定的地點
+                            _showPlaceOnMap(place);
+                          },
+                        );
+                      },
+                    ),
+                  )
+                else if (searchController.text.isNotEmpty && !isSearching)
+                  const Padding(
+                    padding: EdgeInsets.all(TripMuseSpacing.lg),
+                    child: Text(
+                      '未找到相關地點',
+                      style: TextStyle(color: TripMuseTheme.textSecondary),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('取消'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -757,15 +900,58 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     print('📍 座標: ${firstActivity.lat}, ${firstActivity.lng}');
   }
 
-  /// 飛行到行程總覽視角
+  /// 在地圖上顯示選定的地點
+  void _showPlaceOnMap(Place place) {
+    // 創建一個臨時的活動物件來在地圖上顯示
+    final tempActivity = Activity(
+      id: 'search_${place.id}',
+      name: place.name,
+      description: place.address,
+      category: ActivityCategory.sightseeing, // 預設為景點
+      priority: ActivityPriority.medium, // 預設中等優先級
+      lat: place.location.lat,
+      lng: place.location.lng,
+      address: place.address,
+      estimatedCost: null,
+      tips: null,
+    );
+
+    // 更新地圖狀態以顯示這個地點
+    ref.read(mapStateProvider.notifier).selectActivity(tempActivity);
+
+    // 顯示一個snackbar提示用戶
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已在地圖上標記: ${place.name}'),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: '導航',
+          onPressed: () async {
+            try {
+              final navigationHelper = ref.read(navigationHelperProvider);
+              await navigationHelper.navigateToActivity(tempActivity);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('無法啟動導航: $e'),
+                  backgroundColor: TripMuseTheme.errorColor,
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+  /// ������{�`������
   void _flyToTripOverview() {
     if (_selectedTrip == null) {
       return;
     }
 
-    // 清除選中的活動，讓地圖顯示整個行程
+    // �M���襤�����ʡA���a����ܾ�Ӧ�{
     ref.read(mapStateProvider.notifier).selectActivity(null);
     
-    print('🗺️ 切換到行程總覽視角');
+    print(' �������{�`������');
   }
 }

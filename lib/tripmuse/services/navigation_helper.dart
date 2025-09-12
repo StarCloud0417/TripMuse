@@ -64,20 +64,27 @@ class NavigationHelper {
   Future<void> navigateToActivity(Activity activity) async {
     final lat = activity.lat;
     final lng = activity.lng;
-    
+
     // 嘗試使用 Google Maps
     final googleMapsUrl = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
-    
-    if (await canLaunchUrl(googleMapsUrl)) {
+
+    try {
       await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
-    } else {
-      // 備用方案：使用通用地圖 URL
+    } catch (e) {
+      // 如果Google Maps失敗，嘗試使用通用地圖 URL
       final fallbackUrl = Uri.parse('geo:$lat,$lng?q=$lat,$lng(${Uri.encodeComponent(activity.name)})');
-      
-      if (await canLaunchUrl(fallbackUrl)) {
+
+      try {
         await launchUrl(fallbackUrl, mode: LaunchMode.externalApplication);
-      } else {
-        throw Exception('無法啟動導航應用');
+      } catch (fallbackError) {
+        // 如果都失敗了，嘗試使用更簡單的geo URL
+        final simpleGeoUrl = Uri.parse('geo:$lat,$lng');
+
+        try {
+          await launchUrl(simpleGeoUrl, mode: LaunchMode.externalApplication);
+        } catch (simpleError) {
+          throw Exception('無法啟動導航應用。請確認已安裝地圖應用程式。\n錯誤詳情: $simpleError');
+        }
       }
     }
   }
