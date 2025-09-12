@@ -1,5 +1,5 @@
 /// TripMuse 地圖組件
-/// 
+///
 /// 基於 MapBox Maps Flutter SDK 的專用地圖組件
 /// 支援行程路線顯示、景點標記、互動功能、位置追蹤和導航等
 
@@ -17,7 +17,8 @@ import '../services/navigation_helper.dart';
 import '../utils/coordinate_validator.dart';
 
 /// 地圖狀態 Provider
-final mapStateProvider = StateNotifierProvider<MapStateNotifier, MapState>((ref) {
+final mapStateProvider =
+    StateNotifierProvider<MapStateNotifier, MapState>((ref) {
   return MapStateNotifier();
 });
 
@@ -139,37 +140,37 @@ class TripMapWidget extends ConsumerStatefulWidget {
   ConsumerState<TripMapWidget> createState() => _TripMapWidgetState();
 }
 
-class _TripMapWidgetState extends ConsumerState<TripMapWidget> 
+class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     with TickerProviderStateMixin {
   MapboxMap? _mapboxMap;
   PointAnnotationManager? _pointAnnotationManager;
   PolylineAnnotationManager? _polylineAnnotationManager;
-  
+
   // 標記圖標（保留供未來使用）
   // Uint8List? _activityIconData;
-  
+
   // 標記與活動的對應關係
   final Map<String, _ActivityInfo> _markerToActivityMap = {};
-  
+
   // 位置追蹤相關
   bool _isLocationTrackingEnabled = false;
-  
+
   // 動畫控制器
   late AnimationController _markerAnimationController;
   late AnimationController _routeAnimationController;
   late AnimationController _cameraAnimationController;
-  
+
   // 日期篩選（移至 MapScreen）
   // DateTime? _selectedDate;
   // bool _showDateFilter = false;
-  
+
   // 地圖互動狀態
   bool _isAnimating = false;
-  
+
   // 現代化每日行程顏色主題 - 美觀漸層色彩
   static const List<Color> dayColors = [
-    Color(0xFF667EEA), // 漸層藍紫 - 第1天
-    Color(0xFF06D6A0), // 薄荷綠 - 第2天  
+    Color.fromARGB(255, 0, 42, 230), // 漸層藍紫 - 第1天
+    Color(0xFF06D6A0), // 薄荷綠 - 第2天
     Color(0xFFFFB347), // 暖橙色 - 第3天
     Color(0xFF9B59B6), // 優雅紫 - 第4天
     Color(0xFFE74C3C), // 珊瑚紅 - 第5天
@@ -185,7 +186,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     super.initState();
     _loadIcons();
     _initializeAnimations();
-    
+
     // 設置初始狀態
     if (widget.initialTrip != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -194,7 +195,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     }
     if (widget.initialActivity != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(mapStateProvider.notifier).selectActivity(widget.initialActivity);
+        ref
+            .read(mapStateProvider.notifier)
+            .selectActivity(widget.initialActivity);
       });
     }
   }
@@ -202,7 +205,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   @override
   void didUpdateWidget(TripMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // 當 widget 更新時，檢查是否需要更新地圖內容
     if (oldWidget.initialTrip != widget.initialTrip) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -213,10 +216,25 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
         }
       });
     }
-    
+
+    // 當選擇的日期發生變化時，重新聚焦
+    if (oldWidget.selectedDate != widget.selectedDate) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.initialTrip != null) {
+          if (widget.selectedDate != null) {
+            _focusOnSelectedDateFirstActivity(widget.initialTrip!);
+          } else {
+            _focusOnFirstActivityOfTrip(widget.initialTrip!);
+          }
+        }
+      });
+    }
+
     if (oldWidget.initialActivity != widget.initialActivity) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(mapStateProvider.notifier).selectActivity(widget.initialActivity);
+        ref
+            .read(mapStateProvider.notifier)
+            .selectActivity(widget.initialActivity);
       });
     }
   }
@@ -224,35 +242,69 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   /// 聚焦到行程的第一個景點
   Future<void> _focusOnFirstActivityOfTrip(Trip trip) async {
     if (_mapboxMap == null || trip.days.isEmpty) return;
-    
+
     final firstDay = trip.days.first;
     if (firstDay.activities.isEmpty) return;
-    
+
     final firstActivity = firstDay.activities.first;
-    if (!CoordinateValidator.isValidCoordinate(firstActivity.lat, firstActivity.lng)) return;
-    
+    if (!CoordinateValidator.isValidCoordinate(
+        firstActivity.lat, firstActivity.lng)) return;
+
     // 動畫地圖視圖到第一個景點
     await _mapboxMap!.setCamera(CameraOptions(
-      center: Point(coordinates: Position(firstActivity.lng, firstActivity.lat)),
+      center:
+          Point(coordinates: Position(firstActivity.lng, firstActivity.lat)),
       zoom: 16.0, // 高縮放級別以聚焦到景點
       pitch: 0,
     ));
-    
+
     print('🎯 已聚焦到新行程的第一個景點: ${firstActivity.name}');
   }
+
+  /// 聚焦到選擇日期的第一個景點
+  Future<void> _focusOnSelectedDateFirstActivity(Trip trip) async {
+    if (_mapboxMap == null || widget.selectedDate == null) return;
+
+    // 根據選擇的日期找到對應的天數
+    final tripStartDate = trip.startDate ?? DateTime.now();
+    final daysDifference = widget.selectedDate!.difference(tripStartDate).inDays;
+
+    if (daysDifference >= 0 && daysDifference < trip.days.length) {
+      final selectedDay = trip.days[daysDifference];
+      if (selectedDay.activities.isNotEmpty) {
+        final firstActivity = selectedDay.activities.first;
+        if (CoordinateValidator.isValidCoordinate(firstActivity.lat, firstActivity.lng)) {
+          // 聚焦到該日期的第一個景點
+          await _mapboxMap!.setCamera(CameraOptions(
+            center: Point(coordinates: Position(firstActivity.lng, firstActivity.lat)),
+            zoom: 16.0, // 高縮放級別以聚焦到景點
+            pitch: 0,
+          ));
+
+          print('🎯 已聚焦到選擇日期 ${widget.selectedDate!.toString().split(' ')[0]} 的第一個景點: ${firstActivity.name}');
+          return;
+        }
+      }
+    }
+
+    // 如果找不到對應日期的活動，聚焦到第一天的第一個活動
+    print('⚠️ 找不到選擇日期的活動，聚焦到第一天');
+    await _focusOnFirstActivityOfTrip(trip);
+  }
+
   void _initializeAnimations() {
     // 標記動畫控制器
     _markerAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     // 路線動畫控制器
     _routeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     // 相機動畫控制器
     _cameraAnimationController = AnimationController(
       duration: const Duration(milliseconds: 2000),
@@ -278,11 +330,12 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   }
 
   /// 平滑移動到指定位置 - 複製自 animation_example.dart
-  Future<void> _animatedEaseTo(Position position, {double? zoom, double? bearing, double? pitch}) async {
+  Future<void> _animatedEaseTo(Position position,
+      {double? zoom, double? bearing, double? pitch}) async {
     if (_mapboxMap == null || _isAnimating) return;
-    
+
     setState(() => _isAnimating = true);
-    
+
     try {
       await _mapboxMap!.easeTo(
         CameraOptions(
@@ -299,11 +352,12 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   }
 
   /// 飛行到指定位置 - 複製自 animation_example.dart
-  Future<void> _animatedFlyTo(Position position, {double? zoom, double? bearing, double? pitch}) async {
+  Future<void> _animatedFlyTo(Position position,
+      {double? zoom, double? bearing, double? pitch}) async {
     if (_mapboxMap == null || _isAnimating) return;
-    
+
     setState(() => _isAnimating = true);
-    
+
     try {
       await _mapboxMap!.flyTo(
         CameraOptions(
@@ -320,51 +374,53 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   }
 
   /// 動畫顯示活動標記
-  Future<void> _animateMarkerAppearance(List<PointAnnotationOptions> annotations) async {
+  Future<void> _animateMarkerAppearance(
+      List<PointAnnotationOptions> annotations) async {
     if (annotations.isEmpty) {
       print('⚠️ 標記列表為空，跳過動畫');
       return;
     }
-    
+
     print('🎬 開始標記動畫，共 ${annotations.length} 個標記');
-    
+
     // 重置動畫
     _markerAnimationController.reset();
-    
+
     // 分批顯示標記，創造波浪效果
     for (int i = 0; i < annotations.length; i += 2) {
       final batch = annotations.skip(i).take(2).toList();
       print('📍 創建標記批次 ${(i ~/ 2) + 1}，包含 ${batch.length} 個標記');
-      
+
       try {
         await _pointAnnotationManager!.createMulti(batch);
         print('✅ 標記批次創建成功');
       } catch (e) {
         print('❌ 標記創建失敗: $e');
       }
-      
+
       // 短暫延遲創造動畫效果
       await Future.delayed(const Duration(milliseconds: 150));
     }
-    
+
     // 啟動縮放動畫
     _markerAnimationController.forward();
     print('🎬 標記動畫完成');
   }
 
   /// 動畫顯示路線
-  Future<void> _animateRouteAppearance(List<PolylineAnnotationOptions> routes) async {
+  Future<void> _animateRouteAppearance(
+      List<PolylineAnnotationOptions> routes) async {
     if (routes.isEmpty) return;
-    
+
     // 重置動畫
     _routeAnimationController.reset();
-    
+
     // 逐條顯示路線
     for (final route in routes) {
       await _polylineAnnotationManager!.create(route);
       await Future.delayed(const Duration(milliseconds: 300));
     }
-    
+
     // 啟動透明度動畫
     _routeAnimationController.forward();
   }
@@ -373,26 +429,31 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   void _onMapCreated(MapboxMap mapboxMap) async {
     print('🗺️ MapBox 地圖創建回調被調用');
     _mapboxMap = mapboxMap;
-    
+
     try {
       // 設置初始相機位置
-      Point initialCenter = Point(coordinates: Position(121.5654, 25.0330)); // 台北101
+      Point initialCenter =
+          Point(coordinates: Position(121.5654, 25.0330)); // 台北101
       double initialZoom = 12.0; // 預設縮放級別
-      
+
       if (widget.initialTrip != null && widget.initialTrip!.days.isNotEmpty) {
         final firstDay = widget.initialTrip!.days.first;
         if (firstDay.activities.isNotEmpty) {
           final firstActivity = firstDay.activities.first;
-          if (CoordinateValidator.isValidCoordinate(firstActivity.lat, firstActivity.lng)) {
-            initialCenter = Point(coordinates: Position(firstActivity.lng, firstActivity.lat));
+          if (CoordinateValidator.isValidCoordinate(
+              firstActivity.lat, firstActivity.lng)) {
+            initialCenter = Point(
+                coordinates: Position(firstActivity.lng, firstActivity.lat));
             initialZoom = 16.0; // 聚焦到景點時使用更高的縮放級別
-            print('🎯 聚焦到第一個景點: ${firstActivity.name} (${firstActivity.lat}, ${firstActivity.lng})');
+            print(
+                '🎯 聚焦到第一個景點: ${firstActivity.name} (${firstActivity.lat}, ${firstActivity.lng})');
           }
         }
       }
-      
-      print('📍 設置地圖中心點: ${initialCenter.coordinates.lng}, ${initialCenter.coordinates.lat} (縮放: $initialZoom)');
-      
+
+      print(
+          '📍 設置地圖中心點: ${initialCenter.coordinates.lng}, ${initialCenter.coordinates.lat} (縮放: $initialZoom)');
+
       await mapboxMap.setCamera(CameraOptions(
         center: initialCenter,
         zoom: initialZoom,
@@ -402,14 +463,16 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
       print('📷 地圖相機設置完成');
 
       // 創建標記管理器
-      _pointAnnotationManager = await mapboxMap.annotations.createPointAnnotationManager();
-      _polylineAnnotationManager = await mapboxMap.annotations.createPolylineAnnotationManager();
-      
+      _pointAnnotationManager =
+          await mapboxMap.annotations.createPointAnnotationManager();
+      _polylineAnnotationManager =
+          await mapboxMap.annotations.createPolylineAnnotationManager();
+
       print('📌 標記管理器創建完成');
-      
+
       // 設置標記點擊事件
       _pointAnnotationManager?.tapEvents(onTap: _onAnnotationTap);
-      
+
       // 啟用地圖手勢
       await mapboxMap.gestures.updateSettings(GesturesSettings(
         scrollEnabled: true,
@@ -419,15 +482,15 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
         doubleTouchToZoomOutEnabled: true,
         quickZoomEnabled: true,
       ));
-      
+
       print('👆 地圖手勢已啟用');
-      
+
       // 啟用位置組件
       await _enableLocationComponent();
-      
+
       // 初始化地圖內容
       _updateMapContent();
-      
+
       print('✅ 地圖初始化完成');
     } catch (e) {
       print('❌ 地圖初始化失敗: $e');
@@ -439,8 +502,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   Future<void> _enableLocationComponent() async {
     try {
       // 檢查位置權限
-      final permissionStatus = await ref.read(locationServiceProvider).checkAndRequestPermission();
-      
+      final permissionStatus =
+          await ref.read(locationServiceProvider).checkAndRequestPermission();
+
       if (permissionStatus == LocationServiceStatus.granted) {
         // 啟用 MapBox 內建位置組件
         await _mapboxMap?.location.updateSettings(LocationComponentSettings(
@@ -449,10 +513,11 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           pulsingEnabled: true,
           showAccuracyRing: true,
           pulsingColor: TripMuseTheme.primaryColor.toARGB32(),
-          accuracyRingColor: TripMuseTheme.primaryColor.withValues(alpha: 0.2).toARGB32(),
+          accuracyRingColor:
+              TripMuseTheme.primaryColor.withValues(alpha: 0.2).toARGB32(),
           accuracyRingBorderColor: TripMuseTheme.primaryColor.toARGB32(),
         ));
-        
+
         print('✅ 位置組件已啟用');
       } else {
         print('❌ 位置權限未授予，無法啟用位置組件');
@@ -465,25 +530,25 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   /// 標記點擊事件處理
   void _onAnnotationTap(PointAnnotation annotation) {
     print('📍 標記被點擊');
-    
+
     // 通過座標來找到對應的活動
     final clickedPoint = annotation.geometry;
     final clickedPosition = clickedPoint.coordinates;
     final markerKey = '${clickedPosition.lng}_${clickedPosition.lat}';
-    
+
     // 從對應關係中找到活動
     final activityInfo = _markerToActivityMap[markerKey];
-    
+
     if (activityInfo != null) {
       ref.read(mapStateProvider.notifier).selectActivity(activityInfo.activity);
-      
+
       // 只調用一個回調，避免重複彈窗
       if (widget.onActivityTap != null) {
         widget.onActivityTap?.call(activityInfo.activity);
       } else {
         _showActivityInfoWindow(activityInfo.activity, activityInfo.dayPlan);
       }
-      
+
       print('🎯 找到活動: ${activityInfo.activity.name}');
     } else {
       print('❌ 未找到對應的活動');
@@ -493,7 +558,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   /// 顯示活動資訊窗口
   void _showActivityInfoWindow(Activity activity, DayPlan dayPlan) {
     if (!mounted) return;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -505,7 +570,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   /// 更新地圖內容
   void _updateMapContent() {
     final mapState = ref.read(mapStateProvider);
-    
+
     if (mapState.selectedTrip != null) {
       _showTripOnMap(mapState.selectedTrip!);
     } else if (mapState.showAllTrips) {
@@ -522,46 +587,49 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
       print('❌ 標記管理器未初始化');
       return;
     }
-    
+
     print('🗺️ 開始在地圖上顯示行程: ${trip.title}');
     print('📊 行程包含 ${trip.days.length} 天');
-    
+
     // 清除現有標記和路線
     await _clearMapContent();
-    
+
     final allCoordinates = <Position>[];
     final allAnnotations = <PointAnnotationOptions>[];
     final allRoutes = <PolylineAnnotationOptions>[];
-    
+
     // 根據日期篩選決定顯示哪些天
     final daysToShow = _getFilteredDays(trip);
     print('📅 要顯示的天數: ${daysToShow.length}');
-    
+
     // 為每一天創建不同顏色的標記和路線
     for (int dayIndex = 0; dayIndex < daysToShow.length; dayIndex++) {
       final dayPlan = daysToShow[dayIndex];
       final originalDayIndex = trip.days.indexOf(dayPlan);
       final dayColor = _getDayColor(originalDayIndex);
-      
-      print('📍 處理第${originalDayIndex + 1}天，包含 ${dayPlan.activities.length} 個活動');
-      
-      final dayAnnotations = await _prepareDayAnnotations(dayPlan, dayColor, originalDayIndex);
+
+      print(
+          '📍 處理第${originalDayIndex + 1}天，包含 ${dayPlan.activities.length} 個活動');
+
+      final dayAnnotations =
+          await _prepareDayAnnotations(dayPlan, dayColor, originalDayIndex);
       allAnnotations.addAll(dayAnnotations);
-      
+
       // 收集所有座標用於調整視角
       for (final activity in dayPlan.activities) {
         if (CoordinateValidator.isValidCoordinate(activity.lat, activity.lng)) {
           allCoordinates.add(Position(activity.lng, activity.lat));
         }
       }
-      
+
       // 準備路線
       if (ref.read(mapStateProvider).showRoute) {
-        final dayRoutes = await _prepareDayRoutes(dayPlan, dayColor, originalDayIndex);
+        final dayRoutes =
+            await _prepareDayRoutes(dayPlan, dayColor, originalDayIndex);
         allRoutes.addAll(dayRoutes);
       }
     }
-    
+
     // 動畫顯示標記
     print('📌 準備顯示 ${allAnnotations.length} 個標記');
     if (allAnnotations.isNotEmpty) {
@@ -569,22 +637,31 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     } else {
       print('⚠️ 沒有標記需要顯示');
     }
-    
+
     // 動畫顯示路線
     if (allRoutes.isNotEmpty) {
       await _animateRouteAppearance(allRoutes);
     }
-    
+
     // 顯示跨天連接路線
     if (ref.read(mapStateProvider).showRoute && daysToShow.length > 1) {
       await _showInterDayRoutes(trip);
     }
-    
-    // 動畫調整相機視角以包含所有標記
-    if (allCoordinates.isNotEmpty) {
-      await _animatedFitCameraToBounds(allCoordinates);
+
+    // 根據選擇的日期進行聚焦
+    if (widget.selectedDate != null) {
+      // 如果選擇了特定日期，聚焦到該日期的第一個活動
+      await _focusOnSelectedDateFirstActivity(trip);
+    } else {
+      // 如果選擇"全部"，聚焦到第一天的第一個活動
+      await _focusOnFirstActivityOfTrip(trip);
     }
-    
+
+    // 動畫調整相機視角以包含所有標記
+    // if (allCoordinates.isNotEmpty) {
+    //   await _animatedFitCameraToBounds(allCoordinates);
+    // }
+
     print('✅ 行程顯示完成，共 ${daysToShow.length} 天');
   }
 
@@ -593,42 +670,43 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     if (widget.selectedDate == null) {
       return trip.days; // 顯示所有天數
     }
-    
+
     // 計算選中日期對應的天數索引
     final tripStartDate = trip.startDate ?? DateTime.now();
-    final daysDifference = widget.selectedDate!.difference(tripStartDate).inDays;
-    
+    final daysDifference =
+        widget.selectedDate!.difference(tripStartDate).inDays;
+
     if (daysDifference >= 0 && daysDifference < trip.days.length) {
       return [trip.days[daysDifference]]; // 只顯示選中的那一天
     }
-    
+
     return []; // 選中日期不在行程範圍內
   }
 
   /// 準備單日標記（不立即創建）
   Future<List<PointAnnotationOptions>> _prepareDayAnnotations(
-    DayPlan dayPlan, 
-    Color dayColor, 
-    int dayIndex
-  ) async {
+      DayPlan dayPlan, Color dayColor, int dayIndex) async {
     final annotations = <PointAnnotationOptions>[];
-    
+
     // 為每個活動創建標記
-    for (int activityIndex = 0; activityIndex < dayPlan.activities.length; activityIndex++) {
+    for (int activityIndex = 0;
+        activityIndex < dayPlan.activities.length;
+        activityIndex++) {
       final activity = dayPlan.activities[activityIndex];
-      
+
       if (CoordinateValidator.isValidCoordinate(activity.lat, activity.lng)) {
         final position = Position(activity.lng, activity.lat);
-        
+
         // 判斷是否為選中的活動（高亮顯示）
-        final isSelected = ref.read(mapStateProvider).selectedActivity?.id == activity.id;
-        
+        final isSelected =
+            ref.read(mapStateProvider).selectedActivity?.id == activity.id;
+
         // 創建高亮標記 - 選中時使用特殊樣式
         final annotationOptions = PointAnnotationOptions(
           geometry: Point(coordinates: position),
           textField: isSelected ? '🎯' : '📍', // 選中時使用目標圖標
           textSize: isSelected ? 56.0 : 40.0, // 選中時更大
-          textColor: isSelected 
+          textColor: isSelected
               ? const Color(0xFFFF6B35).toARGB32() // 選中時使用橙紅色高亮
               : dayColor.toARGB32(),
           textOffset: [0.0, 0.0],
@@ -637,7 +715,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           symbolSortKey: isSelected ? 100.0 : (10.0 + dayIndex), // 選中的標記顯示在最上層
           iconSize: 0.0,
         );
-        
+
         // 添加活動順序數字 - 選中時樣式增強
         final numberAnnotation = PointAnnotationOptions(
           geometry: Point(coordinates: position),
@@ -645,29 +723,31 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           textSize: isSelected ? 18.0 : 14.0, // 選中時更大的數字
           textColor: Colors.white.toARGB32(),
           textOffset: [0.0, isSelected ? -2.0 : -1.5], // 選中時調整偏移
-          textHaloColor: isSelected 
+          textHaloColor: isSelected
               ? const Color(0xFFFF6B35).toARGB32() // 選中時使用高亮色
               : dayColor.toARGB32(),
           textHaloWidth: isSelected ? 2.0 : 1.5, // 選中時更粗的光暈
           symbolSortKey: isSelected ? 101.0 : (11.0 + dayIndex),
         );
-        
+
         // 如果是選中的活動，添加脈衝動畫效果的外圈
         if (isSelected) {
           final pulseAnnotation = PointAnnotationOptions(
             geometry: Point(coordinates: position),
             textField: '⭕', // 使用圓圈作為脈衝效果
             textSize: 72.0, // 更大的外圈
-            textColor: const Color(0xFFFF6B35).withValues(alpha: 0.3).toARGB32(), // 半透明橙色
+            textColor: const Color(0xFFFF6B35)
+                .withValues(alpha: 0.3)
+                .toARGB32(), // 半透明橙色
             textOffset: [0.0, 0.0],
             symbolSortKey: 99.0, // 顯示在主標記下方
           );
           annotations.add(pulseAnnotation);
         }
-        
+
         // 創建標記的唯一鍵
         final markerKey = '${position.lng}_${position.lat}';
-        
+
         // 存儲標記與活動的對應關係
         _markerToActivityMap[markerKey] = _ActivityInfo(
           activity: activity,
@@ -675,90 +755,93 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           dayIndex: dayIndex,
           activityIndex: activityIndex,
         );
-        
+
         annotations.add(annotationOptions);
         annotations.add(numberAnnotation);
       }
     }
-    
+
     return annotations;
   }
 
   /// 準備單日路線（不立即創建）
   Future<List<PolylineAnnotationOptions>> _prepareDayRoutes(
-    DayPlan dayPlan, 
-    Color dayColor, 
-    int dayIndex
-  ) async {
+      DayPlan dayPlan, Color dayColor, int dayIndex) async {
     final routes = <PolylineAnnotationOptions>[];
     final routeCoordinates = <Position>[];
-    
+
     // 收集路線座標
     for (final activity in dayPlan.activities) {
       if (CoordinateValidator.isValidCoordinate(activity.lat, activity.lng)) {
         routeCoordinates.add(Position(activity.lng, activity.lat));
       }
     }
-    
+
     if (routeCoordinates.length > 1) {
-      // 路線陰影
+      // 生成弧形路徑
+      final curvedCoordinates = _generateCurvedPath(routeCoordinates);
+
+      // 增強顏色飽和度
+      final enhancedColor = _enhanceColorSaturation(dayColor, 0.6);
+
+      // 路線陰影 - 使用更深的陰影
       routes.add(PolylineAnnotationOptions(
-        geometry: LineString(coordinates: routeCoordinates),
-        lineColor: Colors.black.withValues(alpha: 0.3).toARGB32(),
-        lineWidth: 12.0,
-        lineOpacity: 0.4,
+        geometry: LineString(coordinates: curvedCoordinates),
+        lineColor: Colors.black.withValues(alpha: 0.5).toARGB32(),
+        lineWidth: 14.0,
+        lineOpacity: 0.6,
       ));
-      
-      // 主路線
+
+      // 主路線 - 使用增強飽和度的顏色
       routes.add(PolylineAnnotationOptions(
-        geometry: LineString(coordinates: routeCoordinates),
-        lineColor: dayColor.toARGB32(),
-        lineWidth: 8.0,
-        lineOpacity: 0.9,
+        geometry: LineString(coordinates: curvedCoordinates),
+        lineColor: enhancedColor.toARGB32(),
+        lineWidth: 10.0,
+        lineOpacity: 0.95,
       ));
-      
-      // 高光路線
-      final highlightColor = _lightenColor(dayColor, 0.3);
+
+      // 高光路線 - 使用更亮的版本
+      final highlightColor = _lightenColor(enhancedColor, 0.4);
       routes.add(PolylineAnnotationOptions(
-        geometry: LineString(coordinates: routeCoordinates),
+        geometry: LineString(coordinates: curvedCoordinates),
         lineColor: highlightColor.toARGB32(),
-        lineWidth: 4.0,
-        lineOpacity: 0.7,
+        lineWidth: 6.0,
+        lineOpacity: 0.8,
       ));
     }
-    
+
     return routes;
   }
 
-  /// 動畫調整相機視角以包含所有座標點
+  /// 動畫調整相機視角以包含所有座標點 (當前未使用，保留以備將來使用)
   Future<void> _animatedFitCameraToBounds(List<Position> coordinates) async {
     if (_mapboxMap == null || coordinates.isEmpty) return;
-    
+
     // 計算邊界
     double minLat = coordinates.first.lat.toDouble();
     double maxLat = coordinates.first.lat.toDouble();
     double minLng = coordinates.first.lng.toDouble();
     double maxLng = coordinates.first.lng.toDouble();
-    
+
     for (final coord in coordinates) {
       minLat = minLat < coord.lat ? minLat : coord.lat.toDouble();
       maxLat = maxLat > coord.lat ? maxLat : coord.lat.toDouble();
       minLng = minLng < coord.lng ? minLng : coord.lng.toDouble();
       maxLng = maxLng > coord.lng ? maxLng : coord.lng.toDouble();
     }
-    
+
     // 添加邊距
     const double padding = 0.01;
     minLat -= padding;
     maxLat += padding;
     minLng -= padding;
     maxLng += padding;
-    
+
     // 計算中心點和縮放級別
     final centerLat = (minLat + maxLat) / 2;
     final centerLng = (minLng + maxLng) / 2;
     final zoom = _calculateZoomLevel(maxLat - minLat, maxLng - minLng);
-    
+
     // 使用動畫移動相機
     await _animatedEaseTo(
       Position(centerLng, centerLat),
@@ -769,22 +852,24 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   /// 顯示所有行程
   void _showAllTripsOnMap() async {
     final tripsAsync = ref.read(userTripsProvider);
-    
+
     tripsAsync.when(
       data: (trips) async {
         if (_pointAnnotationManager == null) return;
-        
+
         await _pointAnnotationManager!.deleteAll();
         await _polylineAnnotationManager!.deleteAll();
-        
+
         final annotations = <PointAnnotationOptions>[];
-        
+
         for (final trip in trips) {
           for (final dayPlan in trip.days) {
             for (final activity in dayPlan.activities) {
-              if (CoordinateValidator.isValidCoordinate(activity.lat, activity.lng)) {
+              if (CoordinateValidator.isValidCoordinate(
+                  activity.lat, activity.lng)) {
                 final annotationOptions = PointAnnotationOptions(
-                  geometry: Point(coordinates: Position(activity.lng, activity.lat)),
+                  geometry:
+                      Point(coordinates: Position(activity.lng, activity.lat)),
                   textField: '📍 ${activity.name}',
                   textOffset: [0.0, -2.0],
                   textColor: Colors.black.toARGB32(),
@@ -794,13 +879,13 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                   iconSize: 0.0, // 隱藏圖標，因為我們使用 emoji
                   symbolSortKey: 5,
                 );
-                
+
                 annotations.add(annotationOptions);
               }
             }
           }
         }
-        
+
         if (annotations.isNotEmpty) {
           await _pointAnnotationManager!.createMulti(annotations);
         }
@@ -816,53 +901,152 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     final lightness = (hsl.lightness + amount).clamp(0.0, 1.0);
     return hsl.withLightness(lightness).toColor();
   }
-  
+
+  /// 增強顏色飽和度
+  Color _enhanceColorSaturation(Color color, double amount) {
+    final hsl = HSLColor.fromColor(color);
+    final saturation = (hsl.saturation + amount).clamp(0.0, 1.0);
+    return hsl.withSaturation(saturation).toColor();
+  }
+
+  /// 生成弧形路徑座標
+  /// 將直線路徑轉換為有弧度的美觀曲線
+  List<Position> _generateCurvedPath(List<Position> originalPoints) {
+    if (originalPoints.length < 2) return originalPoints;
+
+    final curvedPoints = <Position>[];
+
+    // 添加起點
+    curvedPoints.add(originalPoints.first);
+
+    // 為每兩個連續點生成弧形路徑
+    for (int i = 0; i < originalPoints.length - 1; i++) {
+      final start = originalPoints[i];
+      final end = originalPoints[i + 1];
+
+      // 計算弧形控制點
+      final controlPoints = _calculateArcControlPoints(start, end);
+
+      // 添加弧形上的點
+      for (final point in controlPoints) {
+        curvedPoints.add(point);
+      }
+
+      // 添加終點（除了最後一個點）
+      if (i < originalPoints.length - 2) {
+        curvedPoints.add(end);
+      }
+    }
+
+    // 添加最終終點
+    curvedPoints.add(originalPoints.last);
+
+    return curvedPoints;
+  }
+
+  /// 計算兩個點之間的弧形控制點
+  List<Position> _calculateArcControlPoints(Position start, Position end) {
+    final controlPoints = <Position>[];
+
+    // 計算中點
+    final midLat = (start.lat + end.lat) / 2;
+    final midLng = (start.lng + end.lng) / 2;
+
+    // 計算距離和方向
+    final latDiff = end.lat - start.lat;
+    final lngDiff = end.lng - start.lng;
+    final distance = (latDiff * latDiff + lngDiff * lngDiff).abs();
+
+    // 根據距離調整弧度大小 - 增加弧度讓曲線更彎
+    final arcHeight = distance * 0.5; // 從 0.15 增加到 0.5，讓弧度更加明顯
+
+    // 計算垂直於線段的方向向量
+    final perpendicularLat = -lngDiff;
+    final perpendicularLng = latDiff;
+
+    // 正規化垂直向量
+    final length = (perpendicularLat * perpendicularLat + perpendicularLng * perpendicularLng).abs();
+    if (length > 0) {
+      final normalizedLat = perpendicularLat / length;
+      final normalizedLng = perpendicularLng / length;
+
+      // 計算控制點
+      final controlLat = midLat + normalizedLat * arcHeight;
+      final controlLng = midLng + normalizedLng * arcHeight;
+
+      // 生成弧形上的多個點以創建平滑曲線 - 增加分段數讓弧線更平滑
+      const int segments = 20; // 從 8 增加到 20，讓弧線在更大弧度下仍保持平滑
+      for (int i = 1; i < segments; i++) {
+        final t = i / segments;
+        final tSquared = t * t;
+        final tCubed = tSquared * t;
+
+        // 使用三次貝塞爾曲線公式
+        final u = 1 - t;
+        final uSquared = u * u;
+        final uCubed = uSquared * u;
+
+        final lat = uCubed * start.lat + 3 * uSquared * t * controlLat + 3 * u * tSquared * controlLat + tCubed * end.lat;
+        final lng = uCubed * start.lng + 3 * uSquared * t * controlLng + 3 * u * tSquared * controlLng + tCubed * end.lng;
+
+        controlPoints.add(Position(lng, lat));
+      }
+    }
+
+    return controlPoints;
+  }
+
   /// 顯示連接不同天數的路線
   Future<void> _showInterDayRoutes(Trip trip) async {
     if (_polylineAnnotationManager == null || trip.days.length < 2) return;
-    
+
     for (int i = 0; i < trip.days.length - 1; i++) {
       final currentDay = trip.days[i];
       final nextDay = trip.days[i + 1];
-      
+
       if (currentDay.activities.isNotEmpty && nextDay.activities.isNotEmpty) {
         final lastActivityToday = currentDay.activities.last;
         final firstActivityTomorrow = nextDay.activities.first;
-        
-        if (CoordinateValidator.isValidCoordinate(lastActivityToday.lat, lastActivityToday.lng) &&
-            CoordinateValidator.isValidCoordinate(firstActivityTomorrow.lat, firstActivityTomorrow.lng)) {
-          
+
+        if (CoordinateValidator.isValidCoordinate(
+                lastActivityToday.lat, lastActivityToday.lng) &&
+            CoordinateValidator.isValidCoordinate(
+                firstActivityTomorrow.lat, firstActivityTomorrow.lng)) {
           final coordinates = [
             Position(lastActivityToday.lng, lastActivityToday.lat),
             Position(firstActivityTomorrow.lng, firstActivityTomorrow.lat),
           ];
-          
-          // 使用下一天的顏色作為跨天路線顏色
-          final nextDayColor = _getDayColor(i + 1);
-          
+
+          // 生成弧形路徑
+          final curvedCoordinates = _generateCurvedPath(coordinates);
+
+          // 使用下一天的顏色作為跨天路線顏色，並增強飽和度
+          final nextDayColor = _enhanceColorSaturation(_getDayColor(i + 1), 0.3);
+
           // 創建美觀的跨天連接路線
           final interDayOptions = PolylineAnnotationOptions(
-            geometry: LineString(coordinates: coordinates),
-            lineColor: nextDayColor.withValues(alpha: 0.7).toARGB32(),
-            lineWidth: 6.0,
-            lineOpacity: 0.8,
+            geometry: LineString(coordinates: curvedCoordinates),
+            lineColor: nextDayColor.withValues(alpha: 0.8).toARGB32(),
+            lineWidth: 8.0,
+            lineOpacity: 0.9,
           );
-          
+
           await _polylineAnnotationManager!.create(interDayOptions);
-          
-          print('🔗 創建第${i + 1}天到第${i + 2}天的連接路線，使用第${i + 2}天顏色: ${nextDayColor.toString()}');
+
+          print(
+              '🔗 創建第${i + 1}天到第${i + 2}天的連接路線，使用第${i + 2}天顏色: ${nextDayColor.toString()}');
         }
       }
     }
   }
-  
+
   /// 清除地圖內容
   Future<void> _clearMapContent() async {
     await _pointAnnotationManager?.deleteAll();
     await _polylineAnnotationManager?.deleteAll();
     _markerToActivityMap.clear(); // 清除標記對應關係
   }
-  
+
   /// 取得每日顏色
   Color _getDayColor(int dayIndex) {
     return dayColors[dayIndex % dayColors.length];
@@ -883,7 +1067,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: isActive 
+        color: isActive
             ? (activeColor ?? TripMuseTheme.primaryColor)
             : Colors.white,
         borderRadius: BorderRadius.circular(TripMuseSpacing.sm),
@@ -953,9 +1137,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                   child: Text(
                     activity.name,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 ),
                 IconButton(
@@ -969,7 +1153,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
               ],
             ),
           ),
-          
+
           // 內容
           Padding(
             padding: const EdgeInsets.all(TripMuseSpacing.md),
@@ -984,30 +1168,33 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                   ),
                   const SizedBox(height: TripMuseSpacing.md),
                 ],
-                
+
                 // 活動詳情
                 _buildInfoRow(
                   icon: Icons.schedule,
                   label: '時間',
                   value: '${activity.timeFrom} - ${activity.timeTo}',
                 ),
-                
+
                 if (activity.address?.isNotEmpty == true)
                   _buildInfoRow(
                     icon: Icons.location_on,
                     label: '地址',
                     value: activity.address!,
                   ),
-                
-                if (activity.estimatedCost != null && double.tryParse(activity.estimatedCost!) != null && double.parse(activity.estimatedCost!) > 0)
+
+                if (activity.estimatedCost != null &&
+                    double.tryParse(activity.estimatedCost!) != null &&
+                    double.parse(activity.estimatedCost!) > 0)
                   _buildInfoRow(
                     icon: Icons.attach_money,
                     label: '預估費用',
-                    value: 'NT\$${double.parse(activity.estimatedCost!).toStringAsFixed(0)}',
+                    value:
+                        'NT\$${double.parse(activity.estimatedCost!).toStringAsFixed(0)}',
                   ),
-                
+
                 const SizedBox(height: TripMuseSpacing.md),
-                
+
                 // 操作按鈕
                 Row(
                   children: [
@@ -1066,9 +1253,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           Text(
             '$label: ',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade700,
-            ),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade700,
+                ),
           ),
           Expanded(
             child: Text(
@@ -1113,7 +1300,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   /// 計算適當的縮放級別
   double _calculateZoomLevel(double latSpan, double lngSpan) {
     final maxSpan = latSpan > lngSpan ? latSpan : lngSpan;
-    
+
     if (maxSpan > 10) return 4.0;
     if (maxSpan > 5) return 6.0;
     if (maxSpan > 2) return 8.0;
@@ -1129,13 +1316,13 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     setState(() {
       _isLocationTrackingEnabled = !_isLocationTrackingEnabled;
     });
-    
+
     if (_isLocationTrackingEnabled) {
       // 移動到用戶當前位置
       try {
         final locationService = ref.read(locationServiceProvider);
         final position = await locationService.getCurrentPosition();
-        
+
         if (position != null) {
           await _animatedFlyTo(
             Position(position.longitude, position.latitude),
@@ -1155,11 +1342,12 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   @override
   Widget build(BuildContext context) {
     final mapState = ref.watch(mapStateProvider);
-    
+
     // 監聽地圖狀態變化並更新地圖內容
     ref.listen<MapState>(mapStateProvider, (previous, next) {
-      print('🔄 地圖狀態變化: selectedTrip=${next.selectedTrip?.title}, showRoute=${next.showRoute}');
-      
+      print(
+          '🔄 地圖狀態變化: selectedTrip=${next.selectedTrip?.title}, showRoute=${next.showRoute}');
+
       if (previous?.selectedTrip != next.selectedTrip ||
           previous?.showRoute != next.showRoute ||
           previous?.showAllTrips != next.showAllTrips) {
@@ -1173,9 +1361,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           }
         });
       }
-      
+
       // 監聽選中活動變化，自動飛行到該活動
-      if (previous?.selectedActivity != next.selectedActivity && 
+      if (previous?.selectedActivity != next.selectedActivity &&
           next.selectedActivity != null) {
         final activity = next.selectedActivity!;
         print('🎯 選中活動變化: ${activity.name}');
@@ -1191,7 +1379,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
         }
       }
     });
-    
+
     return Container(
       height: widget.height,
       decoration: BoxDecoration(
@@ -1213,18 +1401,19 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
               key: const ValueKey("tripMapWidget"),
               onMapCreated: _onMapCreated,
             ),
-            
+
             // 載入指示器
             if (mapState.isLoading)
               Container(
                 color: Colors.black.withValues(alpha: 0.3),
                 child: const Center(
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(TripMuseTheme.primaryColor),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        TripMuseTheme.primaryColor),
                   ),
                 ),
               ),
-            
+
             // 錯誤訊息
             if (mapState.error != null)
               Container(
@@ -1242,15 +1431,15 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                       Text(
                         mapState.error!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                        ),
+                              color: Colors.white,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
               ),
-            
+
             // 控制面板
             if (widget.showControls) ...[
               // 右下角 - 地圖控制按鈕
@@ -1261,17 +1450,21 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                   children: [
                     // 位置追蹤按鈕
                     _buildControlButton(
-                      icon: _isLocationTrackingEnabled ? Icons.my_location : Icons.location_searching,
+                      icon: _isLocationTrackingEnabled
+                          ? Icons.my_location
+                          : Icons.location_searching,
                       tooltip: _isLocationTrackingEnabled ? '停止位置追蹤' : '開始位置追蹤',
                       onPressed: _toggleLocationTracking,
                       isActive: _isLocationTrackingEnabled,
                     ),
-                    
+
                     const SizedBox(height: TripMuseSpacing.sm),
-                    
+
                     // 路線顯示切換
                     _buildControlButton(
-                      icon: mapState.showRoute ? Icons.route : Icons.route_outlined,
+                      icon: mapState.showRoute
+                          ? Icons.route
+                          : Icons.route_outlined,
                       tooltip: mapState.showRoute ? '隱藏路線' : '顯示路線',
                       onPressed: () {
                         ref.read(mapStateProvider.notifier).toggleRoute();
@@ -1279,40 +1472,38 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                       },
                       isActive: mapState.showRoute,
                     ),
-                    
+
                     const SizedBox(height: TripMuseSpacing.sm),
-                    
+
                     // 重置到第一個景點按鈕
                     _buildControlButton(
                       icon: Icons.refresh,
-                      tooltip: '重置到第一個景點',
+                      tooltip: widget.selectedDate != null ? '重置到選擇日期的第一個景點' : '重置到第一個景點',
                       onPressed: () {
-                        if (mapState.selectedTrip != null) {
-                          _focusOnFirstActivityOfTrip(mapState.selectedTrip!);
-                        } else if (widget.initialTrip != null) {
-                          _focusOnFirstActivityOfTrip(widget.initialTrip!);
+                        final trip = mapState.selectedTrip ?? widget.initialTrip;
+                        if (trip != null) {
+                          if (widget.selectedDate != null) {
+                            _focusOnSelectedDateFirstActivity(trip);
+                          } else {
+                            _focusOnFirstActivityOfTrip(trip);
+                          }
                         }
                       },
                     ),
-                    
+
                     const SizedBox(height: TripMuseSpacing.sm),
-                    
+
                     // 重新聚焦按鈕
                     _buildControlButton(
                       icon: Icons.center_focus_strong,
-                      tooltip: '重新聚焦',
+                      tooltip: widget.selectedDate != null ? '聚焦到選擇日期' : '重新聚焦',
                       onPressed: () {
-                        if (mapState.selectedTrip != null) {
-                          final allCoordinates = <Position>[];
-                          for (final dayPlan in mapState.selectedTrip!.days) {
-                            for (final activity in dayPlan.activities) {
-                              if (CoordinateValidator.isValidCoordinate(activity.lat, activity.lng)) {
-                                allCoordinates.add(Position(activity.lng, activity.lat));
-                              }
-                            }
-                          }
-                          if (allCoordinates.isNotEmpty) {
-                            _animatedFitCameraToBounds(allCoordinates);
+                        final trip = mapState.selectedTrip ?? widget.initialTrip;
+                        if (trip != null) {
+                          if (widget.selectedDate != null) {
+                            _focusOnSelectedDateFirstActivity(trip);
+                          } else {
+                            _focusOnFirstActivityOfTrip(trip);
                           }
                         }
                       },
@@ -1321,7 +1512,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                 ),
               ),
             ],
-            
+
             // 動畫進行中指示器
             if (_isAnimating)
               Positioned(
@@ -1344,15 +1535,16 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                       const SizedBox(width: TripMuseSpacing.sm),
                       Text(
                         '地圖動畫中...',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white,
-                        ),
+                              color: Colors.white,
+                            ),
                       ),
                     ],
                   ),

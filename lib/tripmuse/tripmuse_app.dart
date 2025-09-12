@@ -124,10 +124,10 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
             onPageChanged: (index) {
               ref.read(currentPageIndexProvider.notifier).state = index;
             },
-            children: const [
-              HomeScreen(),
-              MapScreen(),
-              SettingsScreen(),
+            children: [
+              const HomeScreen(),
+              const MapScreen(),
+              const SettingsScreen(),
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(

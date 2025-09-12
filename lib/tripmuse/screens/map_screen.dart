@@ -943,15 +943,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
     );
   }
-  /// 飛行到行程總覽視角
+
   void _flyToTripOverview() {
     if (_selectedTrip == null) {
       return;
-    }
-
-    // 清除選中的活動，讓地圖顯示整個行程
+    }   
     ref.read(mapStateProvider.notifier).selectActivity(null);
-    
-    print(' 切換到行程總覽視角');
   }
 }
