@@ -7,3 +7,7 @@ export 'trip_generation_progress_widget.dart';
 export 'trip_generation_settings_widget.dart';
 export 'trip_generation_error_widget.dart';
 export 'simple_progress_dialog.dart';
+export 'activity_card.dart';
+export 'timeline_widget.dart';
+export 'day_timeline_card.dart';
+export 'timeline_activity_card.dart';

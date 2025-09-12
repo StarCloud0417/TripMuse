@@ -1,6 +1,6 @@
 # TripMuse 🧳
 
-**Version 0.1.9**
+**Version 0.2.0**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
@@ -30,7 +30,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.1.9** - Date Filter Optimization & Smart Map View Switching / 日期篩選優化與智能地圖視角切換
+**Version 0.2.0** - Timeline View Component Development & Real Map Integration / 時間軸視圖組件開發與真正的地圖整合
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
@@ -78,6 +78,15 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **🎯 Smart Map View Switching** / **🎯  智能地圖視角切換**  
 ✅ **✈️ 3D Flight Animation** / **✈️ 3D 飛行動畫**  
 ✅ **📍 Coordinate Validation** / **📍 座標驗證機制**  
+✅ **🗓️ Timeline View Component Development** / **🗓️ 時間軸視圖組件開發**  
+✅ **🗺️ Real Map Integration** / **🗺️ 真正的地圖整合**  
+✅ **🔄 View Switching Functionality** / **🔄 視圖切換功能**  
+✅ **📍 Attraction Markers & Route Planning** / **📍 景點標記與路線規劃**  
+✅ **🎨 Beautiful Timeline Design** / **🎨 美觀的時間軸設計**  
+✅ **📱 Responsive Design & Material Design 3** / **📱 響應式設計與 Material Design 3**  
+✅ **🧪 Complete Test Coverage** / **🧪 完整測試覆蓋**  
+✅ **⚡ Zero Compilation Errors & Warnings** / **⚡ 無編譯錯誤和警告**  
+
 🚧 Current attraction highlighting / 當前景點高亮顯示進行中  
 🚧 External navigation app integration / 外部導航應用整合進行中  
 🚧 Marker and route animation effects / 標記和路線動畫效果進行中 
@@ -130,6 +139,36 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 1. Launch the app / 啟動應用
 2. Select "🧳 TripMuse App" from the main menu / 從主選單選擇 "🧳 TripMuse App"
 3. Start exploring TripMuse features / 開始探索 TripMuse 功能
+
+### 📱 How to Check New Features / 如何在 APP 中檢查新功能
+
+#### 進入行程詳情頁面 / Enter Trip Detail Page:
+- 在首頁點擊任何現有的行程卡片（如"雲林親子三天樂遊"） / Click any existing trip card on the home page (e.g., "Yunlin Parent-Child Three-Day Tour")
+- 或者使用"行程生成測試"功能建立新行程 / Or create a new trip using the "Trip Generation Test" feature
+
+#### 時間軸視圖（預設視圖） / Timeline View (Default View):
+- 美觀的時間軸設計，包含日期圓點和連接線 / Beautiful timeline design with date dots and connecting lines
+- 每日行程卡片顯示日期、主題和統計資訊 / Daily itinerary cards display date, theme, and statistics
+- 活動卡片顯示時間、類別、描述和小貼士 / Activity cards display time, category, description, and tips
+- 不同活動類別有不同的顏色主題 / Different activity categories have different color themes
+
+#### 地圖視圖 / Map View:
+- 點擊頂部的"地圖"按鈕切換到地圖視圖 / Click the "Map" button at the top to switch to map view
+- 顯示真正的 MapBox 地圖（不再是佔位符） / Display real MapBox map (no longer placeholder)
+- 可以看到所有景點的標記和路線 / Can see markers and routes for all attractions
+- 點擊地圖上的景點標記可以查看詳細資訊 / Click attraction markers on the map to view details
+- 支援地圖縮放、拖拽等互動功能 / Support map zoom, drag, and other interactive features
+
+#### 視圖切換 / View Switching:
+- 在時間軸和地圖之間自由切換 / Free switching between timeline and map
+- 按鈕狀態正確反映當前視圖 / Button states correctly reflect current view
+- 切換過程流暢無卡頓 / Smooth switching process without lag
+
+### 🚀 Launch Command / 啟動命令
+```bash
+flutter run --dart-define ACCESS_TOKEN=YOUR_MAPBOX_ACCESS_TOKEN
+```
+現在您可以使用上述命令啟動應用程式，體驗完整的時間軸和地圖功能！ / Now you can use the above command to launch the application and experience the complete timeline and map features!
 
 ## 🧪 API Testing Features / API 測試功能
 
@@ -184,6 +223,17 @@ lib/
 ```
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.2.0 (2025-09-12)
+- 🎯 **完成的功能** | Completed Features: Timeline view component development and real map functionality integration
+- 🗓️ **時間軸視圖組件** | Timeline View Components: TimelineWidget, DayTimelineCard, TimelineActivityCard
+- 🗺️ **真正的地圖視圖** | Real Map View: Integrated TripMapWidget into trip detail page, displaying full MapBox map
+- 📍 **景點標記和路線規劃** | Attraction Markers & Route Planning: Include attraction markers and route planning, support clicking attractions for details
+- 🔄 **視圖切換功能** | View Switching: Seamless switching between timeline and map views, correct button states and text
+- 🎨 **美觀的時間軸設計** | Beautiful Timeline Design: Includes date dots and connecting lines
+- 📱 **響應式設計** | Responsive Design: Adapts to different screen sizes
+- 🧪 **完整測試覆蓋** | Complete Test Coverage: Includes unit tests to ensure functionality
+- ⚡ **無編譯錯誤和警告** | Zero Compilation Errors & Warnings: All code passed Flutter analysis
 
 ### v0.1.9 (2025-09-12)
 - 🗓️ **日期篩選面板優化** | Optimized date filter panel position to avoid blocking map content
