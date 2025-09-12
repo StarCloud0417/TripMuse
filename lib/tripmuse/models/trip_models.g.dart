@@ -206,3 +206,23 @@ Map<String, dynamic> _$$HealthResponseImplToJson(
       'version': instance.version,
       'service': instance.service,
     };
+
+_$TripProgressImpl _$$TripProgressImplFromJson(Map<String, dynamic> json) =>
+    _$TripProgressImpl(
+      currentDay: (json['currentDay'] as num).toInt(),
+      overallProgress: (json['overallProgress'] as num).toDouble(),
+      dayProgress: (json['dayProgress'] as num).toDouble(),
+      isCompleted: json['isCompleted'] as bool? ?? false,
+      distanceToNext: (json['distanceToNext'] as num?)?.toDouble(),
+      estimatedArrivalTime: json['estimatedArrivalTime'] as String?,
+    );
+
+Map<String, dynamic> _$$TripProgressImplToJson(_$TripProgressImpl instance) =>
+    <String, dynamic>{
+      'currentDay': instance.currentDay,
+      'overallProgress': instance.overallProgress,
+      'dayProgress': instance.dayProgress,
+      'isCompleted': instance.isCompleted,
+      'distanceToNext': instance.distanceToNext,
+      'estimatedArrivalTime': instance.estimatedArrivalTime,
+    };

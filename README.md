@@ -1,6 +1,6 @@
 # TripMuse 🧳
 
-**Version 0.1.7**
+**Version 0.1.9**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
@@ -30,7 +30,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.1.7** - Storage System Stability Improvements / 儲存系統穩定性改善
+**Version 0.1.9** - Date Filter Optimization & Smart Map View Switching / 日期篩選優化與智能地圖視角切換
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
@@ -74,7 +74,13 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 ✅ **💾 Storage System Stability** / **💾 儲存系統穩定性**  
 ✅ **🔧 Trip Saving Functionality** / **🔧 行程儲存功能**  
 ✅ **⭐ Trip Favorites Feature** / **⭐ 行程收藏功能**  
-🚧 AI trip generation service optimization / AI 行程生成服務優化進行中 
+✅ **🗓️ Date Filter Panel Optimization** / **🗓️ 日期篩選面板優化**  
+✅ **🎯 Smart Map View Switching** / **🎯  智能地圖視角切換**  
+✅ **✈️ 3D Flight Animation** / **✈️ 3D 飛行動畫**  
+✅ **📍 Coordinate Validation** / **📍 座標驗證機制**  
+🚧 Current attraction highlighting / 當前景點高亮顯示進行中  
+🚧 External navigation app integration / 外部導航應用整合進行中  
+🚧 Marker and route animation effects / 標記和路線動畫效果進行中 
 
 ## 🛠️ Tech Stack / 技術棧
 
@@ -178,6 +184,24 @@ lib/
 ```
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.1.9 (2025-09-12)
+- 🗓️ **日期篩選面板優化** | Optimized date filter panel position to avoid blocking map content
+- 🎯 **智能地圖視角切換** | Smart map view switching - automatically fly to selected day's first attraction
+- ✈️ **3D 飛行動畫** | Smooth 3D map flight animation with zoom and pitch adjustments
+- 📍 **座標驗證機制** | Smart coordinate validation for flight animation stability
+- 🔄 **狀態同步優化** | Enhanced synchronization between map state and UI state
+- 🎨 **用戶界面優化** | Enhanced UI with better visual harmony and responsive design
+- ⚡ **動畫效果提升** | 3-second smooth flight with 16x zoom and 45-degree pitch
+- 🧪 **測試覆蓋完整** | Complete test coverage with zero compilation errors
+
+### v0.1.8 (2025-09-11)
+- 🐛 **JSON 解析錯誤修復** | Fixed JSON parsing errors and format mismatches
+- 🔧 **budgetRange 欄位修復** | Added missing budgetRange field to UserPreferenceAnalysis
+- 📊 **活動類別統一** | Unified activity category mapping for consistency
+- ⚡ **靈活解析機制** | Flexible budgetRange parsing supporting multiple variants
+- 🎯 **活動類別映射擴展** | Extended activity category mapping for LLM variants
+- 📝 **JSON 格式兼容性** | Significantly improved Client-Server JSON compatibility
 
 ### v0.1.7 (2025-01-11)
 - 🐛 **儲存系統修復** | Fixed critical StorageManager initialization timing issues

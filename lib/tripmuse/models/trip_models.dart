@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'activity.dart';
 
 part 'trip_models.freezed.dart';
 part 'trip_models.g.dart';
@@ -180,4 +181,23 @@ class HealthResponse with _$HealthResponse {
 
   factory HealthResponse.fromJson(Map<String, dynamic> json) =>
       _$HealthResponseFromJson(json);
+}
+
+// 旅程進度
+@freezed
+class TripProgress with _$TripProgress {
+  const factory TripProgress({
+    required int currentDay,
+    required double overallProgress,
+    required double dayProgress,
+    Activity? currentActivity,
+    Activity? nextActivity,
+    @Default(false) bool isCompleted,
+    @Default([]) List<Activity> completedActivities,
+    double? distanceToNext,
+    String? estimatedArrivalTime,
+  }) = _TripProgress;
+
+  factory TripProgress.fromJson(Map<String, dynamic> json) =>
+      _$TripProgressFromJson(json);
 }

@@ -33,6 +33,7 @@ mixin _$Trip {
   List<DayPlan> get days => throw _privateConstructorUsedError;
 
   /// 使用者偏好分析
+  @JsonKey(includeFromJson: false, includeToJson: false)
   UserPreferenceAnalysis? get preferenceAnalysis =>
       throw _privateConstructorUsedError;
 
@@ -76,6 +77,7 @@ abstract class $TripCopyWith<$Res> {
       String title,
       Destination destination,
       List<DayPlan> days,
+      @JsonKey(includeFromJson: false, includeToJson: false)
       UserPreferenceAnalysis? preferenceAnalysis,
       DateTime createdAt,
       DateTime updatedAt,
@@ -220,6 +222,7 @@ abstract class _$$TripImplCopyWith<$Res> implements $TripCopyWith<$Res> {
       String title,
       Destination destination,
       List<DayPlan> days,
+      @JsonKey(includeFromJson: false, includeToJson: false)
       UserPreferenceAnalysis? preferenceAnalysis,
       DateTime createdAt,
       DateTime updatedAt,
@@ -327,6 +330,7 @@ class _$TripImpl implements _Trip {
       required this.title,
       required this.destination,
       final List<DayPlan> days = const [],
+      @JsonKey(includeFromJson: false, includeToJson: false)
       this.preferenceAnalysis,
       required this.createdAt,
       required this.updatedAt,
@@ -367,6 +371,7 @@ class _$TripImpl implements _Trip {
 
   /// 使用者偏好分析
   @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final UserPreferenceAnalysis? preferenceAnalysis;
 
   /// 建立時間
@@ -473,6 +478,7 @@ abstract class _Trip implements Trip {
       required final String title,
       required final Destination destination,
       final List<DayPlan> days,
+      @JsonKey(includeFromJson: false, includeToJson: false)
       final UserPreferenceAnalysis? preferenceAnalysis,
       required final DateTime createdAt,
       required final DateTime updatedAt,
@@ -504,6 +510,7 @@ abstract class _Trip implements Trip {
   @override
 
   /// 使用者偏好分析
+  @JsonKey(includeFromJson: false, includeToJson: false)
   UserPreferenceAnalysis? get preferenceAnalysis;
   @override
 

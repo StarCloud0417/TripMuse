@@ -25,6 +25,15 @@ final userTripsProvider = FutureProvider<List<Trip>>((ref) async {
     final trips = await tripRepository.getAllTrips();
     print('📋 成功載入 ${trips.length} 個行程');
     
+    // 如果沒有行程，創建範例行程
+    if (trips.isEmpty) {
+      print('📝 沒有找到行程，創建範例行程...');
+      final sampleTrip = ExampleData.taipeiTripExample;
+      await tripRepository.saveTrip(sampleTrip);
+      print('✅ 範例行程已創建: ${sampleTrip.title}');
+      return [sampleTrip];
+    }
+    
     // 打印每個行程的基本信息
     for (final trip in trips) {
       print('  - ${trip.id}: ${trip.title}');

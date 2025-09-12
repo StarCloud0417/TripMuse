@@ -118,7 +118,7 @@
 
 ## AI 行程生成系統
 
-- [ ] 4. 實作行程生成服務
+- [X] 4. 實作行程生成服務
 
   - 建立 TripGenerationService 處理 AI 行程生成
   - 實作兩階段 LLM 請求（偏好分析 + 行程生成）
@@ -146,21 +146,33 @@
 
 ## 基於現有範例的地圖功能開發
 
-- [ ] 5. 建立 TripMuse 地圖組件
+- [X] 5. 建立 TripMuse 地圖組件
+
+
   - 創建 lib/tripmuse/widgets/trip_map_widget.dart，**複製並修改** simple_map_example.dart 的程式碼
   - **直接引用** point_annotations_example.dart 的標記功能程式碼
   - **直接使用**現有的 utils.dart 工具函數
   - 建立 TripMuse 專用的地圖狀態管理
   - _Requirements: 3.2_
 
-- [ ] 5.1 實作行程可視化功能
+- [x] 5.1 實作行程可視化功能
+
+
+
+
+
   - **複製** PointAnnotationManager 相關程式碼到 trip_map_widget.dart
   - **複製** polyline_annotations_example.dart 的路線顯示程式碼
   - 為每日行程使用不同顏色主題
   - 實作標記點擊事件和資訊彈窗
   - _Requirements: 3.2, 3.3, 3.5_
 
-- [ ] 5.2 整合位置服務和導航
+- [x] 5.2 整合位置服務和導航
+
+
+
+
+
   - **複製** location_example.dart 的位置追蹤程式碼
   - 建立旅程進度指示器
   - 實作當前景點高亮顯示

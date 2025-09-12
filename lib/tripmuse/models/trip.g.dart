@@ -15,10 +15,6 @@ _$TripImpl _$$TripImplFromJson(Map<String, dynamic> json) => _$TripImpl(
               ?.map((e) => DayPlan.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      preferenceAnalysis: json['preferenceAnalysis'] == null
-          ? null
-          : UserPreferenceAnalysis.fromJson(
-              json['preferenceAnalysis'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       userId: json['userId'] as String?,
@@ -39,7 +35,6 @@ Map<String, dynamic> _$$TripImplToJson(_$TripImpl instance) =>
       'title': instance.title,
       'destination': instance.destination,
       'days': instance.days,
-      'preferenceAnalysis': instance.preferenceAnalysis,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
       'userId': instance.userId,

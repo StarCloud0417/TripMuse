@@ -5,93 +5,41 @@ part 'user_preference_analysis.freezed.dart';
 part 'user_preference_analysis.g.dart';
 
 /// 使用者偏好分析資料模型
-/// 
+///
 /// 由 LLM 分析使用者的旅行描述後產生的偏好分析結果
 @freezed
 class UserPreferenceAnalysis with _$UserPreferenceAnalysis {
   const factory UserPreferenceAnalysis({
     /// 主要關注重點
     required String primaryFocus,
-    
+
     /// 旅行節奏
     required TravelPace travelPace,
-    
+
     /// 預算範圍
     required BudgetRange budgetRange,
-    
+
     /// 興趣列表
     @Default([]) List<String> interests,
-    
+
     /// 要避免的事項
     @Default([]) List<String> avoidances,
-    
+
     /// 旅行情調/氛圍
     required String mood,
-    
+
     /// 關鍵字列表
     @Default([]) List<String> keywords,
-    
+
     /// 分析信心度 (0.0 - 1.0)
     @Default(0.0) double confidence,
-    
+
     /// 分析時間戳記
     DateTime? analyzedAt,
   }) = _UserPreferenceAnalysis;
 
-  factory UserPreferenceAnalysis.fromJson(Map<String, dynamic> json) {
-    // 自定義解析邏輯來處理未知的budgetRange值
-    BudgetRange budgetRange;
-    final budgetValue = json['budgetRange'] as String?;
-    switch (budgetValue?.toLowerCase()) {
-      case 'low':
-      case 'cheap':
-      case 'economy':
-      case 'budget':
-      case '經濟':
-        budgetRange = BudgetRange.low;
-        break;
-      case 'mid':
-      case 'medium':
-      case 'moderate':
-      case '中等':
-        budgetRange = BudgetRange.mid;
-        break;
-      case 'high':
-      case 'expensive':
-      case 'luxury':
-      case 'premium':
-      case '豪華':
-        budgetRange = BudgetRange.high;
-        break;
-      default:
-        // 對於未知值，使用mid作為預設值
-        budgetRange = BudgetRange.mid;
-        break;
-    }
-
-    return UserPreferenceAnalysis(
-      primaryFocus: json['primaryFocus'] as String,
-      travelPace: $enumDecode(_$TravelPaceEnumMap, json['travelPace']),
-      budgetRange: budgetRange,
-      interests: (json['interests'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      avoidances: (json['avoidances'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      mood: json['mood'] as String,
-      keywords: (json['keywords'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
-      analyzedAt: json['analyzedAt'] == null
-          ? null
-          : DateTime.parse(json['analyzedAt'] as String),
-    );
-  }
+  factory UserPreferenceAnalysis.fromJson(Map<String, dynamic> json) =>
+      _$UserPreferenceAnalysisFromJson(json);
 }
 
 /// UserPreferenceAnalysis 擴展方法

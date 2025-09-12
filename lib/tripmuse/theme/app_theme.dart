@@ -31,6 +31,7 @@ class TripMuseTheme {
   // 邊框和分隔線
   static const Color dividerColor = Color(0xFFE0E0E0);
   static const Color borderColor = Color(0xFFE0E0E0);
+  static const Color outline = Color(0xFFBDBDBD);
   
   /// 亮色主題
   static ThemeData get lightTheme {

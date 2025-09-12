@@ -2290,3 +2290,383 @@ abstract class _HealthResponse implements HealthResponse {
   _$$HealthResponseImplCopyWith<_$HealthResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+TripProgress _$TripProgressFromJson(Map<String, dynamic> json) {
+  return _TripProgress.fromJson(json);
+}
+
+/// @nodoc
+mixin _$TripProgress {
+  int get currentDay => throw _privateConstructorUsedError;
+  double get overallProgress => throw _privateConstructorUsedError;
+  double get dayProgress => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  Activity? get currentActivity => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  Activity? get nextActivity => throw _privateConstructorUsedError;
+  bool get isCompleted => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  List<Activity> get completedActivities => throw _privateConstructorUsedError;
+  double? get distanceToNext => throw _privateConstructorUsedError;
+  String? get estimatedArrivalTime => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $TripProgressCopyWith<TripProgress> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TripProgressCopyWith<$Res> {
+  factory $TripProgressCopyWith(
+          TripProgress value, $Res Function(TripProgress) then) =
+      _$TripProgressCopyWithImpl<$Res, TripProgress>;
+  @useResult
+  $Res call(
+      {int currentDay,
+      double overallProgress,
+      double dayProgress,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      Activity? currentActivity,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      Activity? nextActivity,
+      bool isCompleted,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      List<Activity> completedActivities,
+      double? distanceToNext,
+      String? estimatedArrivalTime});
+
+  $ActivityCopyWith<$Res>? get currentActivity;
+  $ActivityCopyWith<$Res>? get nextActivity;
+}
+
+/// @nodoc
+class _$TripProgressCopyWithImpl<$Res, $Val extends TripProgress>
+    implements $TripProgressCopyWith<$Res> {
+  _$TripProgressCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currentDay = null,
+    Object? overallProgress = null,
+    Object? dayProgress = null,
+    Object? currentActivity = freezed,
+    Object? nextActivity = freezed,
+    Object? isCompleted = null,
+    Object? completedActivities = null,
+    Object? distanceToNext = freezed,
+    Object? estimatedArrivalTime = freezed,
+  }) {
+    return _then(_value.copyWith(
+      currentDay: null == currentDay
+          ? _value.currentDay
+          : currentDay // ignore: cast_nullable_to_non_nullable
+              as int,
+      overallProgress: null == overallProgress
+          ? _value.overallProgress
+          : overallProgress // ignore: cast_nullable_to_non_nullable
+              as double,
+      dayProgress: null == dayProgress
+          ? _value.dayProgress
+          : dayProgress // ignore: cast_nullable_to_non_nullable
+              as double,
+      currentActivity: freezed == currentActivity
+          ? _value.currentActivity
+          : currentActivity // ignore: cast_nullable_to_non_nullable
+              as Activity?,
+      nextActivity: freezed == nextActivity
+          ? _value.nextActivity
+          : nextActivity // ignore: cast_nullable_to_non_nullable
+              as Activity?,
+      isCompleted: null == isCompleted
+          ? _value.isCompleted
+          : isCompleted // ignore: cast_nullable_to_non_nullable
+              as bool,
+      completedActivities: null == completedActivities
+          ? _value.completedActivities
+          : completedActivities // ignore: cast_nullable_to_non_nullable
+              as List<Activity>,
+      distanceToNext: freezed == distanceToNext
+          ? _value.distanceToNext
+          : distanceToNext // ignore: cast_nullable_to_non_nullable
+              as double?,
+      estimatedArrivalTime: freezed == estimatedArrivalTime
+          ? _value.estimatedArrivalTime
+          : estimatedArrivalTime // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ActivityCopyWith<$Res>? get currentActivity {
+    if (_value.currentActivity == null) {
+      return null;
+    }
+
+    return $ActivityCopyWith<$Res>(_value.currentActivity!, (value) {
+      return _then(_value.copyWith(currentActivity: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ActivityCopyWith<$Res>? get nextActivity {
+    if (_value.nextActivity == null) {
+      return null;
+    }
+
+    return $ActivityCopyWith<$Res>(_value.nextActivity!, (value) {
+      return _then(_value.copyWith(nextActivity: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$TripProgressImplCopyWith<$Res>
+    implements $TripProgressCopyWith<$Res> {
+  factory _$$TripProgressImplCopyWith(
+          _$TripProgressImpl value, $Res Function(_$TripProgressImpl) then) =
+      __$$TripProgressImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int currentDay,
+      double overallProgress,
+      double dayProgress,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      Activity? currentActivity,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      Activity? nextActivity,
+      bool isCompleted,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      List<Activity> completedActivities,
+      double? distanceToNext,
+      String? estimatedArrivalTime});
+
+  @override
+  $ActivityCopyWith<$Res>? get currentActivity;
+  @override
+  $ActivityCopyWith<$Res>? get nextActivity;
+}
+
+/// @nodoc
+class __$$TripProgressImplCopyWithImpl<$Res>
+    extends _$TripProgressCopyWithImpl<$Res, _$TripProgressImpl>
+    implements _$$TripProgressImplCopyWith<$Res> {
+  __$$TripProgressImplCopyWithImpl(
+      _$TripProgressImpl _value, $Res Function(_$TripProgressImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currentDay = null,
+    Object? overallProgress = null,
+    Object? dayProgress = null,
+    Object? currentActivity = freezed,
+    Object? nextActivity = freezed,
+    Object? isCompleted = null,
+    Object? completedActivities = null,
+    Object? distanceToNext = freezed,
+    Object? estimatedArrivalTime = freezed,
+  }) {
+    return _then(_$TripProgressImpl(
+      currentDay: null == currentDay
+          ? _value.currentDay
+          : currentDay // ignore: cast_nullable_to_non_nullable
+              as int,
+      overallProgress: null == overallProgress
+          ? _value.overallProgress
+          : overallProgress // ignore: cast_nullable_to_non_nullable
+              as double,
+      dayProgress: null == dayProgress
+          ? _value.dayProgress
+          : dayProgress // ignore: cast_nullable_to_non_nullable
+              as double,
+      currentActivity: freezed == currentActivity
+          ? _value.currentActivity
+          : currentActivity // ignore: cast_nullable_to_non_nullable
+              as Activity?,
+      nextActivity: freezed == nextActivity
+          ? _value.nextActivity
+          : nextActivity // ignore: cast_nullable_to_non_nullable
+              as Activity?,
+      isCompleted: null == isCompleted
+          ? _value.isCompleted
+          : isCompleted // ignore: cast_nullable_to_non_nullable
+              as bool,
+      completedActivities: null == completedActivities
+          ? _value._completedActivities
+          : completedActivities // ignore: cast_nullable_to_non_nullable
+              as List<Activity>,
+      distanceToNext: freezed == distanceToNext
+          ? _value.distanceToNext
+          : distanceToNext // ignore: cast_nullable_to_non_nullable
+              as double?,
+      estimatedArrivalTime: freezed == estimatedArrivalTime
+          ? _value.estimatedArrivalTime
+          : estimatedArrivalTime // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$TripProgressImpl implements _TripProgress {
+  const _$TripProgressImpl(
+      {required this.currentDay,
+      required this.overallProgress,
+      required this.dayProgress,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      this.currentActivity,
+      @JsonKey(includeFromJson: false, includeToJson: false) this.nextActivity,
+      this.isCompleted = false,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final List<Activity> completedActivities = const [],
+      this.distanceToNext,
+      this.estimatedArrivalTime})
+      : _completedActivities = completedActivities;
+
+  factory _$TripProgressImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TripProgressImplFromJson(json);
+
+  @override
+  final int currentDay;
+  @override
+  final double overallProgress;
+  @override
+  final double dayProgress;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final Activity? currentActivity;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final Activity? nextActivity;
+  @override
+  @JsonKey()
+  final bool isCompleted;
+  final List<Activity> _completedActivities;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  List<Activity> get completedActivities {
+    if (_completedActivities is EqualUnmodifiableListView)
+      return _completedActivities;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_completedActivities);
+  }
+
+  @override
+  final double? distanceToNext;
+  @override
+  final String? estimatedArrivalTime;
+
+  @override
+  String toString() {
+    return 'TripProgress(currentDay: $currentDay, overallProgress: $overallProgress, dayProgress: $dayProgress, currentActivity: $currentActivity, nextActivity: $nextActivity, isCompleted: $isCompleted, completedActivities: $completedActivities, distanceToNext: $distanceToNext, estimatedArrivalTime: $estimatedArrivalTime)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TripProgressImpl &&
+            (identical(other.currentDay, currentDay) ||
+                other.currentDay == currentDay) &&
+            (identical(other.overallProgress, overallProgress) ||
+                other.overallProgress == overallProgress) &&
+            (identical(other.dayProgress, dayProgress) ||
+                other.dayProgress == dayProgress) &&
+            (identical(other.currentActivity, currentActivity) ||
+                other.currentActivity == currentActivity) &&
+            (identical(other.nextActivity, nextActivity) ||
+                other.nextActivity == nextActivity) &&
+            (identical(other.isCompleted, isCompleted) ||
+                other.isCompleted == isCompleted) &&
+            const DeepCollectionEquality()
+                .equals(other._completedActivities, _completedActivities) &&
+            (identical(other.distanceToNext, distanceToNext) ||
+                other.distanceToNext == distanceToNext) &&
+            (identical(other.estimatedArrivalTime, estimatedArrivalTime) ||
+                other.estimatedArrivalTime == estimatedArrivalTime));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      currentDay,
+      overallProgress,
+      dayProgress,
+      currentActivity,
+      nextActivity,
+      isCompleted,
+      const DeepCollectionEquality().hash(_completedActivities),
+      distanceToNext,
+      estimatedArrivalTime);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TripProgressImplCopyWith<_$TripProgressImpl> get copyWith =>
+      __$$TripProgressImplCopyWithImpl<_$TripProgressImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TripProgressImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _TripProgress implements TripProgress {
+  const factory _TripProgress(
+      {required final int currentDay,
+      required final double overallProgress,
+      required final double dayProgress,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final Activity? currentActivity,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final Activity? nextActivity,
+      final bool isCompleted,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final List<Activity> completedActivities,
+      final double? distanceToNext,
+      final String? estimatedArrivalTime}) = _$TripProgressImpl;
+
+  factory _TripProgress.fromJson(Map<String, dynamic> json) =
+      _$TripProgressImpl.fromJson;
+
+  @override
+  int get currentDay;
+  @override
+  double get overallProgress;
+  @override
+  double get dayProgress;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  Activity? get currentActivity;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  Activity? get nextActivity;
+  @override
+  bool get isCompleted;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  List<Activity> get completedActivities;
+  @override
+  double? get distanceToNext;
+  @override
+  String? get estimatedArrivalTime;
+  @override
+  @JsonKey(ignore: true)
+  _$$TripProgressImplCopyWith<_$TripProgressImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

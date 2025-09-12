@@ -120,6 +120,7 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
         home: Scaffold(
           body: PageView(
             controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(), // 禁用滑動，防止與地圖手勢衝突
             onPageChanged: (index) {
               ref.read(currentPageIndexProvider.notifier).state = index;
             },
