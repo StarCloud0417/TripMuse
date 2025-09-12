@@ -2300,12 +2300,9 @@ mixin _$TripProgress {
   int get currentDay => throw _privateConstructorUsedError;
   double get overallProgress => throw _privateConstructorUsedError;
   double get dayProgress => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
   Activity? get currentActivity => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
   Activity? get nextActivity => throw _privateConstructorUsedError;
   bool get isCompleted => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: false, includeToJson: false)
   List<Activity> get completedActivities => throw _privateConstructorUsedError;
   double? get distanceToNext => throw _privateConstructorUsedError;
   String? get estimatedArrivalTime => throw _privateConstructorUsedError;
@@ -2326,12 +2323,9 @@ abstract class $TripProgressCopyWith<$Res> {
       {int currentDay,
       double overallProgress,
       double dayProgress,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       Activity? currentActivity,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       Activity? nextActivity,
       bool isCompleted,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       List<Activity> completedActivities,
       double? distanceToNext,
       String? estimatedArrivalTime});
@@ -2440,12 +2434,9 @@ abstract class _$$TripProgressImplCopyWith<$Res>
       {int currentDay,
       double overallProgress,
       double dayProgress,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       Activity? currentActivity,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       Activity? nextActivity,
       bool isCompleted,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       List<Activity> completedActivities,
       double? distanceToNext,
       String? estimatedArrivalTime});
@@ -2525,11 +2516,9 @@ class _$TripProgressImpl implements _TripProgress {
       {required this.currentDay,
       required this.overallProgress,
       required this.dayProgress,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       this.currentActivity,
-      @JsonKey(includeFromJson: false, includeToJson: false) this.nextActivity,
+      this.nextActivity,
       this.isCompleted = false,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       final List<Activity> completedActivities = const [],
       this.distanceToNext,
       this.estimatedArrivalTime})
@@ -2545,17 +2534,15 @@ class _$TripProgressImpl implements _TripProgress {
   @override
   final double dayProgress;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final Activity? currentActivity;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final Activity? nextActivity;
   @override
   @JsonKey()
   final bool isCompleted;
   final List<Activity> _completedActivities;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey()
   List<Activity> get completedActivities {
     if (_completedActivities is EqualUnmodifiableListView)
       return _completedActivities;
@@ -2631,12 +2618,9 @@ abstract class _TripProgress implements TripProgress {
       {required final int currentDay,
       required final double overallProgress,
       required final double dayProgress,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       final Activity? currentActivity,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       final Activity? nextActivity,
       final bool isCompleted,
-      @JsonKey(includeFromJson: false, includeToJson: false)
       final List<Activity> completedActivities,
       final double? distanceToNext,
       final String? estimatedArrivalTime}) = _$TripProgressImpl;
@@ -2651,15 +2635,12 @@ abstract class _TripProgress implements TripProgress {
   @override
   double get dayProgress;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   Activity? get currentActivity;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   Activity? get nextActivity;
   @override
   bool get isCompleted;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
   List<Activity> get completedActivities;
   @override
   double? get distanceToNext;

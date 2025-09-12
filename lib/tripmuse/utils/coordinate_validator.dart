@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_maps_example/tripmuse/models/models.dart';
 
 /// 地理座標驗證和處理工具類
@@ -20,23 +21,49 @@ class CoordinateValidator {
   static const double _minLongitude = -180.0;
   static const double _maxLongitude = 180.0;
 
-  /// 驗證座標是否有效
+  /// 驗證座標是否有效 (改進版)
   /// [lat] 緯度
   /// [lng] 經度
   /// [strict] 是否使用嚴格模式 (檢查台灣範圍)
-  static bool isValidCoordinate(double lat, double lng, {bool strict = false}) {
-    // 基本範圍檢查
-    if (lat < _minLatitude || lat > _maxLatitude) return false;
-    if (lng < _minLongitude || lng > _maxLongitude) return false;
-    
+  static bool isValidCoordinate(double? lat, double? lng, {bool strict = false}) {
+    // 空值檢查
+    if (lat == null || lng == null) {
+      print('❌ 座標驗證失敗: 空值 (lat: $lat, lng: $lng)');
+      return false;
+    }
+
+    // NaN 檢查
+    if (lat.isNaN || lng.isNaN) {
+      print('❌ 座標驗證失敗: NaN 值 (lat: $lat, lng: $lng)');
+      return false;
+    }
+
+    // 放寬的基本範圍檢查 (允許邊界情況)
+    if (lat < _minLatitude - 0.1 || lat > _maxLatitude + 0.1) {
+      print('❌ 座標驗證失敗: 緯度超出範圍 (lat: $lat, 允許範圍: ${_minLatitude - 0.1} ~ ${_maxLatitude + 0.1})');
+      return false;
+    }
+    if (lng < _minLongitude - 0.1 || lng > _maxLongitude + 0.1) {
+      print('❌ 座標驗證失敗: 經度超出範圍 (lng: $lng, 允許範圍: ${_minLongitude - 0.1} ~ ${_maxLongitude + 0.1})');
+      return false;
+    }
+
     // 檢查是否為零座標 (通常是無效的)
-    if (lat == 0.0 && lng == 0.0) return false;
-    
+    if (lat.abs() < 0.0001 && lng.abs() < 0.0001) {
+      print('❌ 座標驗證失敗: 零座標 (lat: $lat, lng: $lng)');
+      return false;
+    }
+
     // 嚴格模式：檢查是否在台灣範圍內
     if (strict) {
-      return isInTaiwan(lat, lng);
+      final inTaiwan = isInTaiwan(lat, lng);
+      if (!inTaiwan) {
+        print('⚠️ 座標在台灣範圍外 (lat: $lat, lng: $lng)');
+      }
+      return inTaiwan;
     }
-    
+
+    print('✅ 座標驗證通過 (lat: $lat, lng: $lng)');
     return true;
   }
 
@@ -46,6 +73,109 @@ class CoordinateValidator {
            lat <= _taiwanMaxLat && 
            lng >= _taiwanMinLng && 
            lng <= _taiwanMaxLng;
+  }
+
+  /// 清理和標準化座標
+  /// [lat] 緯度
+  /// [lng] 經度
+  /// 返回清理後的座標，如果無效則返回 null
+  static Point? sanitizeCoordinate(double? lat, double? lng) {
+    if (lat == null || lng == null) {
+      print('⚠️ 座標清理: 空值輸入 (lat: $lat, lng: $lng)');
+      return null;
+    }
+
+    if (lat.isNaN || lng.isNaN) {
+      print('⚠️ 座標清理: NaN 值輸入 (lat: $lat, lng: $lng)');
+      return null;
+    }
+
+    // 修剪到合理的小數位數 (避免過度精確)
+    final sanitizedLat = double.parse(lat.toStringAsFixed(6));
+    final sanitizedLng = double.parse(lng.toStringAsFixed(6));
+
+    print('🧹 座標清理: ($lat, $lng) -> ($sanitizedLat, $sanitizedLng)');
+    return Point(coordinates: Position(sanitizedLng, sanitizedLat));
+  }
+
+  /// 驗證座標列表並過濾無效座標
+  /// [coordinates] 座標列表
+  /// [strict] 是否使用嚴格模式
+  /// 返回有效的座標列表
+  static List<Point> validateAndFilterCoordinates(
+    List<Point?> coordinates, {
+    bool strict = false,
+  }) {
+    final validCoordinates = <Point>[];
+
+    print('🔍 開始驗證 ${coordinates.length} 個座標...');
+
+    for (final coord in coordinates) {
+      if (coord == null) {
+        print('⚠️ 跳過空座標');
+        continue;
+      }
+
+      final position = coord.coordinates;
+      final sanitized = sanitizeCoordinate(position.lat.toDouble(), position.lng.toDouble());
+      if (sanitized == null) {
+        print('⚠️ 座標清理失敗: (${position.lat}, ${position.lng})');
+        continue;
+      }
+
+      if (isValidCoordinate(position.lat.toDouble(), position.lng.toDouble(), strict: strict)) {
+        validCoordinates.add(sanitized);
+      } else {
+        print('❌ 座標驗證失敗: (${position.lat}, ${position.lng})');
+      }
+    }
+
+    print('✅ 驗證完成: ${validCoordinates.length}/${coordinates.length} 個有效座標');
+    return validCoordinates;
+  }
+
+  /// 從活動列表中提取並驗證座標
+  /// [activities] 活動列表
+  /// [strict] 是否使用嚴格模式
+  /// 返回有效的座標列表和無效活動的列表
+  static CoordinateValidationResult extractAndValidateActivityCoordinates(
+    List<Activity> activities, {
+    bool strict = false,
+  }) {
+    final validCoordinates = <Point>[];
+    final invalidActivities = <Activity>[];
+
+    print('🔍 開始驗證 ${activities.length} 個活動的座標...');
+
+    for (final activity in activities) {
+      // 檢查活動是否有有效座標
+      if (activity.lat == 0.0 && activity.lng == 0.0) {
+        print('⚠️ 活動 "${activity.name}" 缺少座標資訊');
+        invalidActivities.add(activity);
+        continue;
+      }
+
+      final sanitized = sanitizeCoordinate(activity.lat, activity.lng);
+      if (sanitized == null) {
+        print('⚠️ 活動 "${activity.name}" 座標清理失敗: (${activity.lat}, ${activity.lng})');
+        invalidActivities.add(activity);
+        continue;
+      }
+
+      if (isValidCoordinate(activity.lat, activity.lng, strict: strict)) {
+        validCoordinates.add(sanitized);
+        print('✅ 活動 "${activity.name}" 座標驗證通過: (${activity.lat}, ${activity.lng})');
+      } else {
+        print('❌ 活動 "${activity.name}" 座標驗證失敗: (${activity.lat}, ${activity.lng})');
+        invalidActivities.add(activity);
+      }
+    }
+
+    print('✅ 活動座標驗證完成: ${validCoordinates.length}/${activities.length} 個有效座標');
+    return CoordinateValidationResult(
+      validCoordinates: validCoordinates,
+      invalidActivities: invalidActivities,
+    );
   }
 
   /// 計算兩點間的距離 (公里)
@@ -291,4 +421,24 @@ enum ValidationSeverity {
   info,
   warning,
   error,
+}
+
+/// 座標驗證結果
+class CoordinateValidationResult {
+  final List<Point> validCoordinates;
+  final List<Activity> invalidActivities;
+
+  const CoordinateValidationResult({
+    required this.validCoordinates,
+    required this.invalidActivities,
+  });
+
+  bool get hasInvalidActivities => invalidActivities.isNotEmpty;
+  int get totalActivities => validCoordinates.length + invalidActivities.length;
+  double get validationRate => totalActivities > 0 ? validCoordinates.length / totalActivities : 0.0;
+
+  @override
+  String toString() {
+    return 'CoordinateValidationResult(valid: ${validCoordinates.length}, invalid: ${invalidActivities.length}, rate: ${(validationRate * 100).toStringAsFixed(1)}%)';
+  }
 }

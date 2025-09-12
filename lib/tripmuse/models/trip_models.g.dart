@@ -212,7 +212,17 @@ _$TripProgressImpl _$$TripProgressImplFromJson(Map<String, dynamic> json) =>
       currentDay: (json['currentDay'] as num).toInt(),
       overallProgress: (json['overallProgress'] as num).toDouble(),
       dayProgress: (json['dayProgress'] as num).toDouble(),
+      currentActivity: json['currentActivity'] == null
+          ? null
+          : Activity.fromJson(json['currentActivity'] as Map<String, dynamic>),
+      nextActivity: json['nextActivity'] == null
+          ? null
+          : Activity.fromJson(json['nextActivity'] as Map<String, dynamic>),
       isCompleted: json['isCompleted'] as bool? ?? false,
+      completedActivities: (json['completedActivities'] as List<dynamic>?)
+              ?.map((e) => Activity.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       distanceToNext: (json['distanceToNext'] as num?)?.toDouble(),
       estimatedArrivalTime: json['estimatedArrivalTime'] as String?,
     );
@@ -222,7 +232,10 @@ Map<String, dynamic> _$$TripProgressImplToJson(_$TripProgressImpl instance) =>
       'currentDay': instance.currentDay,
       'overallProgress': instance.overallProgress,
       'dayProgress': instance.dayProgress,
+      'currentActivity': instance.currentActivity,
+      'nextActivity': instance.nextActivity,
       'isCompleted': instance.isCompleted,
+      'completedActivities': instance.completedActivities,
       'distanceToNext': instance.distanceToNext,
       'estimatedArrivalTime': instance.estimatedArrivalTime,
     };
