@@ -7,6 +7,8 @@ import 'storage/storage_service.dart';
 import 'repositories/trip_repository.dart';
 import 'repositories/user_repository.dart';
 import 'sync/sync_service.dart';
+import 'trip_api_service_impl.dart';
+import 'api_client.dart';
 
 /// 儲存管理器
 class StorageManager {
@@ -24,7 +26,7 @@ class StorageManager {
   bool _isInitialized = false;
   
   /// 初始化所有儲存服務
-  Future<void> initialize() async {
+  Future<void> initialize([TripApiServiceImpl? tripApiService]) async {
     if (_isInitialized) return;
     
     try {
@@ -34,9 +36,13 @@ class StorageManager {
       
       _secureStorage = FlutterSecureStorageService();
       
+      // 創建 TripApiService（如果沒有提供）
+      final apiService = tripApiService ?? TripApiServiceImpl(ApiClient());
+      
       // 初始化同步服務
       _syncService = SyncServiceImpl(
         localStorage: _hiveStorage!,
+        tripApiService: apiService,
       );
       
       // 初始化 Repository

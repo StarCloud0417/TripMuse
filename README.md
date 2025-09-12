@@ -225,7 +225,14 @@ lib/
 ## 📈 Latest Updates / 最新更新
 
 ### v0.2.1 (2025-09-12)
-- 🔍 **地圖搜索功能** | Map Search Functionality: Added complete place search with real-time results
+- �️ **行程刪除功能修復** | Trip Deletion Fix: Fixed recent trips deletion functionality with proper async handling and UI refresh
+- 🛤️ **路線曲度優化** | Route Curvature Optimization: Reduced route curvature for straighter, more natural-looking paths on map
+- 🔄 **UI 狀態同步** | UI State Synchronization: Improved UI refresh after trip deletion operations
+- ⚡ **異步處理優化** | Async Handling Optimization: Enhanced async/await patterns for better deletion reliability
+- 🎯 **用戶體驗改善** | User Experience Enhancement: Added loading indicators and error handling for deletion operations
+
+### v0.2.1 (2025-09-12)
+- �🔍 **地圖搜索功能** | Map Search Functionality: Added complete place search with real-time results
 - 🧭 **導航功能整合** | Navigation Integration: Integrated navigation in search results for one-click navigation
 - 🐛 **導航修復** | Navigation Fix: Fixed navigation launch failure by updating deprecated API usage
 - 🔧 **錯誤處理強化** | Enhanced Error Handling: Improved error handling with multiple fallback options

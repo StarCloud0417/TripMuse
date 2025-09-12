@@ -514,12 +514,35 @@ class HomeScreen extends ConsumerWidget {
             child: const Text('取消'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ref.read(tripNotifierProvider.notifier).deleteTrip(trip.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('已刪除行程: ${trip.title}')),
-              );
+              
+              try {
+                // 顯示載入指示器
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('正在刪除行程...')),
+                );
+                
+                // 執行刪除操作
+                await ref.read(tripNotifierProvider.notifier).deleteTrip(trip.id);
+                
+                // 刷新相關的 providers
+                ref.invalidate(userTripsProvider);
+                ref.invalidate(recentTripsProvider);
+                
+                // 顯示成功訊息
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('已刪除行程: ${trip.title}')),
+                );
+              } catch (error) {
+                // 顯示錯誤訊息
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('刪除行程失敗: ${error.toString()}'),
+                    backgroundColor: TripMuseTheme.errorColor,
+                  ),
+                );
+              }
             },
             style: TextButton.styleFrom(foregroundColor: TripMuseTheme.errorColor),
             child: const Text('刪除'),

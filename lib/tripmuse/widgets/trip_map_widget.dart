@@ -329,28 +329,6 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     print('✅ 地圖標記系統已準備就緒');
   }
 
-  /// 平滑移動到指定位置 - 複製自 animation_example.dart
-  Future<void> _animatedEaseTo(Position position,
-      {double? zoom, double? bearing, double? pitch}) async {
-    if (_mapboxMap == null || _isAnimating) return;
-
-    setState(() => _isAnimating = true);
-
-    try {
-      await _mapboxMap!.easeTo(
-        CameraOptions(
-          center: Point(coordinates: position),
-          zoom: zoom ?? 14.0,
-          bearing: bearing ?? 0,
-          pitch: pitch ?? 0,
-        ),
-        MapAnimationOptions(duration: 2000, startDelay: 0),
-      );
-    } finally {
-      setState(() => _isAnimating = false);
-    }
-  }
-
   /// 飛行到指定位置 - 複製自 animation_example.dart
   Future<void> _animatedFlyTo(Position position,
       {double? zoom, double? bearing, double? pitch}) async {
@@ -712,7 +690,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
           textOffset: [0.0, 0.0],
           textHaloColor: Colors.white.toARGB32(),
           textHaloWidth: isSelected ? 3.0 : 2.0, // 選中時更粗的光暈
-          symbolSortKey: isSelected ? 100.0 : (10.0 + dayIndex), // 選中的標記顯示在最上層
+          symbolSortKey: isSelected ? 100.0 : (13.0 + dayIndex), // 在景點圓點裝飾之上
           iconSize: 0.0,
         );
 
@@ -727,7 +705,7 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
               ? const Color(0xFFFF6B35).toARGB32() // 選中時使用高亮色
               : dayColor.toARGB32(),
           textHaloWidth: isSelected ? 2.0 : 1.5, // 選中時更粗的光暈
-          symbolSortKey: isSelected ? 101.0 : (11.0 + dayIndex),
+          symbolSortKey: isSelected ? 101.0 : (14.0 + dayIndex),
         );
 
         // 如果是選中的活動，添加脈衝動畫效果的外圈
@@ -758,6 +736,21 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
 
         annotations.add(annotationOptions);
         annotations.add(numberAnnotation);
+
+        // 添加景點圓點裝飾 - 在主標記下方顯示
+        final activityDotDecoration = PointAnnotationOptions(
+          geometry: Point(coordinates: position),
+          textField: '●', // 實心圓點
+          textSize: 16.0,
+          textColor: dayColor.toARGB32(),
+          textOffset: [0.0, 0.0],
+          textHaloColor: Colors.white.toARGB32(),
+          textHaloWidth: 2.0,
+          symbolSortKey: isSelected ? 98.0 : (12.0 + dayIndex), // 在路線之上，主標記下方
+          iconSize: 0.0,
+        );
+
+        annotations.add(activityDotDecoration);
       }
     }
 
@@ -808,45 +801,55 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
         lineWidth: 6.0,
         lineOpacity: 0.8,
       ));
+
+      // 添加路線首尾圓點裝飾
+      await _addRouteEndpointDecorations(routeCoordinates, enhancedColor, dayIndex);
     }
 
     return routes;
   }
 
-  /// 動畫調整相機視角以包含所有座標點 (當前未使用，保留以備將來使用)
-  Future<void> _animatedFitCameraToBounds(List<Position> coordinates) async {
-    if (_mapboxMap == null || coordinates.isEmpty) return;
+  /// 添加路線首尾圓點裝飾
+  Future<void> _addRouteEndpointDecorations(List<Position> routeCoordinates, Color routeColor, int dayIndex) async {
+    if (_pointAnnotationManager == null || routeCoordinates.isEmpty) return;
 
-    // 計算邊界
-    double minLat = coordinates.first.lat.toDouble();
-    double maxLat = coordinates.first.lat.toDouble();
-    double minLng = coordinates.first.lng.toDouble();
-    double maxLng = coordinates.first.lng.toDouble();
+    final decorations = <PointAnnotationOptions>[];
 
-    for (final coord in coordinates) {
-      minLat = minLat < coord.lat ? minLat : coord.lat.toDouble();
-      maxLat = maxLat > coord.lat ? maxLat : coord.lat.toDouble();
-      minLng = minLng < coord.lng ? minLng : coord.lng.toDouble();
-      maxLng = maxLng > coord.lng ? maxLng : coord.lng.toDouble();
-    }
-
-    // 添加邊距
-    const double padding = 0.01;
-    minLat -= padding;
-    maxLat += padding;
-    minLng -= padding;
-    maxLng += padding;
-
-    // 計算中心點和縮放級別
-    final centerLat = (minLat + maxLat) / 2;
-    final centerLng = (minLng + maxLng) / 2;
-    final zoom = _calculateZoomLevel(maxLat - minLat, maxLng - minLng);
-
-    // 使用動畫移動相機
-    await _animatedEaseTo(
-      Position(centerLng, centerLat),
-      zoom: zoom,
+    // 添加起點圓點
+    final startPoint = routeCoordinates.first;
+    final startDecoration = PointAnnotationOptions(
+      geometry: Point(coordinates: startPoint),
+      textField: '●', // 實心圓點
+      textSize: 24.0,
+      textColor: routeColor.toARGB32(),
+      textOffset: [0.0, 0.0],
+      textHaloColor: Colors.white.toARGB32(),
+      textHaloWidth: 3.0,
+      symbolSortKey: 15.0 + dayIndex, // 在路線之上
+      iconSize: 0.0,
     );
+    decorations.add(startDecoration);
+
+    // 添加終點圓點
+    final endPoint = routeCoordinates.last;
+    final endDecoration = PointAnnotationOptions(
+      geometry: Point(coordinates: endPoint),
+      textField: '●', // 實心圓點
+      textSize: 24.0,
+      textColor: routeColor.toARGB32(),
+      textOffset: [0.0, 0.0],
+      textHaloColor: Colors.white.toARGB32(),
+      textHaloWidth: 3.0,
+      symbolSortKey: 15.0 + dayIndex, // 在路線之上
+      iconSize: 0.0,
+    );
+    decorations.add(endDecoration);
+
+    // 創建裝飾標記
+    if (decorations.isNotEmpty) {
+      await _pointAnnotationManager!.createMulti(decorations);
+      print('✅ 添加了 ${decorations.length} 個路線端點圓點裝飾');
+    }
   }
 
   /// 顯示所有行程
@@ -957,8 +960,8 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     final lngDiff = end.lng - start.lng;
     final distance = (latDiff * latDiff + lngDiff * lngDiff).abs();
 
-    // 根據距離調整弧度大小 - 增加弧度讓曲線更彎
-    final arcHeight = distance * 0.5; // 從 0.15 增加到 0.5，讓弧度更加明顯
+    // 根據距離調整弧度大小 - 降低弧度讓曲線更直
+    final arcHeight = distance * 0.15; // 從 0.5 降低到 0.15，讓弧度更小更直
 
     // 計算垂直於線段的方向向量
     final perpendicularLat = -lngDiff;
@@ -974,8 +977,8 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
       final controlLat = midLat + normalizedLat * arcHeight;
       final controlLng = midLng + normalizedLng * arcHeight;
 
-      // 生成弧形上的多個點以創建平滑曲線 - 增加分段數讓弧線更平滑
-      const int segments = 20; // 從 8 增加到 20，讓弧線在更大弧度下仍保持平滑
+      // 生成弧形上的多個點以創建平滑曲線 - 適當減少分段數以優化性能
+      const int segments = 12; // 從 20 減少到 12，在降低弧度後仍保持足夠平滑
       for (int i = 1; i < segments; i++) {
         final t = i / segments;
         final tSquared = t * t;
@@ -1295,20 +1298,6 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
         bearing: 0.0,
       );
     }
-  }
-
-  /// 計算適當的縮放級別
-  double _calculateZoomLevel(double latSpan, double lngSpan) {
-    final maxSpan = latSpan > lngSpan ? latSpan : lngSpan;
-
-    if (maxSpan > 10) return 4.0;
-    if (maxSpan > 5) return 6.0;
-    if (maxSpan > 2) return 8.0;
-    if (maxSpan > 1) return 10.0;
-    if (maxSpan > 0.5) return 12.0;
-    if (maxSpan > 0.1) return 14.0;
-    if (maxSpan > 0.05) return 15.0;
-    return 16.0;
   }
 
   /// 切換位置追蹤

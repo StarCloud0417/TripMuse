@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../storage/storage_service.dart';
+import '../trip_api_service_impl.dart';
 
 /// 同步動作類型
 enum SyncAction {
@@ -127,6 +128,7 @@ abstract class SyncService {
 /// 同步服務實作
 class SyncServiceImpl implements SyncService {
   final HiveStorageService _localStorage;
+  final TripApiServiceImpl _tripApiService;
   
   static const String _syncQueueKey = 'sync_queue';
   static const int _maxRetryCount = 3;
@@ -137,7 +139,9 @@ class SyncServiceImpl implements SyncService {
   
   SyncServiceImpl({
     required HiveStorageService localStorage,
-  }) : _localStorage = localStorage;
+    required TripApiServiceImpl tripApiService,
+  }) : _localStorage = localStorage,
+       _tripApiService = tripApiService;
   
   @override
   Future<bool> isOnline() async {
@@ -392,13 +396,20 @@ class SyncServiceImpl implements SyncService {
     print('行程 $tripId 已同步到雲端');
   }
   
-  /// 從雲端刪除行程（模擬實作）
+  /// 從雲端刪除行程
   Future<void> _deleteTripFromCloud(String tripId) async {
-    // 這裡應該實作實際的 API 呼叫
-    // 暫時模擬網路延遲
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    print('行程 $tripId 已從雲端刪除');
+    try {
+      final response = await _tripApiService.deleteTrip(tripId);
+      
+      if (response.success) {
+        print('行程 $tripId 已成功從雲端刪除');
+      } else {
+        throw Exception('刪除雲端行程失敗: ${response.message}');
+      }
+    } catch (e) {
+      print('刪除雲端行程時發生錯誤: $e');
+      throw e; // 重新拋出錯誤，讓上層處理
+    }
   }
   
   /// 釋放資源

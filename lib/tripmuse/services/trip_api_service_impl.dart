@@ -71,6 +71,12 @@ class TripApiServiceImpl implements TripApiService {
         return ApiResponseWrapper.error(response['error'] ?? '刪除行程失敗');
       }
     } catch (e) {
+      // 特殊處理 404 錯誤：如果行程不存在，視為刪除成功
+      if (e is ServerException && e.statusCode == 404) {
+        print('行程 $tripId 在雲端不存在，視為已刪除');
+        return ApiResponseWrapper.success(null, message: '行程已刪除（雲端不存在）');
+      }
+
       return ApiResponseWrapper.error('刪除行程時發生錯誤: $e');
     }
   }

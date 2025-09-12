@@ -589,12 +589,26 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
             child: const Text('取消'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ref.read(tripRepositoryProvider).deleteTrip(trip.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('已刪除行程: ${trip.title}')),
-              );
+              
+              try {
+                await ref.read(tripRepositoryProvider).deleteTrip(trip.id);
+                
+                // 強制重新載入行程列表
+                ref.invalidate(userTripsProvider);
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('已刪除行程: ${trip.title}')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('刪除行程失敗: $e'),
+                    backgroundColor: TripMuseTheme.errorColor,
+                  ),
+                );
+              }
             },
             style: TextButton.styleFrom(foregroundColor: TripMuseTheme.errorColor),
             child: const Text('刪除'),

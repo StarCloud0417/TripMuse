@@ -9,6 +9,8 @@ import '../theme/app_theme.dart';
 import '../widgets/activity_card.dart';
 import '../widgets/timeline_widget.dart';
 import '../widgets/trip_map_widget.dart';
+import '../providers/trip_provider.dart';
+import '../services/storage_manager.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
   final Trip trip;
@@ -876,9 +878,53 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   }
 
   void _deleteTrip(BuildContext context) {
-    // TODO: 實作刪除功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('刪除功能即將推出')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('刪除行程'),
+        content: Text('確定要刪除「${widget.trip.title}」嗎？此操作無法復原。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // 關閉確認對話框
+
+              try {
+                // 刪除行程（同時刪除本地和雲端）
+                await ref.read(tripRepositoryProvider).deleteTrip(widget.trip.id);
+
+                // 強制重新載入行程列表
+                ref.invalidate(userTripsProvider);
+
+                // 顯示成功訊息
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('已刪除行程: ${widget.trip.title}')),
+                  );
+
+                  // 導航回上一頁
+                  Navigator.of(context).pop();
+                }
+              } catch (e) {
+                // 顯示錯誤訊息
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('刪除行程失敗: $e'),
+                      backgroundColor: TripMuseTheme.errorColor,
+                    ),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: TripMuseTheme.errorColor),
+            child: const Text('刪除'),
+          ),
+        ],
+      ),
     );
   }
 }
