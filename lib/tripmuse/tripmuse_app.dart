@@ -3,6 +3,7 @@
 /// 提供底部導航欄和頁面路由管理
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'theme/app_theme.dart';
@@ -106,6 +107,16 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(currentPageIndexProvider);
+    
+    // 設定系統UI顏色
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Color(0xFF4ECDC4), // 主題綠色
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
     
     return ProviderScope(
       child: MaterialApp(

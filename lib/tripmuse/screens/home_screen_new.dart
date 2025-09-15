@@ -343,69 +343,71 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
 
   /// 建立旅程列表
   Widget _buildTripsList(List<Trip> trips) {
-    // 創建示例旅程數據以匹配設計圖
-    final sampleTrips = [
-      Trip(
-        id: 'sample-1',
-        title: 'Kyoto Ancient History Tour',
-        destination: const Destination(
-          name: 'Kyoto',
-          city: 'Kyoto',
-          country: 'Japan',
-          lat: 35.0116,
-          lng: 135.7681,
+    // 優先使用真實的行程數據
+    List<Trip> displayTrips = trips;
+    
+    // 如果沒有真實行程，創建示例數據以展示UI
+    if (trips.isEmpty) {
+      displayTrips = [
+        Trip(
+          id: 'sample-1',
+          title: 'Kyoto Ancient History Tour',
+          destination: const Destination(
+            name: 'Kyoto',
+            city: 'Kyoto',
+            country: 'Japan',
+            lat: 35.0116,
+            lng: 135.7681,
+          ),
+          days: List.generate(10, (i) => DayPlan(
+            dayIndex: i + 1,
+            date: DateTime.now().add(Duration(days: i)),
+            theme: 'Day ${i + 1}',
+            activities: [],
+          )),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-        days: List.generate(10, (i) => DayPlan(
-          dayIndex: i + 1,
-          date: DateTime.now().add(Duration(days: i)),
-          theme: 'Day ${i + 1}',
-          activities: [],
-        )),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Trip(
-        id: 'sample-2',
-        title: 'Alpine Escape',
-        destination: const Destination(
-          name: 'Alps',
-          city: 'Alps',
-          country: 'Switzerland',
-          lat: 46.5197,
-          lng: 8.2985,
+        Trip(
+          id: 'sample-2',
+          title: 'Alpine Escape',
+          destination: const Destination(
+            name: 'Alps',
+            city: 'Alps',
+            country: 'Switzerland',
+            lat: 46.5197,
+            lng: 8.2985,
+          ),
+          days: List.generate(5, (i) => DayPlan(
+            dayIndex: i + 1,
+            date: DateTime.now().add(Duration(days: i)),
+            theme: 'Day ${i + 1}',
+            activities: [],
+          )),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-        days: List.generate(5, (i) => DayPlan(
-          dayIndex: i + 1,
-          date: DateTime.now().add(Duration(days: i)),
-          theme: 'Day ${i + 1}',
-          activities: [],
-        )),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Trip(
-        id: 'sample-3',
-        title: 'NYC Foodie Adventure',
-        destination: const Destination(
-          name: 'New York',
-          city: 'New York',
-          country: 'USA',
-          lat: 40.7128,
-          lng: -74.0060,
+        Trip(
+          id: 'sample-3',
+          title: 'NYC Foodie Adventure',
+          destination: const Destination(
+            name: 'New York',
+            city: 'New York',
+            country: 'USA',
+            lat: 40.7128,
+            lng: -74.0060,
+          ),
+          days: List.generate(3, (i) => DayPlan(
+            dayIndex: i + 1,
+            date: DateTime.now().add(Duration(days: i)),
+            theme: 'Day ${i + 1}',
+            activities: [],
+          )),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         ),
-        days: List.generate(3, (i) => DayPlan(
-          dayIndex: i + 1,
-          date: DateTime.now().add(Duration(days: i)),
-          theme: 'Day ${i + 1}',
-          activities: [],
-        )),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    ];
-
-    // 如果沒有真實旅程，使用示例數據
-    final displayTrips = trips.isEmpty ? sampleTrips : trips;
+      ];
+    }
 
     if (displayTrips.isEmpty) {
       return Center(
@@ -482,31 +484,12 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
 
   /// 建立旅程卡片
   Widget _buildTripCard(Trip trip) {
-    // 預設示例旅程數據，匹配設計圖中的內容
-    final List<Map<String, dynamic>> sampleTrips = [
-      {
-        'title': 'Kyoto Ancient History Tour',
-        'subtitle': '10 Days / Temples & Traditions',
-        'image': 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400',
-        'isLarge': true,
-      },
-      {
-        'title': 'Alpine Escape',
-        'subtitle': '5 Days',
-        'image': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-        'isLarge': false,
-      },
-      {
-        'title': 'NYC Foodie Adventure',
-        'subtitle': '3 Days',
-        'image': 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400',
-        'isLarge': false,
-      },
-    ];
-
-    // 根據索引選擇示例數據
-    final sampleIndex = trip.hashCode % sampleTrips.length;
-    final sampleData = sampleTrips[sampleIndex];
+    // 使用實際的行程數據
+    final String title = trip.title;
+    final String subtitle = '${trip.destination.city} • ${trip.days.length}天';
+    
+    // 根據目的地選擇合適的背景圖片
+    final String imageUrl = _getDestinationImage(trip.destination.city);
 
     return GestureDetector(
       onTap: () => _navigateToTripDetail(trip),
@@ -531,7 +514,7 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(sampleData['image']),
+                    image: NetworkImage(imageUrl),
                     fit: BoxFit.cover,
                     onError: (exception, stackTrace) {
                       // 如果圖片載入失敗，使用漸層背景
@@ -562,7 +545,7 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      sampleData['title'],
+                      title,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -574,7 +557,7 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      sampleData['subtitle'],
+                      subtitle,
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -662,5 +645,35 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
 
   void _createNewTrip() {
     Navigator.pushNamed(context, '/create-trip');
+  }
+
+  /// 根據目的地獲取合適的背景圖片
+  String _getDestinationImage(String city) {
+    // 根據城市名稱返回相應的圖片URL
+    final cityImages = {
+      'kyoto': 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400',
+      'tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400',
+      'paris': 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400',
+      'london': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400',
+      'new york': 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400',
+      'rome': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400',
+      'barcelona': 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400',
+      'amsterdam': 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=400',
+      'berlin': 'https://images.unsplash.com/photo-1587330979470-3016b6702d89?w=400',
+      'vienna': 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=400',
+      'prague': 'https://images.unsplash.com/photo-1541849546-216549ae216d?w=400',
+      'budapest': 'https://images.unsplash.com/photo-1541725641319-7fc5d605b7d4?w=400',
+      'alps': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+      'switzerland': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+      'taipei': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400',
+      'seoul': 'https://images.unsplash.com/photo-1540042716690-b1b4dbeeb295?w=400',
+      'singapore': 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400',
+      'bangkok': 'https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=400',
+      'sydney': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=400',
+      'melbourne': 'https://images.unsplash.com/photo-1514395462725-fb4566210144?w=400',
+    };
+
+    final cityKey = city.toLowerCase();
+    return cityImages[cityKey] ?? 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400'; // 預設旅遊圖片
   }
 }

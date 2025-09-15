@@ -14,6 +14,9 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 - 🎯 **行程全貌展示** | Complete Trip Display: Show all trip activities and routes at once
 - 🔍 **動態縮放動畫** | Dynamic Zoom Animation: Smooth zoom-out animation for better user experience
 - 🧭 **導航體驗優化** | Navigation Experience Optimization: Enhanced map interaction when viewing trip details
+- 🔄 **動態行程顯示** | Dynamic Trip Display: Replaced hardcoded sample data with real trip data loading
+- 🖼️ **城市圖片動態選擇** | Dynamic City Image Selection: Automatically select appropriate images based on destination cities
+- 🎨 **系統UI主題優化** | System UI Theme Optimization: Enhanced status bar and navigation bar styling for consistent theming
 
 ### v0.2.3 (2025-09-15)
 - 🆕 **我的行程頁面** | My Trips Page: New dedicated page for managing all user trips with search and filter functionality
