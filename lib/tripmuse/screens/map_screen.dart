@@ -79,49 +79,55 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             child: Row(
               children: [
                 // 行程選擇按鈕
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: TripMuseSpacing.md,
-                    vertical: TripMuseSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-                    boxShadow: TripMuseShadows.small,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _showTripSelector = !_showTripSelector;
-                      });
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.luggage,
-                          color: TripMuseTheme.primaryColor,
-                          size: 20,
-                        ),
-                        const SizedBox(width: TripMuseSpacing.sm),
-                        Text(
-                          _selectedTrip?.title ?? '選擇行程',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: _selectedTrip != null 
-                                ? TripMuseTheme.primaryColor 
-                                : TripMuseTheme.textHint,
-                            fontWeight: _selectedTrip != null 
-                                ? FontWeight.w500 
-                                : FontWeight.normal,
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: TripMuseSpacing.md,
+                      vertical: TripMuseSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                      boxShadow: TripMuseShadows.small,
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _showTripSelector = !_showTripSelector;
+                        });
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.luggage,
+                            color: TripMuseTheme.primaryColor,
+                            size: 20,
                           ),
-                        ),
-                        const SizedBox(width: TripMuseSpacing.sm),
-                        Icon(
-                          _showTripSelector ? Icons.expand_less : Icons.expand_more,
-                          color: TripMuseTheme.textSecondary,
-                          size: 20,
-                        ),
-                      ],
+                          const SizedBox(width: TripMuseSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              _selectedTrip?.title ?? '選擇行程',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: _selectedTrip != null 
+                                    ? TripMuseTheme.primaryColor 
+                                    : TripMuseTheme.textHint,
+                                fontWeight: _selectedTrip != null 
+                                    ? FontWeight.w500 
+                                    : FontWeight.normal,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: TripMuseSpacing.sm),
+                          Icon(
+                            _showTripSelector ? Icons.expand_less : Icons.expand_more,
+                            color: TripMuseTheme.textSecondary,
+                            size: 20,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

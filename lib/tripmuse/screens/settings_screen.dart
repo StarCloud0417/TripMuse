@@ -1,23 +1,17 @@
-/// TripMuse 設定畫面
-/// 
-/// 使用者偏好設定和應用配置
-
-// ignore_for_file: deprecated_member_use
+/// TripMuse 設定頁面
+///
+/// 提供應用設定和偏好設定管理
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
-import '../providers/user_provider.dart';
-import '../models/models.dart';
-import 'profile_screen.dart';
 
+/// 設定頁面
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(userAuthNotifierProvider);
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text('設定'),
@@ -25,666 +19,143 @@ class SettingsScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
       ),
       body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          // 使用者資訊區域
-          userAsync.when(
-            data: (user) => _buildUserSection(context, ref, user),
-            loading: () => _buildLoadingUserSection(),
-            error: (_, __) => _buildErrorUserSection(context, ref),
-          ),
-          
-          const SizedBox(height: TripMuseSpacing.lg),
-          
-          // 一般設定
-          _buildSectionTitle(context, '一般設定'),
-          _buildSettingTile(
-            context,
-            icon: Icons.language,
-            title: '語言',
-            subtitle: '繁體中文',
-            onTap: () {
-              _showLanguageDialog(context);
-            },
-          ),
-          _buildSettingTile(
-            context,
+          // 應用設定區塊
+          _buildSectionHeader('應用設定'),
+          _buildSettingItem(
             icon: Icons.palette,
-            title: '主題',
-            subtitle: '跟隨系統',
+            title: '主題設定',
+            subtitle: '淺色/深色主題',
             onTap: () {
-              _showThemeDialog(context);
+              // TODO: 實現主題切換
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('主題設定功能開發中...')),
+              );
             },
           ),
-          _buildSettingTile(
-            context,
-            icon: Icons.currency_exchange,
-            title: '預設貨幣',
-            subtitle: 'TWD (新台幣)',
+          _buildSettingItem(
+            icon: Icons.language,
+            title: '語言設定',
+            subtitle: '選擇應用語言',
             onTap: () {
-              _showCurrencyDialog(context);
+              // TODO: 實現語言切換
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('語言設定功能開發中...')),
+              );
             },
           ),
-          
-          const Divider(),
-          
-          // 地圖設定
-          _buildSectionTitle(context, '地圖設定'),
-          _buildSettingTile(
-            context,
-            icon: Icons.map,
-            title: '地圖樣式',
-            subtitle: '標準地圖',
-            onTap: () {
-              _showMapStyleDialog(context);
-            },
-          ),
-          _buildSwitchTile(
-            context,
-            icon: Icons.my_location,
-            title: '位置追蹤',
-            subtitle: '允許應用追蹤您的位置',
-            value: true,
-            onChanged: (value) {
-              // TODO: 更新位置追蹤設定
-            },
-          ),
-          _buildSwitchTile(
-            context,
-            icon: Icons.offline_pin,
-            title: '離線地圖',
-            subtitle: '下載地圖以供離線使用',
-            value: false,
-            onChanged: (value) {
-              // TODO: 更新離線地圖設定
-            },
-          ),
-          
-          const Divider(),
-          
-          // 通知設定
-          _buildSectionTitle(context, '通知設定'),
-          _buildSwitchTile(
-            context,
+
+          const SizedBox(height: 24),
+
+          // 通知設定區塊
+          _buildSectionHeader('通知設定'),
+          _buildSettingItem(
             icon: Icons.notifications,
             title: '推播通知',
-            subtitle: '接收行程提醒和更新',
-            value: true,
-            onChanged: (value) {
-              // TODO: 更新通知設定
-            },
+            subtitle: '接收行程提醒',
+            trailing: Switch(
+              value: true, // TODO: 從狀態管理獲取
+              onChanged: (value) {
+                // TODO: 實現通知設定
+              },
+            ),
           ),
-          _buildSwitchTile(
-            context,
-            icon: Icons.schedule,
-            title: '行程提醒',
-            subtitle: '在活動開始前提醒您',
-            value: true,
-            onChanged: (value) {
-              // TODO: 更新行程提醒設定
-            },
-          ),
-          
-          const Divider(),
-          
-          // 資料與隱私
-          _buildSectionTitle(context, '資料與隱私'),
-          _buildSettingTile(
-            context,
-            icon: Icons.cloud_sync,
-            title: '資料同步',
-            subtitle: '管理雲端同步設定',
+
+          const SizedBox(height: 24),
+
+          // 資料管理區塊
+          _buildSectionHeader('資料管理'),
+          _buildSettingItem(
+            icon: Icons.backup,
+            title: '資料備份',
+            subtitle: '備份您的行程資料',
             onTap: () {
-              _showSyncDialog(context);
-            },
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.download,
-            title: '匯出資料',
-            subtitle: '下載您的行程資料',
-            onTap: () {
+              // TODO: 實現資料備份
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('匯出功能開發中...')),
+                const SnackBar(content: Text('資料備份功能開發中...')),
               );
             },
           ),
-          _buildSettingTile(
-            context,
-            icon: Icons.delete_forever,
-            title: '清除資料',
-            subtitle: '刪除所有本地資料',
+          _buildSettingItem(
+            icon: Icons.restore,
+            title: '資料還原',
+            subtitle: '從備份還原資料',
             onTap: () {
-              _showClearDataDialog(context);
+              // TODO: 實現資料還原
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('資料還原功能開發中...')),
+              );
             },
           ),
-          
-          const Divider(),
-          
-          // 關於
-          _buildSectionTitle(context, '關於'),
-          _buildSettingTile(
-            context,
+
+          const SizedBox(height: 24),
+
+          // 關於區塊
+          _buildSectionHeader('關於'),
+          _buildSettingItem(
             icon: Icons.info,
-            title: '關於 TripMuse',
-            subtitle: '版本 0.0.3',
+            title: '版本資訊',
+            subtitle: 'TripMuse v0.2.1',
             onTap: () {
-              _showAboutDialog(context);
+              showAboutDialog(
+                context: context,
+                applicationName: 'TripMuse',
+                applicationVersion: '0.2.1',
+                applicationLegalese: '© 2025 TripMuse Team',
+              );
             },
           ),
-          _buildSettingTile(
-            context,
+          _buildSettingItem(
             icon: Icons.help,
-            title: '說明與支援',
-            subtitle: '使用指南和常見問題',
+            title: '幫助與支援',
+            subtitle: '常見問題與聯絡我們',
             onTap: () {
+              // TODO: 實現幫助頁面
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('說明功能開發中...')),
+                const SnackBar(content: Text('幫助頁面開發中...')),
               );
             },
           ),
-          _buildSettingTile(
-            context,
-            icon: Icons.privacy_tip,
-            title: '隱私政策',
-            subtitle: '了解我們如何保護您的隱私',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('隱私政策功能開發中...')),
-              );
-            },
-          ),
-          
-          const SizedBox(height: TripMuseSpacing.xxl),
         ],
       ),
     );
   }
-  
-  Widget _buildSectionTitle(BuildContext context, String title) {
+
+  /// 建立區塊標題
+  Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        TripMuseSpacing.md,
-        TripMuseSpacing.lg,
-        TripMuseSpacing.md,
-        TripMuseSpacing.sm,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: TripMuseTheme.primaryColor,
+        style: const TextStyle(
+          fontSize: 18,
           fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildSettingTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: TripMuseTheme.primaryColor),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
-    );
-  }
-  
-  Widget _buildSwitchTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return SwitchListTile(
-      secondary: Icon(icon, color: TripMuseTheme.primaryColor),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      value: value,
-      onChanged: onChanged,
-      activeThumbColor: TripMuseTheme.primaryColor,
-    );
-  }
-  
-  void _showLanguageDialog(BuildContext context) {
-    String selectedValue = 'zh-TW';
-    
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('選擇語言'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: const Text('繁體中文'),
-                value: 'zh-TW',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('English'),
-                value: 'en-US',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showThemeDialog(BuildContext context) {
-    String selectedValue = 'system';
-    
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('選擇主題'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: const Text('跟隨系統'),
-                value: 'system',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('亮色主題'),
-                value: 'light',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('暗色主題'),
-                value: 'dark',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showCurrencyDialog(BuildContext context) {
-    String selectedValue = 'TWD';
-    
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('選擇預設貨幣'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: const Text('TWD (新台幣)'),
-                value: 'TWD',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('USD (美元)'),
-                value: 'USD',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('JPY (日圓)'),
-                value: 'JPY',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showMapStyleDialog(BuildContext context) {
-    String selectedValue = 'standard';
-    
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('選擇地圖樣式'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: const Text('標準地圖'),
-                value: 'standard',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('衛星地圖'),
-                value: 'satellite',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('地形地圖'),
-                value: 'terrain',
-                groupValue: selectedValue,
-                onChanged: (value) {
-                  setState(() => selectedValue = value!);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  void _showSyncDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('資料同步'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('同步狀態：已同步'),
-            SizedBox(height: 8),
-            Text('最後同步：剛剛'),
-            SizedBox(height: 8),
-            Text('待同步項目：0'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('立即同步'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('關閉'),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  void _showClearDataDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('清除資料'),
-        content: const Text('此操作將刪除所有本地儲存的行程資料，且無法復原。您確定要繼續嗎？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('清除資料功能開發中...')),
-              );
-            },
-            style: TextButton.styleFrom(foregroundColor: TripMuseTheme.errorColor),
-            child: const Text('確定清除'),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
-      context: context,
-      applicationName: 'TripMuse',
-      applicationVersion: '0.1.0',
-      applicationIcon: const Icon(
-        Icons.luggage,
-        size: 48,
-        color: TripMuseTheme.primaryColor,
-      ),
-      children: const [
-        Text('TripMuse 是一個基於 AI 的智能旅行規劃應用，幫助您輕鬆規劃完美的旅程。'),
-        SizedBox(height: 16),
-        Text('使用 Flutter 和 MapBox Maps SDK 開發，提供跨平台的優質體驗。'),
-      ],
-    );
-  }
-  
-  Widget _buildUserSection(BuildContext context, WidgetRef ref, User? user) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen()),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(TripMuseSpacing.lg),
-        decoration: const BoxDecoration(
           color: TripMuseTheme.primaryColor,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(TripMuseRadius.xl),
-            bottomRight: Radius.circular(TripMuseRadius.xl),
-          ),
-        ),
-        child: Column(
-          children: [
-            // 使用者頭像
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.white.withValues(alpha: 51),
-              backgroundImage: user?.avatarUrl != null 
-                  ? NetworkImage(user!.avatarUrl!) 
-                  : null,
-              child: user?.avatarUrl == null
-                  ? Icon(
-                      user?.isGuest == true ? Icons.person_outline : Icons.person,
-                      size: 40,
-                      color: Colors.white,
-                    )
-                  : null,
-            ),
-            
-            const SizedBox(height: TripMuseSpacing.md),
-            
-            // 使用者名稱
-            Text(
-              user?.name ?? '未登入',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            
-            const SizedBox(height: TripMuseSpacing.sm),
-            
-            // 使用者狀態或登入按鈕
-            if (user == null)
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white),
-                ),
-                child: const Text('登入或註冊'),
-              )
-            else
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: TripMuseSpacing.md,
-                  vertical: TripMuseSpacing.sm,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 51),
-                  borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-                ),
-                child: Text(
-                  user.isGuest ? '訪客模式' : '已登入',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            
-            const SizedBox(height: TripMuseSpacing.sm),
-            
-            // 點擊提示
-            const Text(
-              '點擊查看個人資料',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-              ),
-            ),
-          ],
         ),
       ),
     );
   }
-  
-  Widget _buildLoadingUserSection() {
-    return Container(
-      padding: const EdgeInsets.all(TripMuseSpacing.lg),
-      decoration: const BoxDecoration(
-        color: TripMuseTheme.primaryColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(TripMuseRadius.xl),
-          bottomRight: Radius.circular(TripMuseRadius.xl),
+
+  /// 建立設定項目
+  Widget _buildSettingItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: ListTile(
+        leading: Icon(icon, color: TripMuseTheme.primaryColor),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: trailing,
+        onTap: onTap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-      ),
-      child: const Column(
-        children: [
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          ),
-          SizedBox(height: TripMuseSpacing.md),
-          Text(
-            '載入中...',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildErrorUserSection(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.all(TripMuseSpacing.lg),
-      decoration: const BoxDecoration(
-        color: TripMuseTheme.primaryColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(TripMuseRadius.xl),
-          bottomRight: Radius.circular(TripMuseRadius.xl),
-        ),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.error_outline,
-            size: 40,
-            color: Colors.white,
-          ),
-          const SizedBox(height: TripMuseSpacing.md),
-          const Text(
-            '載入失敗',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: TripMuseSpacing.sm),
-          OutlinedButton(
-            onPressed: () {
-              ref.invalidate(userAuthNotifierProvider);
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: const BorderSide(color: Colors.white),
-            ),
-            child: const Text('重試'),
-          ),
-        ],
       ),
     );
   }

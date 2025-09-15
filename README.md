@@ -1,8 +1,22 @@
 # TripMuse 🧳
 
-**Version 0.2.1**
+**Version 0.2.2**
 
-TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
+TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of arti## 📈 Latest Updates / 最新更新
+
+### v0.2.2 (2025-09-15)
+- 🤖 **AI 模型升級** | AI Model Upgrade: Upgraded from Gemini Pro to Gemini 2.5 Flash for enhanced performance and accuracy
+- ⚡ **回應速度提升** | Response Speed Improvement: Faster trip generation with improved AI processing capabilities
+- 🎯 **生成品質優化** | Generation Quality Enhancement: Better trip planning accuracy and richer detail generation
+- 🔧 **設定頁面修復** | Settings Page Fix: Fixed settings screen import issues and improved UI consistency
+- 🎨 **用戶介面改善** | UI Improvements: Enhanced user experience with better error handling and visual feedback
+
+### v0.2.1 (2025-09-12)
+- 🗑️ **行程刪除功能修復** | Trip Deletion Fix: Fixed recent trips deletion functionality with proper async handling and UI refresh
+- 🛤️ **路線曲度優化** | Route Curvature Optimization: Reduced route curvature for straighter, more natural-looking paths on map
+- 🔄 **UI 狀態同步** | UI State Synchronization: Improved UI refresh after trip deletion operations
+- ⚡ **異步處理優化** | Async Handling Optimization: Enhanced async/await patterns for better deletion reliability
+- 🎯 **用戶體驗改善** | User Experience Enhancement: Added loading indicators and error handling for deletion operationsntelligence.
 
 TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 MapBox Maps SDK 開發。透過人工智慧的力量，將您的旅行想法轉化為個人化的行程規劃。
 
@@ -30,7 +44,7 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.2.1** - Map Search & Navigation Integration / 地圖搜索與導航功能整合
+**Version 0.2.2** - AI Model Upgrade & UI Improvements / AI 模型升級與介面改善
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  

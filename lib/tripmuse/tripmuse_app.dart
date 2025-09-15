@@ -7,8 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
+import 'screens/home_screen_new.dart';
 import 'screens/map_screen.dart';
-import 'screens/settings_screen.dart';
+import 'screens/settings_screen_new.dart';
 import 'screens/trip_detail_screen.dart';
 import 'services/services.dart';
 import 'models/models.dart';
@@ -116,6 +117,11 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
             final trip = ModalRoute.of(context)!.settings.arguments as Trip;
             return TripDetailScreen(trip: trip);
           },
+          '/api-test': (context) => const HomeScreen(), // API 測試頁面
+          '/trip-generation': (context) => const HomeScreen(), // 行程生成頁面
+          '/trips': (context) => const HomeScreen(), // 所有行程頁面
+          '/map': (context) => const MapScreen(), // 地圖頁面
+          '/settings': (context) => const SettingsScreenNew(), // 設定頁面
         },
         home: Scaffold(
           body: PageView(
@@ -125,43 +131,73 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
               ref.read(currentPageIndexProvider.notifier).state = index;
             },
             children: [
-              const HomeScreen(),
+              const HomeScreenNew(),
               const MapScreen(),
-              const SettingsScreen(),
+              const SettingsScreenNew(),
             ],
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: currentIndex,
-            onTap: (index) {
-              ref.read(currentPageIndexProvider.notifier).state = index;
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: TripMuseTheme.surfaceColor,
-            selectedItemColor: TripMuseTheme.primaryColor,
-            unselectedItemColor: TripMuseTheme.textSecondary,
-            elevation: 8,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: '首頁',
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.map_outlined),
-                activeIcon: Icon(Icons.map),
-                label: '地圖',
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined),
-                activeIcon: Icon(Icons.settings),
-                label: '設定',
+              child: BottomNavigationBar(
+                currentIndex: currentIndex,
+                onTap: (index) {
+                  ref.read(currentPageIndexProvider.notifier).state = index;
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.transparent,
+                selectedItemColor: const Color(0xFF4ECDC4),
+                unselectedItemColor: Colors.grey.shade500,
+                elevation: 0,
+                selectedLabelStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home_outlined, size: 24),
+                    activeIcon: Icon(Icons.home, size: 24),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.map_outlined, size: 24),
+                    activeIcon: Icon(Icons.map, size: 24),
+                    label: 'Map',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.settings_outlined, size: 24),
+                    activeIcon: Icon(Icons.settings, size: 24),
+                    label: 'Settings',
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
