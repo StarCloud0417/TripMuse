@@ -22,15 +22,21 @@ class TimelineActivityCard extends StatelessWidget {
       children: [
         // 活動卡片
         Container(
-          margin: const EdgeInsets.only(bottom: TripMuseSpacing.sm),
+          margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: TripMuseTheme.surfaceColor,
-            borderRadius: BorderRadius.circular(TripMuseRadius.md),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: _getCategoryColor().withValues(alpha: 0.3),
+              color: _getCategoryColor().withValues(alpha: 0.2),
               width: 1,
             ),
-            boxShadow: TripMuseShadows.small,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -53,44 +59,64 @@ class TimelineActivityCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
-        horizontal: TripMuseSpacing.md,
-        vertical: TripMuseSpacing.sm,
+        horizontal: 16,
+        vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: _getCategoryColor().withValues(alpha: 0.1),
+        gradient: LinearGradient(
+          colors: [
+            _getCategoryColor().withValues(alpha: 0.1),
+            _getCategoryColor().withValues(alpha: 0.05),
+          ],
+        ),
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(TripMuseRadius.md),
-          topRight: Radius.circular(TripMuseRadius.md),
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
         ),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.access_time,
-            size: 16,
-            color: _getCategoryColor(),
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: _getCategoryColor().withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              Icons.access_time,
+              size: 14,
+              color: _getCategoryColor(),
+            ),
           ),
-          const SizedBox(width: TripMuseSpacing.xs),
+          const SizedBox(width: 8),
           Text(
             activity.timeRange,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: TextStyle(
               color: _getCategoryColor(),
               fontWeight: FontWeight.w600,
+              fontSize: 14,
             ),
           ),
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: TripMuseSpacing.xs,
-              vertical: 2,
+              horizontal: 8,
+              vertical: 4,
             ),
             decoration: BoxDecoration(
               color: _getPriorityColor(),
-              borderRadius: BorderRadius.circular(TripMuseRadius.sm),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: _getPriorityColor().withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Text(
               activity.priority.displayName,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 10,
@@ -104,7 +130,7 @@ class TimelineActivityCard extends StatelessWidget {
 
   Widget _buildActivityContent(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(TripMuseSpacing.md),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -113,10 +139,22 @@ class TimelineActivityCard extends StatelessWidget {
             children: [
               // 類別圖標
               Container(
-                padding: const EdgeInsets.all(TripMuseSpacing.xs),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: _getCategoryColor().withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(TripMuseRadius.sm),
+                  gradient: LinearGradient(
+                    colors: [
+                      _getCategoryColor().withValues(alpha: 0.2),
+                      _getCategoryColor().withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _getCategoryColor().withValues(alpha: 0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Icon(
                   _getCategoryIcon(),
@@ -124,41 +162,43 @@ class TimelineActivityCard extends StatelessWidget {
                   color: _getCategoryColor(),
                 ),
               ),
-              const SizedBox(width: TripMuseSpacing.sm),
+              const SizedBox(width: 12),
               
               // 活動名稱
               Expanded(
                 child: Text(
                   activity.name,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: TripMuseTheme.textPrimary,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
               ),
             ],
           ),
           
-          const SizedBox(height: TripMuseSpacing.sm),
+          const SizedBox(height: 12),
           
           // 活動描述
           Text(
             activity.description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: TripMuseTheme.textPrimary,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade700,
               height: 1.4,
             ),
           ),
           
           // 額外資訊
           if (activity.estimatedCost != null || activity.address != null) ...[
-            const SizedBox(height: TripMuseSpacing.sm),
+            const SizedBox(height: 12),
             _buildExtraInfo(context),
           ],
           
           // 旅行小貼士
           if (activity.tips != null && activity.tips!.isNotEmpty) ...[
-            const SizedBox(height: TripMuseSpacing.sm),
+            const SizedBox(height: 12),
             _buildTipsSection(context),
           ],
         ],
@@ -167,74 +207,110 @@ class TimelineActivityCard extends StatelessWidget {
   }
 
   Widget _buildExtraInfo(BuildContext context) {
-    return Row(
+    return Column(
       children: [
         // 費用資訊
-        if (activity.estimatedCost != null) ...[
-          Icon(
-            Icons.attach_money,
-            size: 16,
-            color: TripMuseTheme.textSecondary,
-          ),
-          const SizedBox(width: TripMuseSpacing.xs),
-          Text(
-            activity.estimatedCost!,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: TripMuseTheme.textSecondary,
-              fontWeight: FontWeight.w500,
+        if (activity.estimatedCost != null)
+          Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    Icons.attach_money,
+                    size: 14,
+                    color: Colors.green.shade600,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  activity.estimatedCost!,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
         
         // 地址資訊
-        if (activity.address != null) ...[
-          if (activity.estimatedCost != null) 
-            const SizedBox(width: TripMuseSpacing.md),
-          Icon(
-            Icons.location_on,
-            size: 16,
-            color: TripMuseTheme.textSecondary,
-          ),
-          const SizedBox(width: TripMuseSpacing.xs),
-          Expanded(
-            child: Text(
-              activity.address!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: TripMuseTheme.textSecondary,
+        if (activity.address != null)
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.location_on,
+                  size: 14,
+                  color: Colors.blue.shade600,
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-            ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  activity.address!,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-        ],
       ],
     );
   }
 
   Widget _buildTipsSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(TripMuseSpacing.sm),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: TripMuseTheme.infoColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(TripMuseRadius.sm),
+        gradient: LinearGradient(
+          colors: [
+            Colors.amber.shade50,
+            Colors.orange.shade50,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: TripMuseTheme.infoColor.withValues(alpha: 0.3),
+          color: Colors.amber.shade200,
           width: 1,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.lightbulb_outline,
-            size: 16,
-            color: TripMuseTheme.infoColor,
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.amber.shade100,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              Icons.lightbulb_outline,
+              size: 14,
+              color: Colors.amber.shade700,
+            ),
           ),
-          const SizedBox(width: TripMuseSpacing.xs),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               activity.tips!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: TripMuseTheme.textPrimary,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.amber.shade800,
                 height: 1.3,
               ),
             ),
@@ -246,18 +322,19 @@ class TimelineActivityCard extends StatelessWidget {
 
   Widget _buildActivityConnector() {
     return Container(
-      width: 2,
+      width: 3,
       height: 20,
-      margin: const EdgeInsets.only(bottom: TripMuseSpacing.sm),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            _getCategoryColor().withValues(alpha: 0.5),
+            _getCategoryColor().withValues(alpha: 0.6),
             _getCategoryColor().withValues(alpha: 0.2),
           ],
         ),
+        borderRadius: BorderRadius.circular(2),
       ),
     );
   }

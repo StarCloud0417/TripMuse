@@ -643,11 +643,11 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
   }
 
   void _navigateToItineraryTest() {
-    Navigator.pushNamed(context, '/trip-generation');
+    Navigator.pushNamed(context, '/create-trip');
   }
 
   void _navigateToAllTrips() {
-    Navigator.pushNamed(context, '/trips');
+    Navigator.pushNamed(context, '/my-trips');
   }
 
   void _navigateToTripDetail(Trip trip) {
@@ -661,6 +661,6 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
 
 
   void _createNewTrip() {
-    Navigator.pushNamed(context, '/trip-generation');
+    Navigator.pushNamed(context, '/create-trip');
   }
 }

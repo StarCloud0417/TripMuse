@@ -44,108 +44,182 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   }
 
   Widget _buildTimelineView(BuildContext context) {
-    return Column(
-      children: [
-        _buildAppBar(context),
-        Expanded(
-          child: TimelineWidget(
-            trip: widget.trip,
-            onSwitchToMap: () {
-              setState(() {
-                _isTimelineView = false;
-              });
-            },
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF4ECDC4), // 青綠色
+            Color(0xFF44A08D), // 深綠色
+            Color(0xFFFF9A8B), // 珊瑚色
+            Color(0xFFFEAD96), // 桃色
+          ],
+          stops: [0.0, 0.3, 0.7, 1.0],
         ),
-      ],
+      ),
+      child: Column(
+        children: [
+          _buildAppBar(context),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: TimelineWidget(
+                trip: widget.trip,
+                onSwitchToMap: () {
+                  setState(() {
+                    _isTimelineView = false;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildMapView(BuildContext context) {
-    return Column(
-      children: [
-        _buildAppBar(context),
-        // 視圖切換器
-        Container(
-          margin: const EdgeInsets.all(TripMuseSpacing.md),
-          decoration: BoxDecoration(
-            color: TripMuseTheme.surfaceColor,
-            borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-            boxShadow: TripMuseShadows.small,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isTimelineView = true;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: TripMuseSpacing.md,
-                      vertical: TripMuseSpacing.sm,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF4ECDC4), // 青綠色
+            Color(0xFF44A08D), // 深綠色
+            Color(0xFFFF9A8B), // 珊瑚色
+            Color(0xFFFEAD96), // 桃色
+          ],
+          stops: [0.0, 0.3, 0.7, 1.0],
+        ),
+      ),
+      child: Column(
+        children: [
+          _buildAppBar(context),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // 視圖切換器
+                  Container(
+                    margin: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.timeline,
-                          color: TripMuseTheme.textSecondary,
-                          size: 20,
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isTimelineView = true;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: TripMuseSpacing.md,
+                                vertical: TripMuseSpacing.sm,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.timeline,
+                                    color: Colors.grey.shade600,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: TripMuseSpacing.xs),
+                                  Text(
+                                    '時間軸',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: TripMuseSpacing.xs),
-                        Text(
-                          '時間軸',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: TripMuseTheme.textSecondary,
-                            fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: TripMuseSpacing.md,
+                              vertical: TripMuseSpacing.sm,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF4ECDC4),
+                                  Color(0xFF44A08D),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.map,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '地圖',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
+                  // 地圖內容
+                  Expanded(
+                    child: _buildTripMapContent(context),
+                  ),
+                ],
               ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: TripMuseSpacing.md,
-                    vertical: TripMuseSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: TripMuseTheme.primaryColor,
-                    borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.map,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: TripMuseSpacing.xs),
-                      Text(
-                        '地圖',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-        // 地圖內容
-        Expanded(
-          child: _buildTripMapContent(context),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -444,74 +518,151 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
-      height: 120,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
-            TripMuseTheme.primaryColor,
-            TripMuseTheme.primaryColor.withValues(alpha: 0.8),
+            Color(0xFF4ECDC4), // 青綠色
+            Color(0xFF44A08D), // 深綠色
+            Color(0xFFFF9A8B), // 珊瑚色
+            Color(0xFFFEAD96), // 桃色
           ],
+          stops: [0.0, 0.3, 0.7, 1.0],
         ),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: TripMuseSpacing.md),
-          child: Row(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              Expanded(
-                child: Text(
-                  widget.trip.title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              // 返回按鈕和標題
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white),
-                onSelected: (value) {
-                  switch (value) {
-                    case 'edit':
-                      _editTrip(context);
-                      break;
-                    case 'delete':
-                      _deleteTrip(context);
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit),
-                        SizedBox(width: 8),
-                        Text('編輯行程'),
+                  Expanded(
+                    child: Text(
+                      widget.trip.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.white),
+                      onSelected: (value) {
+                        switch (value) {
+                          case 'edit':
+                            _editTrip(context);
+                            break;
+                          case 'delete':
+                            _deleteTrip(context);
+                            break;
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, color: Color(0xFF4ECDC4)),
+                              SizedBox(width: 8),
+                              Text('編輯行程'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text('刪除行程', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete),
-                        SizedBox(width: 8),
-                        Text('刪除行程'),
-                      ],
-                    ),
+                ],
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // 行程信息
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTripInfoChip(
+                    Icons.location_on,
+                    widget.trip.destination.city,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildTripInfoChip(
+                    Icons.calendar_today,
+                    '${widget.trip.days.length}天',
+                  ),
+                  const SizedBox(width: 12),
+                  _buildTripInfoChip(
+                    Icons.event,
+                    '${widget.trip.totalActivities}個活動',
                   ),
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTripInfoChip(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 16,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

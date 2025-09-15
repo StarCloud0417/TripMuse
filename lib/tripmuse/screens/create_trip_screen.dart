@@ -57,67 +57,154 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('建立新行程'),
-        backgroundColor: TripMuseTheme.primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(TripMuseSpacing.lg),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF4ECDC4), // 青綠色
+              Color(0xFF44A08D), // 深綠色
+              Color(0xFFFF9A8B), // 珊瑚色
+              Color(0xFFFEAD96), // 桃色
+            ],
+            stops: [0.0, 0.3, 0.7, 1.0],
+          ),
+        ),
+        child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 頁面標題和描述
-              _buildHeader(),
+              // 頂部標題區域
+              _buildNewHeader(),
+              
+              // 主要內容區域
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 頁面標題和描述
+                          _buildHeader(),
 
-              const SizedBox(height: TripMuseSpacing.xl),
+                          const SizedBox(height: TripMuseSpacing.xl),
 
-              // 目的地選擇
-              _buildDestinationSection(),
+                          // 目的地選擇
+                          _buildDestinationSection(),
 
-              const SizedBox(height: TripMuseSpacing.xl),
+                          const SizedBox(height: TripMuseSpacing.xl),
 
-              // 日期和天數設定
-              _buildDateSection(),
+                          // 日期和天數設定
+                          _buildDateSection(),
 
-              const SizedBox(height: TripMuseSpacing.xl),
+                          const SizedBox(height: TripMuseSpacing.xl),
 
-              // 旅行描述
-              _buildDescriptionSection(),
+                          // 旅行描述
+                          _buildDescriptionSection(),
 
-              const SizedBox(height: TripMuseSpacing.xl),
+                          const SizedBox(height: TripMuseSpacing.xl),
 
-              // 選擇性設定
-              _buildOptionalSettings(),
+                          // 選擇性設定
+                          _buildOptionalSettings(),
 
-              const SizedBox(height: TripMuseSpacing.xxl),
+                          const SizedBox(height: TripMuseSpacing.xxl),
 
-              // 生成按鈕
-              _buildGenerateButton(),
+                          // 生成按鈕
+                          _buildGenerateButton(),
 
-              const SizedBox(height: TripMuseSpacing.md),
+                          const SizedBox(height: TripMuseSpacing.md),
 
-              // 除錯按鈕
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _showDebugDialog,
-                  icon: const Icon(Icons.bug_report),
-                  label: const Text('🔍 除錯測試'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.orange,
-                    side: const BorderSide(color: Colors.orange),
+                          // 除錯按鈕
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _showDebugDialog,
+                              icon: const Icon(Icons.bug_report),
+                              label: const Text('🔍 除錯測試'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.orange,
+                                side: const BorderSide(color: Colors.orange),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: TripMuseSpacing.xl),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-
-              const SizedBox(height: TripMuseSpacing.xl),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// 建立新的頂部標題區域（漸層背景）
+  Widget _buildNewHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          // 返回按鈕和標題
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ),
+              const Expanded(
+                child: Text(
+                  '建立新行程',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(width: 40), // 平衡返回按鈕
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // 副標題
+          const Text(
+            '讓AI為您規劃完美的旅程',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w300,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -153,44 +240,46 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
         const SizedBox(height: TripMuseSpacing.md),
 
         // 目的地輸入框
-        TextFormField(
-          controller: _destinationController,
-          decoration: InputDecoration(
-            hintText: '搜尋城市或國家...',
-            prefixIcon: const Icon(
-              Icons.location_on,
-              color: TripMuseTheme.primaryColor,
-            ),
-            suffixIcon: _destinationController.text.isNotEmpty
-                ? IconButton(
-                    onPressed: () {
-                      _destinationController.clear();
-                      setState(() {
-                        _selectedDestination = null;
-                      });
-                    },
-                    icon: const Icon(Icons.clear),
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-              borderSide: const BorderSide(color: TripMuseTheme.borderColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-              borderSide: const BorderSide(
-                color: TripMuseTheme.primaryColor,
-                width: 2,
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: TextFormField(
+            controller: _destinationController,
+            decoration: InputDecoration(
+              hintText: '搜尋城市或國家...',
+              hintStyle: TextStyle(color: Colors.grey.shade400),
+              prefixIcon: const Icon(
+                Icons.location_on,
+                color: Color(0xFF4ECDC4),
+              ),
+              suffixIcon: _destinationController.text.isNotEmpty
+                  ? IconButton(
+                      onPressed: () {
+                        _destinationController.clear();
+                        setState(() {
+                          _selectedDestination = null;
+                        });
+                      },
+                      icon: const Icon(Icons.clear),
+                    )
+                  : null,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
               ),
             ),
+            onChanged: _onDestinationChanged,
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return '請選擇目的地';
+              }
+              return null;
+            },
           ),
-          onChanged: _onDestinationChanged,
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return '請選擇目的地';
-            }
-            return null;
-          },
         ),
 
         // 已選擇的目的地顯示
@@ -263,9 +352,9 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
       decoration: BoxDecoration(
-        color: TripMuseTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-        border: Border.all(color: TripMuseTheme.borderColor),
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         children: [
@@ -276,7 +365,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                 '旅行天數',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: TripMuseTheme.textPrimary,
+                  color: Colors.black87,
                 ),
               ),
               Text(
@@ -284,7 +373,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: TripMuseTheme.primaryColor,
+                  color: Color(0xFF4ECDC4),
                 ),
               ),
             ],
@@ -295,28 +384,28 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
             min: 1,
             max: 14,
             divisions: 13,
-            activeColor: TripMuseTheme.primaryColor,
+            activeColor: const Color(0xFF4ECDC4),
             onChanged: (value) {
               setState(() {
                 _days = value.round();
               });
             },
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 '1天',
                 style: TextStyle(
                   fontSize: 12,
-                  color: TripMuseTheme.textSecondary,
+                  color: Colors.grey.shade600,
                 ),
               ),
               Text(
                 '14天',
                 style: TextStyle(
                   fontSize: 12,
-                  color: TripMuseTheme.textSecondary,
+                  color: Colors.grey.shade600,
                 ),
               ),
             ],
@@ -340,32 +429,31 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
         const SizedBox(height: TripMuseSpacing.md),
 
         // 描述輸入框
-        TextFormField(
-          controller: _descriptionController,
-          maxLines: 4,
-          decoration: InputDecoration(
-            hintText: '例如：我想要一趟放鬆的美食之旅，體驗當地文化和歷史...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-              borderSide: const BorderSide(color: TripMuseTheme.borderColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-              borderSide: const BorderSide(
-                color: TripMuseTheme.primaryColor,
-                width: 2,
-              ),
-            ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return '請描述你想要的旅行體驗';
-            }
-            if (value!.length < 10) {
-              return '請提供更詳細的描述（至少10個字）';
-            }
-            return null;
-          },
+          child: TextFormField(
+            controller: _descriptionController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              hintText: '例如：我想要一趟放鬆的美食之旅，體驗當地文化和歷史...',
+              hintStyle: TextStyle(color: Colors.grey.shade400),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(16),
+            ),
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return '請描述你想要的旅行體驗';
+              }
+              if (value!.length < 10) {
+                return '請提供更詳細的描述（至少10個字）';
+              }
+              return null;
+            },
+          ),
         ),
       ],
     );
@@ -399,24 +487,24 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
           children: examples.map((example) {
             return InkWell(
               onTap: () => _addExampleToDescription(example),
-              borderRadius: BorderRadius.circular(TripMuseRadius.md),
+              borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: TripMuseSpacing.md,
-                  vertical: TripMuseSpacing.sm,
+                  horizontal: 16,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                  color: const Color(0xFF4ECDC4).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.blue.shade200,
+                    color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
                   example,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.blue.shade700,
+                    color: Color(0xFF4ECDC4),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -451,9 +539,9 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
       decoration: BoxDecoration(
-        color: TripMuseTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-        border: Border.all(color: TripMuseTheme.borderColor),
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,7 +550,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
             children: [
               const Icon(
                 Icons.group,
-                color: TripMuseTheme.primaryColor,
+                color: Color(0xFF4ECDC4),
                 size: 20,
               ),
               const SizedBox(width: TripMuseSpacing.sm),
@@ -470,7 +558,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                 '旅伴數量',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: TripMuseTheme.textPrimary,
+                  color: Colors.black87,
                 ),
               ),
               const Spacer(),
@@ -479,7 +567,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: TripMuseTheme.primaryColor,
+                  color: Color(0xFF4ECDC4),
                 ),
               ),
             ],
@@ -495,19 +583,19 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                     _groupSize = size;
                   });
                 },
-                borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? TripMuseTheme.primaryColor
+                        ? const Color(0xFF4ECDC4)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
-                          ? TripMuseTheme.primaryColor
-                          : TripMuseTheme.borderColor,
+                          ? const Color(0xFF4ECDC4)
+                          : Colors.grey.shade300,
                     ),
                   ),
                   child: Center(
@@ -516,7 +604,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                       style: TextStyle(
                         color: isSelected
                             ? Colors.white
-                            : TripMuseTheme.textSecondary,
+                            : Colors.grey.shade600,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -534,9 +622,9 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     return Container(
       padding: const EdgeInsets.all(TripMuseSpacing.md),
       decoration: BoxDecoration(
-        color: TripMuseTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-        border: Border.all(color: TripMuseTheme.borderColor),
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -545,7 +633,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
             children: [
               const Icon(
                 Icons.attach_money,
-                color: TripMuseTheme.primaryColor,
+                color: Color(0xFF4ECDC4),
                 size: 20,
               ),
               const SizedBox(width: TripMuseSpacing.sm),
@@ -553,7 +641,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                 '預算範圍',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: TripMuseTheme.textPrimary,
+                  color: Colors.black87,
                 ),
               ),
             ],
@@ -568,7 +656,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                     _budgetRange = budget;
                   });
                 },
-                borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -578,13 +666,13 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                   margin: const EdgeInsets.only(bottom: TripMuseSpacing.sm),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? TripMuseTheme.primaryColor.withValues(alpha: 25.5)
+                        ? const Color(0xFF4ECDC4).withValues(alpha: 0.1)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(TripMuseRadius.md),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
-                          ? TripMuseTheme.primaryColor
-                          : TripMuseTheme.borderColor,
+                          ? const Color(0xFF4ECDC4)
+                          : Colors.grey.shade300,
                     ),
                   ),
                   child: Row(
@@ -594,8 +682,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                             ? Icons.radio_button_checked
                             : Icons.radio_button_off,
                         color: isSelected
-                            ? TripMuseTheme.primaryColor
-                            : TripMuseTheme.textSecondary,
+                            ? const Color(0xFF4ECDC4)
+                            : Colors.grey.shade600,
                         size: 20,
                       ),
                       const SizedBox(width: TripMuseSpacing.sm),
@@ -603,8 +691,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                         budget.displayName,
                         style: TextStyle(
                           color: isSelected
-                              ? TripMuseTheme.primaryColor
-                              : TripMuseTheme.textPrimary,
+                              ? const Color(0xFF4ECDC4)
+                              : Colors.black87,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
@@ -628,56 +716,76 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     return SizedBox(
       width: double.infinity,
       height: 56,
-      child: ElevatedButton(
-        onPressed: isFormValid && !_isGenerating ? _generateTrip : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: TripMuseTheme.primaryColor,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: TripMuseTheme.textSecondary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF4ECDC4),
+              Color(0xFF44A08D),
+            ],
           ),
-          elevation: isFormValid ? 4 : 0,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        child: _isGenerating
-            ? const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        child: ElevatedButton(
+          onPressed: isFormValid && !_isGenerating ? _generateTrip : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            disabledBackgroundColor: Colors.grey.shade400,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+          child: _isGenerating
+              ? const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: TripMuseSpacing.md),
-                  Text(
-                    '正在生成行程...',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    SizedBox(width: 12),
+                    Text(
+                      '正在生成行程...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
-              )
-            : const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    size: 24,
-                  ),
-                  SizedBox(width: TripMuseSpacing.sm),
-                  Text(
-                    '🚀 智能生成行程',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  ],
+                )
+              : const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      color: Colors.white,
+                      size: 24,
                     ),
-                  ),
-                ],
-              ),
+                    SizedBox(width: 8),
+                    Text(
+                      '🚀 智能生成行程',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

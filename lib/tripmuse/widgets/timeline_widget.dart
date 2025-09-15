@@ -34,11 +34,17 @@ class TimelineWidget extends StatelessWidget {
 
   Widget _buildViewSwitcher(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(TripMuseSpacing.md),
+      margin: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: TripMuseTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(TripMuseRadius.lg),
-        boxShadow: TripMuseShadows.small,
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -49,21 +55,33 @@ class TimelineWidget extends StatelessWidget {
                 vertical: TripMuseSpacing.sm,
               ),
               decoration: BoxDecoration(
-                color: TripMuseTheme.primaryColor,
-                borderRadius: BorderRadius.circular(TripMuseRadius.lg),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF4ECDC4),
+                    Color(0xFF44A08D),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.timeline,
                     color: Colors.white,
                     size: 20,
                   ),
-                  const SizedBox(width: TripMuseSpacing.xs),
+                  SizedBox(width: 8),
                   Text(
                     '時間軸',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -85,14 +103,14 @@ class TimelineWidget extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.map,
-                      color: TripMuseTheme.textSecondary,
+                      color: Colors.grey.shade600,
                       size: 20,
                     ),
-                    const SizedBox(width: TripMuseSpacing.xs),
+                    const SizedBox(width: 8),
                     Text(
                       '地圖',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: TripMuseTheme.textSecondary,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -130,28 +148,44 @@ class TimelineWidget extends StatelessWidget {
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(TripMuseSpacing.xl),
+        padding: const EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.timeline,
-              size: 80,
-              color: TripMuseTheme.textHint,
-            ),
-            const SizedBox(height: TripMuseSpacing.lg),
-            Text(
-              '暫無行程安排',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: TripMuseTheme.textSecondary,
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF4ECDC4).withValues(alpha: 0.1),
+                    const Color(0xFF44A08D).withValues(alpha: 0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(
+                Icons.timeline,
+                size: 64,
+                color: Color(0xFF4ECDC4),
               ),
             ),
-            const SizedBox(height: TripMuseSpacing.sm),
+            const SizedBox(height: 24),
+            const Text(
+              '暫無行程安排',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
             Text(
               '開始規劃您的精彩旅程吧！',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: TripMuseTheme.textHint,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

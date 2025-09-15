@@ -11,6 +11,8 @@ import 'screens/home_screen_new.dart';
 import 'screens/map_screen.dart';
 import 'screens/settings_screen_new.dart';
 import 'screens/trip_detail_screen.dart';
+import 'screens/create_trip_screen.dart';
+import 'screens/my_trips_screen.dart';
 import 'services/services.dart';
 import 'models/models.dart';
 
@@ -118,8 +120,10 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
             return TripDetailScreen(trip: trip);
           },
           '/api-test': (context) => const HomeScreen(), // API 測試頁面
-          '/trip-generation': (context) => const HomeScreen(), // 行程生成頁面
-          '/trips': (context) => const HomeScreen(), // 所有行程頁面
+          '/trip-generation': (context) => const CreateTripScreen(), // 行程生成頁面
+          '/create-trip': (context) => const CreateTripScreen(), // 建立新行程頁面
+          '/trips': (context) => const MyTripsScreen(), // 所有行程頁面
+          '/my-trips': (context) => const MyTripsScreen(), // 我的行程頁面
           '/map': (context) => const MapScreen(), // 地圖頁面
           '/settings': (context) => const SettingsScreenNew(), // 設定頁面
         },
