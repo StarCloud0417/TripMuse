@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../theme/app_theme.dart';
 
 class TimelineActivityCard extends StatelessWidget {
   final Activity activity;

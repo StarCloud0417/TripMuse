@@ -351,6 +351,119 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     }
   }
 
+  /// 調整相機視角以顯示所有活動
+  Future<void> _fitCameraToShowAllActivities(List<Position> coordinates) async {
+    if (_mapboxMap == null || coordinates.isEmpty) return;
+
+    print('🎯 調整相機視角以顯示 ${coordinates.length} 個活動');
+
+    // 計算邊界框
+    double minLat = coordinates.first.lat.toDouble();
+    double maxLat = coordinates.first.lat.toDouble();
+    double minLng = coordinates.first.lng.toDouble();
+    double maxLng = coordinates.first.lng.toDouble();
+
+    for (final coord in coordinates) {
+      final lat = coord.lat.toDouble();
+      final lng = coord.lng.toDouble();
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      if (lng < minLng) minLng = lng;
+      if (lng > maxLng) maxLng = lng;
+    }
+
+    // 計算中心點
+    final centerLat = (minLat + maxLat) / 2.0;
+    final centerLng = (minLng + maxLng) / 2.0;
+    final center = Position(centerLng, centerLat);
+
+    // 計算適當的縮放級別
+    final latDiff = maxLat - minLat;
+    final lngDiff = maxLng - minLng;
+    final maxDiff = latDiff > lngDiff ? latDiff : lngDiff;
+
+    // 根據範圍計算縮放級別，添加一些邊距
+    double zoom;
+    if (maxDiff > 1.0) {
+      zoom = 7.0;  // 跨國或大範圍（如歐洲多國遊）
+    } else if (maxDiff > 0.5) {
+      zoom = 8.5;  // 大範圍（如整個台灣）
+    } else if (maxDiff > 0.2) {
+      zoom = 9.5;  // 中大範圍（如北台灣）
+    } else if (maxDiff > 0.1) {
+      zoom = 11.0; // 中等範圍（如台北市）
+    } else if (maxDiff > 0.05) {
+      zoom = 12.5; // 較小範圍（如台北某區）
+    } else if (maxDiff > 0.02) {
+      zoom = 13.5; // 小範圍（如幾個街區）
+    } else if (maxDiff > 0.01) {
+      zoom = 14.5; // 很小範圍（如同一街區）
+    } else {
+      zoom = 15.5; // 極小範圍（如同一建築群）
+    }
+
+    // 為了更好的視覺效果，稍微降低縮放級別以提供邊距
+    zoom = zoom - 0.5;
+
+    print('📍 邊界框: 緯度 $minLat - $maxLat, 經度 $minLng - $maxLng');
+    print('📍 中心點: $centerLat, $centerLng, 縮放級別: $zoom');
+
+    setState(() => _isAnimating = true);
+
+    try {
+      // 使用動畫飛行到計算出的視角
+      await _mapboxMap!.flyTo(
+        CameraOptions(
+          center: Point(coordinates: center),
+          zoom: zoom,
+          bearing: 0,
+          pitch: 0, // 使用俯視角度以便更好地查看整個路線
+        ),
+        MapAnimationOptions(duration: 2500, startDelay: 500), // 稍微延遲以便標記先顯示
+      );
+
+      print('✅ 相機視角調整完成');
+    } catch (e) {
+      print('❌ 相機視角調整失敗: $e');
+    } finally {
+      setState(() => _isAnimating = false);
+    }
+  }
+
+  /// 顯示整個行程概覽
+  Future<void> _showFullTripOverview(Trip trip) async {
+    if (_mapboxMap == null || trip.days.isEmpty) return;
+
+    print('🗺️ 顯示整個行程概覽: ${trip.title}');
+
+    // 收集所有活動的座標
+    final allCoordinates = <Position>[];
+    
+    for (final dayPlan in trip.days) {
+      for (final activity in dayPlan.activities) {
+        if (CoordinateValidator.isValidCoordinate(activity.lat, activity.lng)) {
+          allCoordinates.add(Position(activity.lng, activity.lat));
+        }
+      }
+    }
+
+    if (allCoordinates.isNotEmpty) {
+      await _fitCameraToShowAllActivities(allCoordinates);
+      print('✅ 已調整視角顯示整個行程，包含 ${allCoordinates.length} 個活動');
+    } else {
+      print('⚠️ 行程中沒有有效的座標');
+      // 顯示提示訊息
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('此行程沒有有效的地理位置信息'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
   /// 動畫顯示活動標記
   Future<void> _animateMarkerAppearance(
       List<PointAnnotationOptions> annotations) async {
@@ -631,14 +744,14 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
       // 如果選擇了特定日期，聚焦到該日期的第一個活動
       await _focusOnSelectedDateFirstActivity(trip);
     } else {
-      // 如果選擇"全部"，聚焦到第一天的第一個活動
-      await _focusOnFirstActivityOfTrip(trip);
+      // 如果選擇"全部"，調整相機視角以顯示整個行程
+      if (allCoordinates.isNotEmpty) {
+        await _fitCameraToShowAllActivities(allCoordinates);
+      } else {
+        // 如果沒有有效座標，聚焦到第一天的第一個活動
+        await _focusOnFirstActivityOfTrip(trip);
+      }
     }
-
-    // 動畫調整相機視角以包含所有標記
-    // if (allCoordinates.isNotEmpty) {
-    //   await _animatedFitCameraToBounds(allCoordinates);
-    // }
 
     print('✅ 行程顯示完成，共 ${daysToShow.length} 天');
   }
@@ -1494,6 +1607,20 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                           } else {
                             _focusOnFirstActivityOfTrip(trip);
                           }
+                        }
+                      },
+                    ),
+
+                    const SizedBox(height: TripMuseSpacing.sm),
+
+                    // 查看全程按鈕
+                    _buildControlButton(
+                      icon: Icons.zoom_out_map,
+                      tooltip: '查看整個行程路線',
+                      onPressed: () {
+                        final trip = mapState.selectedTrip ?? widget.initialTrip;
+                        if (trip != null) {
+                          _showFullTripOverview(trip);
                         }
                       },
                     ),
