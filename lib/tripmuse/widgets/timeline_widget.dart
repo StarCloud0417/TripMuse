@@ -140,6 +140,7 @@ class TimelineWidget extends StatelessWidget {
           dayPlan: dayPlan,
           dayNumber: index + 1,
           isLastDay: isLastDay,
+          tripId: trip.id,
         );
       },
     );

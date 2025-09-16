@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-09-16
+
+### Added
+- 🎯 **活動拖拉功能** - 新增完整的活動拖拉和重新排序功能 (Added complete activity drag and reorder functionality)
+- 📝 **活動編輯系統** - 新增活動編輯 provider 和服務，支援即時編輯 (Added activity editing provider and service with real-time editing support)
+- 🗂️ **活動管理功能** - 新增活動刪除、移動到其他日期、替換等管理功能 (Added activity management features: delete, move to other days, replace)
+- 🎨 **拖拉視覺回饋** - 新增拖拉過程中的視覺效果和動畫 (Added visual feedback and animations during drag operations)
+- 📅 **跨日期活動移動** - 支援將活動移動到其他日期的功能 (Added cross-day activity movement functionality)
+
+### Enhanced
+- 🔄 **時間軸組件重構** - 重構 DayTimelineCard 為 ConsumerWidget，整合狀態管理 (Refactored DayTimelineCard to ConsumerWidget with integrated state management)
+- 🎯 **拖拉觸發優化** - 優化拖拉觸發機制，提供更好的用戶體驗 (Optimized drag trigger mechanism for better user experience)
+- 📱 **響應式設計改進** - 改善拖拉操作的響應式設計和觸摸體驗 (Improved responsive design for drag operations and touch experience)
+- 🔔 **操作回饋增強** - 新增操作成功/失敗的視覺和觸覺回饋 (Enhanced operation feedback with visual and haptic feedback)
+
+### Technical
+- 🏗️ **狀態管理架構** - 新增 ActivityEditProvider 進行活動編輯狀態管理 (Added ActivityEditProvider for activity editing state management)
+- 🔧 **服務層擴展** - 新增 ActivityEditService 處理活動編輯業務邏輯 (Added ActivityEditService for activity editing business logic)
+- 🎯 **組件模組化** - 將拖拉功能封裝到獨立的 DraggableActivityCard 組件 (Modularized drag functionality into separate DraggableActivityCard component)
+- 📦 **依賴注入優化** - 優化 Riverpod provider 的依賴注入和狀態同步 (Optimized Riverpod provider dependency injection and state synchronization)
+
+### 中文
+- 🎯 **活動拖拉功能** - 新增完整的活動拖拉和重新排序功能
+- 📝 **活動編輯系統** - 新增活動編輯 provider 和服務，支援即時編輯
+- 🗂️ **活動管理功能** - 新增活動刪除、移動到其他日期、替換等管理功能
+- 🎨 **拖拉視覺回饋** - 新增拖拉過程中的視覺效果和動畫
+- 📅 **跨日期活動移動** - 支援將活動移動到其他日期的功能
+
+### 技術改進
+- 🔄 **時間軸組件重構** - 重構 DayTimelineCard 為 ConsumerWidget，整合狀態管理
+- 🎯 **拖拉觸發優化** - 優化拖拉觸發機制，提供更好的用戶體驗
+- 📱 **響應式設計改進** - 改善拖拉操作的響應式設計和觸摸體驗
+- 🔔 **操作回饋增強** - 新增操作成功/失敗的視覺和觸覺回饋
+
+### 檔案變更
+- 新增: `lib/tripmuse/providers/activity_edit_provider.dart` - 活動編輯狀態管理
+- 新增: `lib/tripmuse/services/activity_edit_service.dart` - 活動編輯業務邏輯
+- 新增: `lib/tripmuse/widgets/activity_drop_target.dart` - 拖拉目標組件
+- 修改: `lib/tripmuse/widgets/day_timeline_card.dart` - 重構為 ConsumerWidget，添加拖拉功能
+- 修改: `lib/tripmuse/widgets/draggable_activity_card.dart` - 優化拖拉觸發機制
+- 修改: `lib/tripmuse/widgets/timeline_widget.dart` - 整合拖拉功能支援
+- 修改: `lib/tripmuse/providers/providers.dart` - 添加活動編輯 provider
+- 修改: `lib/tripmuse/services/services.dart` - 添加活動編輯服務導出
+- 修改: `lib/tripmuse/widgets/widgets.dart` - 添加新組件導出
+
 ## [0.3.1] - 2025-09-16
 
 ### Added

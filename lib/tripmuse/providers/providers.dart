@@ -6,3 +6,4 @@ export 'api_provider.dart';
 export 'trip_provider.dart';
 export 'user_provider.dart';
 export 'trip_generation_provider.dart';
+export 'activity_edit_provider.dart';

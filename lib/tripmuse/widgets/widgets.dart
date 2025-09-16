@@ -12,3 +12,5 @@ export 'timeline_widget.dart';
 export 'day_timeline_card.dart';
 export 'timeline_activity_card.dart';
 export 'trip_map_widget.dart';
+export 'draggable_activity_card.dart';
+export 'activity_drop_target.dart';

@@ -30,11 +30,6 @@
   - _Requirements: 10.1, 9.5_
 
 - [x] 1.2 建立 TripMuse 資料模型
-
-
-
-
-
   - 在 lib/tripmuse/models/ 建立 Trip, DayPlan, Activity 等資料模型
   - 使用 Freezed 和 json_annotation 實作序列化
   - 建立 UserPreferenceAnalysis 和相關 enum 類型
@@ -42,9 +37,6 @@
   - _Requirements: 2.2, 2.3_
 
 - [x] 1.3 設定 TripMuse 儲存系統
-
-
-
   - 在 lib/tripmuse/services/ 配置 Hive 作為本地資料庫，建立 TypeAdapter
   - 設定 Flutter Secure Storage 用於敏感資料
   - 實作 Repository 模式的資料存取層
@@ -54,9 +46,6 @@
 ## TripMuse 應用入口
 
 - [x] 2. 建立 TripMuse 應用入口（不修改 main.dart 結構）
-
-
-
   - 在 main.dart 的現有範例列表中**新增一行** TripMuse 選項
   - 創建 lib/tripmuse/tripmuse_app.dart 作為 TripMuse 主頁面
   - 在 TripMuse 內建立底部導航欄（地圖、行程列表、設定）
@@ -66,11 +55,6 @@
 
 
 - [x] 2.1 建立簡化的使用者系統（MVP 版本）
-
-
-
-
-
   - 實作 Guest 模式的本地使用者管理
   - 建立簡單的使用者偏好設定頁面
   - 實作本地資料的使用者隔離（如果需要）
@@ -79,10 +63,6 @@
 
 
 - [x] 2.2 建立行程列表頁面
-
-
-
-
   - 設計並實作行程列表主頁面
   - 建立行程卡片組件顯示預覽資訊
   - 實作 FAB 建立新行程按鈕
@@ -100,7 +80,6 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
 - [x] 3.1 實作旅行偏好設定
-
 
   - 建立預算範圍滑桿和旅伴數量選擇
   - 實作表單驗證和錯誤處理
@@ -136,8 +115,6 @@
 
 - [x] 4.2 建立行程生成 UI 和狀態管理
 
-
-
   - 實作生成進度指示器和載入動畫
   - 建立取消生成功能和超時處理
   - 實作生成結果的狀態管理和快取
@@ -157,10 +134,6 @@
 
 - [x] 5.1 實作行程可視化功能
 
-
-
-
-
   - **複製** PointAnnotationManager 相關程式碼到 trip_map_widget.dart
   - **複製** polyline_annotations_example.dart 的路線顯示程式碼
   - 為每日行程使用不同顏色主題
@@ -170,16 +143,13 @@
 - [x] 5.2 整合位置服務和導航
 
 
-
-
-
   - **複製** location_example.dart 的位置追蹤程式碼
   - 建立旅程進度指示器
   - 實作當前景點高亮顯示
   - 加入外部導航應用連結
   - _Requirements: 3.4, 3.9, 4.5_
 
-- [ ] 5.3 實作地圖互動和動畫
+- [X] 5.3 實作地圖互動和動畫
   - **複製** animation_example.dart 的動畫程式碼
   - 建立日期篩選控制項
   - 實作地圖視角自動調整
@@ -188,7 +158,7 @@
 
 ## 時間軸視圖系統
 
-- [ ] 6. 建立時間軸視圖組件
+- [X] 6. 建立時間軸視圖組件
   - 在 lib/tripmuse/widgets/ 設計並實作 TimelineWidget 主要組件
   - 建立 DayTimelineCard 顯示每日行程
   - 實作 ActivityCard 顯示個別活動資訊
@@ -196,6 +166,10 @@
   - _Requirements: 3.1, 3.6_
 
 - [ ] 6.1 實作活動拖拉和編輯功能
+
+
+
+
   - 建立 DraggableActivityCard 支援拖拉操作
   - 實作活動時間段變更和驗證邏輯
   - 建立長按選單（刪除、移動、替換）

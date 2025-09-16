@@ -3,31 +3,35 @@
 /// 顯示單日行程的時間軸卡片，包含日期資訊和活動列表
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
-import 'timeline_activity_card.dart';
+import '../providers/activity_edit_provider.dart';
+import 'draggable_activity_card.dart';
 
-class DayTimelineCard extends StatelessWidget {
+class DayTimelineCard extends ConsumerWidget {
   final DayPlan dayPlan;
   final int dayNumber;
   final bool isLastDay;
+  final String? tripId;
 
   const DayTimelineCard({
     super.key,
     required this.dayPlan,
     required this.dayNumber,
     this.isLastDay = false,
+    this.tripId,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         // 日期標題區域
         _buildDayHeader(context),
         
         // 活動列表
-        _buildActivitiesList(context),
+        _buildActivitiesList(context, ref),
         
         // 時間軸連接線（除了最後一天）
         if (!isLastDay) _buildTimelineConnector(),
@@ -170,7 +174,7 @@ class DayTimelineCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActivitiesList(BuildContext context) {
+  Widget _buildActivitiesList(BuildContext context, WidgetRef ref) {
     if (dayPlan.activities.isEmpty) {
       return Container(
         margin: const EdgeInsets.only(left: 56), // 對齊時間軸圓點右側
@@ -206,16 +210,7 @@ class DayTimelineCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 56), // 對齊時間軸圓點右側
       child: Column(
-        children: dayPlan.activities.asMap().entries.map((entry) {
-          final index = entry.key;
-          final activity = entry.value;
-          final isLastActivity = index == dayPlan.activities.length - 1;
-          
-          return TimelineActivityCard(
-            activity: activity,
-            isLastActivity: isLastActivity,
-          );
-        }).toList(),
+        children: _buildActivityCards(context, ref),
       ),
     );
   }
@@ -271,6 +266,158 @@ class DayTimelineCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  List<Widget> _buildActivityCards(BuildContext context, WidgetRef ref) {
+    return dayPlan.activities.asMap().entries.map((entry) {
+      final index = entry.key;
+      final activity = entry.value;
+      final isLastActivity = index == dayPlan.activities.length - 1;
+      
+      return DraggableActivityCard(
+        activity: activity,
+        isLastActivity: isLastActivity,
+        onTimeChanged: (activity, newTimeFrom, newTimeTo) {
+          _handleTimeChanged(ref, activity, newTimeFrom, newTimeTo, context);
+        },
+        onDelete: (activity) {
+          _handleDeleteActivity(ref, activity, context);
+        },
+        onMoveToDay: (activity, targetDay) {
+          _handleMoveToDay(ref, activity, targetDay, context);
+        },
+        onReplace: (activity) {
+          _handleReplaceActivity(ref, activity, context);
+        },
+        onEdit: (activity) {
+          _handleEditActivity(ref, activity, context);
+        },
+        onMapSync: () {
+          _handleMapSync(context);
+        },
+      );
+    }).toList();
+  }
+
+  void _handleTimeChanged(WidgetRef ref, Activity activity, String newTimeFrom, String newTimeTo, BuildContext context) {
+    if (tripId == null) return;
+    
+    final activityEditNotifier = ref.read(activityEditProvider.notifier);
+    activityEditNotifier.updateActivityTime(
+      tripId!,
+      dayNumber - 1, // dayNumber 從 1 開始，但索引從 0 開始
+      activity,
+      newTimeFrom,
+      newTimeTo,
+    ).then((success) {
+      if (!success) {
+        final error = ref.read(activityEditErrorProvider);
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _handleDeleteActivity(WidgetRef ref, Activity activity, BuildContext context) {
+    if (tripId == null) return;
+    
+    final activityEditNotifier = ref.read(activityEditProvider.notifier);
+    activityEditNotifier.deleteActivity(
+      tripId!,
+      dayNumber - 1,
+      activity,
+    ).then((success) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已刪除「${activity.name}」'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        final error = ref.read(activityEditErrorProvider);
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _handleMoveToDay(WidgetRef ref, Activity activity, int targetDay, BuildContext context) {
+    if (tripId == null) return;
+    
+    final activityEditNotifier = ref.read(activityEditProvider.notifier);
+    activityEditNotifier.moveActivityToDay(
+      tripId!,
+      dayNumber - 1,
+      targetDay - 1, // 轉換為索引
+      activity,
+    ).then((success) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已將「${activity.name}」移動到第 $targetDay 天'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        final error = ref.read(activityEditErrorProvider);
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _handleReplaceActivity(WidgetRef ref, Activity activity, BuildContext context) {
+    // 這裡可以實作活動替換邏輯
+    // 暫時顯示一個提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('活動替換功能開發中...'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  void _handleEditActivity(WidgetRef ref, Activity activity, BuildContext context) {
+    // 開始編輯活動
+    ref.read(activityEditProvider.notifier).startEditing(activity);
+    
+    // 這裡可以導航到活動編輯頁面
+    // 暫時顯示一個提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('編輯「${activity.name}」'),
+        backgroundColor: Colors.blue,
+      ),
+    );
+  }
+
+  void _handleMapSync(BuildContext context) {
+    // 同步到地圖視圖
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('已同步到地圖視圖'),
+        backgroundColor: Colors.green,
       ),
     );
   }

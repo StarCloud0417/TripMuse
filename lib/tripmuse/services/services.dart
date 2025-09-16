@@ -26,3 +26,6 @@ export 'storage_manager.dart';
 
 // 圖片服務
 export 'destination_image_service.dart';
+
+// 活動編輯服務
+export 'activity_edit_service.dart';
