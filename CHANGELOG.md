@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-09-16
+
+### Added
+- 🖼️ **目的地圖片服務** - 新增專門的圖片服務根據目的地城市獲取高品質風景圖片 (Added DestinationImageService for fetching high-quality destination images based on cities)
+- 🏙️ **城市圖片數據庫** - 擴展支援的城市圖片數據庫，涵蓋亞洲、歐洲、美洲等多個地區 (Expanded city image database supporting multiple regions including Asia, Europe, and Americas)
+- 📸 **Unsplash 圖片整合** - 整合 Unsplash API 獲取無版權的高品質旅遊景點圖片 (Integrated Unsplash API for fetching copyright-free high-quality travel destination images)
+
+### Enhanced
+- 🎨 **行程卡片視覺優化** - 改進行程卡片的視覺效果，使用真實目的地圖片替代漸層背景 (Enhanced trip card visuals by replacing gradient backgrounds with real destination images)
+- 📱 **我的行程頁面UI優化** - 優化TabBar樣式，增加圓角和陰影效果，提升視覺一致性 (Optimized My Trips page UI with improved TabBar styling, rounded corners, and shadow effects)
+- 🔄 **圖片載入體驗** - 新增圖片載入狀態指示器和錯誤處理，提供更好的用戶體驗 (Added image loading indicators and error handling for better user experience)
+
+### Technical
+- 🔄 **圖片服務架構重構** - 重構圖片獲取邏輯，統一使用 DestinationImageService，提高代碼可維護性 (Refactored image service architecture to use DestinationImageService consistently, improving code maintainability)
+- 🏗️ **服務導出優化** - 更新 services.dart 導出文件，統一圖片服務的訪問方式 (Updated services.dart export file for unified image service access)
+- 📦 **模組化設計** - 將圖片獲取邏輯封裝到獨立的服務類中，提高代碼組織性和可測試性 (Modularized image fetching logic into separate service class for better code organization and testability)
+
+### 中文
+- 🖼️ **目的地圖片服務** - 新增專門的圖片服務根據目的地城市獲取高品質風景圖片
+- 🏙️ **城市圖片數據庫** - 擴展支援的城市圖片數據庫，涵蓋亞洲、歐洲、美洲等多個地區
+- 📸 **Unsplash 圖片整合** - 整合 Unsplash API 獲取無版權的高品質旅遊景點圖片
+
+### 技術改進
+- 🎨 **行程卡片視覺優化** - 改進行程卡片的視覺效果，使用真實目的地圖片替代漸層背景
+- 📱 **我的行程頁面UI優化** - 優化TabBar樣式，增加圓角和陰影效果，提升視覺一致性
+- 🔄 **圖片載入體驗** - 新增圖片載入狀態指示器和錯誤處理，提供更好的用戶體驗
+
+### 檔案變更
+- 新增: `lib/tripmuse/services/destination_image_service.dart` - 目的地圖片服務核心實現
+- 新增: `lib/tripmuse/services/README_destination_images.md` - 圖片服務使用說明文檔
+- 新增: `test/tripmuse/destination_image_service_test.dart` - 圖片服務單元測試
+- 修改: `lib/tripmuse/screens/home_screen_new.dart` - 整合圖片服務，移除硬編碼圖片邏輯
+- 修改: `lib/tripmuse/screens/my_trips_screen.dart` - 優化UI樣式，使用圖片服務
+- 修改: `lib/tripmuse/services/services.dart` - 添加圖片服務導出
+- 修改: `pubspec.yaml` - 版本號更新為 0.3.1
+
 ## [0.2.1] - 2025-09-12
 
 ### Added
