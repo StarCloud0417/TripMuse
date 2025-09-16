@@ -23,3 +23,6 @@ export 'sync/sync_service.dart';
 
 // 儲存管理器
 export 'storage_manager.dart';
+
+// 圖片服務
+export 'destination_image_service.dart';

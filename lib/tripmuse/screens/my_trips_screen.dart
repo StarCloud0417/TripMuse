@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../providers/trip_provider.dart';
+import '../services/destination_image_service.dart';
 
 class MyTripsScreen extends ConsumerStatefulWidget {
   const MyTripsScreen({super.key});
@@ -345,7 +346,7 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(25), // 更圓的背景
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -359,23 +360,31 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
         indicator: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF4ECDC4),
-              Color(0xFF44A08D),
+              Color(0xFF4ECDC4), // 主題綠色
+              Color(0xFF44A08D), // 主題深綠色
             ],
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(25), // 橢圓形膠囊狀
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
+        indicatorSize: TabBarIndicatorSize.tab, // 指示器覆蓋整個標籤
+        dividerColor: Colors.transparent, // 移除分隔線
         labelColor: Colors.white,
         unselectedLabelColor: Colors.grey.shade600,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400),
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+        ),
         tabs: const [
           Tab(text: '網格檢視'),
           Tab(text: '列表檢視'),
@@ -452,6 +461,13 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
 
   /// 建立網格卡片
   Widget _buildTripGridCard(Trip trip) {
+    // 使用目的地圖片服務
+    final imageService = DestinationImageService();
+    final String imageUrl = imageService.getDestinationThumbnail(
+      trip.destination.city,
+      trip.destination.country,
+    );
+
     return GestureDetector(
       onTap: () => _navigateToTripDetail(trip),
       child: Container(
@@ -474,33 +490,29 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
                 height: double.infinity,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF4ECDC4),
-                      const Color(0xFF44A08D),
-                      const Color(0xFFFF9A8B).withValues(alpha: 0.8),
-                    ],
-                    stops: const [0.0, 0.6, 1.0],
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
+                    onError: (exception, stackTrace) {
+                      // 如果圖片載入失敗，使用漸層背景作為後備
+                    },
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.7),
+                      ],
+                      stops: const [0.4, 1.0],
+                    ),
                   ),
                 ),
               ),
-              
-              // 漸層遮罩
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.6),
-                    ],
-                    stops: const [0.4, 1.0],
-                  ),
-                ),
-              ),
+
               
               // 內容
               Padding(
@@ -573,6 +585,13 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
 
   /// 建立列表卡片
   Widget _buildTripListCard(Trip trip) {
+    // 使用目的地圖片服務
+    final imageService = DestinationImageService();
+    final String imageUrl = imageService.getDestinationThumbnail(
+      trip.destination.city,
+      trip.destination.country,
+    );
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: GestureDetector(
@@ -596,30 +615,69 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
           ),
           child: Row(
             children: [
-              // 行程圖示
+              // 目的地圖片縮圖
               Container(
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF4ECDC4),
-                      Color(0xFF44A08D),
-                    ],
-                  ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.luggage,
-                  color: Colors.white,
-                  size: 28,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // 圖片載入失敗時顯示後備UI
+                      return Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF4ECDC4),
+                              Color(0xFF44A08D),
+                            ],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.luggage,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      // 載入中顯示後備UI
+                      return Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF4ECDC4),
+                              Color(0xFF44A08D),
+                            ],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.luggage,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
               

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../providers/trip_provider.dart';
+import '../services/destination_image_service.dart';
 
 class HomeScreenNew extends ConsumerStatefulWidget {
   const HomeScreenNew({super.key});
@@ -488,8 +489,12 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
     final String title = trip.title;
     final String subtitle = '${trip.destination.city} • ${trip.days.length}天';
     
-    // 根據目的地選擇合適的背景圖片
-    final String imageUrl = _getDestinationImage(trip.destination.city);
+    // 使用目的地圖片服務獲取高品質圖片
+    final imageService = DestinationImageService();
+    final String imageUrl = imageService.getDestinationThumbnail(
+      trip.destination.city,
+      trip.destination.country,
+    );
 
     return GestureDetector(
       onTap: () => _navigateToTripDetail(trip),
@@ -647,33 +652,5 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
     Navigator.pushNamed(context, '/create-trip');
   }
 
-  /// 根據目的地獲取合適的背景圖片
-  String _getDestinationImage(String city) {
-    // 根據城市名稱返回相應的圖片URL
-    final cityImages = {
-      'kyoto': 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400',
-      'tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400',
-      'paris': 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400',
-      'london': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400',
-      'new york': 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400',
-      'rome': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400',
-      'barcelona': 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400',
-      'amsterdam': 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=400',
-      'berlin': 'https://images.unsplash.com/photo-1587330979470-3016b6702d89?w=400',
-      'vienna': 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=400',
-      'prague': 'https://images.unsplash.com/photo-1541849546-216549ae216d?w=400',
-      'budapest': 'https://images.unsplash.com/photo-1541725641319-7fc5d605b7d4?w=400',
-      'alps': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-      'switzerland': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-      'taipei': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400',
-      'seoul': 'https://images.unsplash.com/photo-1540042716690-b1b4dbeeb295?w=400',
-      'singapore': 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400',
-      'bangkok': 'https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=400',
-      'sydney': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=400',
-      'melbourne': 'https://images.unsplash.com/photo-1514395462725-fb4566210144?w=400',
-    };
 
-    final cityKey = city.toLowerCase();
-    return cityImages[cityKey] ?? 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400'; // 預設旅遊圖片
-  }
 }
