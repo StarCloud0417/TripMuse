@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'transport_demo_screen.dart';
 
 class SettingsScreenNew extends ConsumerStatefulWidget {
   const SettingsScreenNew({super.key});
@@ -183,6 +184,24 @@ class _SettingsScreenNewState extends ConsumerState<SettingsScreenNew> {
                   color: const Color(0xFF9C27B0),
                   onTap: () => _showMapStyleDialog(),
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // 第三行設定按鈕 - 交通演示
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickSettingButton(
+                  title: 'Transport Demo',
+                  icon: Icons.directions,
+                  color: const Color(0xFFFF9800),
+                  onTap: () => _navigateToTransportDemo(),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Container(), // 空白佔位符
               ),
             ],
           ),
@@ -510,6 +529,15 @@ class _SettingsScreenNewState extends ConsumerState<SettingsScreenNew> {
             _buildDialogOption('Dark', '🌃'),
           ],
         ),
+      ),
+    );
+  }
+
+  void _navigateToTransportDemo() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TransportDemoScreen(),
       ),
     );
   }

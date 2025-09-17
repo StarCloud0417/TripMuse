@@ -8,7 +8,12 @@ import '../models/models.dart';
 import '../theme/app_theme.dart';
 import '../providers/activity_edit_provider.dart';
 import '../providers/trip_edit_mode_provider.dart';
+import '../providers/transport_provider.dart';
+import '../providers/trip_provider.dart';
+import '../services/transport_service.dart';
 import 'draggable_activity_card.dart';
+import 'transport_info_widget.dart';
+import 'transport_mode_selector.dart';
 
 class DayTimelineCard extends ConsumerWidget {
   final DayPlan dayPlan;
@@ -272,46 +277,91 @@ class DayTimelineCard extends ConsumerWidget {
   }
 
   List<Widget> _buildActivityCards(BuildContext context, WidgetRef ref) {
-    return dayPlan.activities.asMap().entries.map((entry) {
-      final index = entry.key;
-      final activity = entry.value;
+    final List<Widget> widgets = [];
+    
+    for (int index = 0; index < dayPlan.activities.length; index++) {
+      final activity = dayPlan.activities[index];
       final isLastActivity = index == dayPlan.activities.length - 1;
       final isFirstActivity = index == 0;
       
-      return DraggableActivityCard(
-        activity: activity,
-        isLastActivity: isLastActivity,
-        isFirstActivity: isFirstActivity,
-        tripId: tripId,
-        onTimeChanged: (activity, newTimeFrom, newTimeTo) {
-          _handleTimeChanged(ref, activity, newTimeFrom, newTimeTo, context);
-        },
-        onDelete: (activity) {
-          _handleDeleteActivity(ref, activity, context);
-        },
-        onMoveToDay: (activity, targetDay) {
-          _handleMoveToDay(ref, activity, targetDay, context);
-        },
-        onReplace: (activity) {
-          _handleReplaceActivity(ref, activity, context);
-        },
-        onEdit: (activity) {
-          _handleEditActivity(ref, activity, context);
-        },
-        onMoveUp: (activity) {
-          _handleMoveActivityUp(ref, activity, context);
-        },
-        onMoveDown: (activity) {
-          _handleMoveActivityDown(ref, activity, context);
-        },
-        onMapSync: () {
-          _handleMapSync(context);
-        },
-        onEnterEditMode: () {
-          _handleEnterEditMode(ref, context);
-        },
+      // 添加活動卡片
+      widgets.add(
+        DraggableActivityCard(
+          activity: activity,
+          isLastActivity: isLastActivity,
+          isFirstActivity: isFirstActivity,
+          tripId: tripId,
+          onTimeChanged: (activity, newTimeFrom, newTimeTo) {
+            _handleTimeChanged(ref, activity, newTimeFrom, newTimeTo, context);
+          },
+          onDelete: (activity) {
+            _handleDeleteActivity(ref, activity, context);
+          },
+          onMoveToDay: (activity, targetDay) {
+            _handleMoveToDay(ref, activity, targetDay, context);
+          },
+          onReplace: (activity) {
+            _handleReplaceActivity(ref, activity, context);
+          },
+          onEdit: (activity) {
+            _handleEditActivity(ref, activity, context);
+          },
+          onMoveUp: (activity) {
+            _handleMoveActivityUp(ref, activity, context);
+          },
+          onMoveDown: (activity) {
+            _handleMoveActivityDown(ref, activity, context);
+          },
+          onMapSync: () {
+            _handleMapSync(context);
+          },
+          onEnterEditMode: () {
+            _handleEnterEditMode(ref, context);
+          },
+        ),
       );
-    }).toList();
+      
+      // 如果不是最後一個活動，添加交通信息
+      if (!isLastActivity) {
+        var transportInfo = dayPlan.getTransportAfter(index);
+        
+        // 如果沒有交通信息，創建預設的步行交通信息
+        if (transportInfo == null) {
+          final fromActivity = dayPlan.activities[index];
+          final toActivity = dayPlan.activities[index + 1];
+          
+          transportInfo = TransportService.calculateTransport(
+            fromActivity: fromActivity,
+            toActivity: toActivity,
+            mode: TransportMode.walking, // 預設使用步行
+          );
+          
+          // 自動保存這個預設交通信息到行程中
+          if (tripId != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref.read(transportProvider.notifier).addTransportInfo(
+                tripId: tripId!,
+                dayIndex: dayNumber - 1,
+                activityIndex: index,
+                mode: TransportMode.walking,
+              );
+            });
+          }
+        }
+        
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: TransportDivider(
+              transportInfo: transportInfo,
+              onTap: () => _handleTransportEdit(ref, index, context),
+            ),
+          ),
+        );
+      }
+    }
+    
+    return widgets;
   }
 
   void _handleTimeChanged(WidgetRef ref, Activity activity, String newTimeFrom, String newTimeTo, BuildContext context) {
@@ -511,5 +561,77 @@ class DayTimelineCard extends ConsumerWidget {
         duration: Duration(seconds: 2),
       ),
     );
+  }
+
+
+
+  void _handleTransportEdit(WidgetRef ref, int activityIndex, BuildContext context) async {
+    if (tripId == null) return;
+    
+    final transportInfo = dayPlan.getTransportAfter(activityIndex);
+    final fromActivity = dayPlan.activities[activityIndex];
+    final toActivity = dayPlan.activities[activityIndex + 1];
+    
+    // 顯示交通方式選擇對話框
+    final selectedMode = await showDialog<TransportMode>(
+      context: context,
+      builder: (context) => TransportModeDialog(
+        initialMode: transportInfo?.mode ?? TransportMode.walking,
+        fromActivityName: fromActivity.name,
+        toActivityName: toActivity.name,
+      ),
+    );
+    
+    if (selectedMode != null) {
+      if (transportInfo == null) {
+        // 如果沒有交通資訊，創建新的
+        final success = await ref.read(transportProvider.notifier).addTransportInfo(
+          tripId: tripId!,
+          dayIndex: dayNumber - 1,
+          activityIndex: activityIndex,
+          mode: selectedMode,
+        );
+        
+        if (success) {
+          // 刷新行程資料
+          ref.invalidate(tripProvider(tripId!));
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('已添加交通方式：${selectedMode.displayName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else if (selectedMode != transportInfo.mode) {
+        // 更新現有交通方式
+        final success = await ref.read(transportProvider.notifier).updateTransportMode(
+          tripId: tripId!,
+          dayIndex: dayNumber - 1,
+          activityIndex: activityIndex,
+          newMode: selectedMode,
+        );
+        
+        if (success) {
+          // 刷新行程資料
+          ref.invalidate(tripProvider(tripId!));
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('已更新交通方式為 ${selectedMode.displayName}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          final error = ref.read(transportErrorProvider);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error ?? '更新交通方式失敗'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 }

@@ -32,6 +32,9 @@ mixin _$DayPlan {
   /// 當日活動列表
   List<Activity> get activities => throw _privateConstructorUsedError;
 
+  /// 活動之間的交通信息 (索引對應活動間的交通，如 [0] 是第一個活動到第二個活動的交通)
+  List<TransportInfo> get transports => throw _privateConstructorUsedError;
+
   /// 當日備註
   String? get notes => throw _privateConstructorUsedError;
 
@@ -53,6 +56,7 @@ abstract class $DayPlanCopyWith<$Res> {
       DateTime date,
       String theme,
       List<Activity> activities,
+      List<TransportInfo> transports,
       String? notes,
       String? estimatedTotalCost});
 }
@@ -74,6 +78,7 @@ class _$DayPlanCopyWithImpl<$Res, $Val extends DayPlan>
     Object? date = null,
     Object? theme = null,
     Object? activities = null,
+    Object? transports = null,
     Object? notes = freezed,
     Object? estimatedTotalCost = freezed,
   }) {
@@ -94,6 +99,10 @@ class _$DayPlanCopyWithImpl<$Res, $Val extends DayPlan>
           ? _value.activities
           : activities // ignore: cast_nullable_to_non_nullable
               as List<Activity>,
+      transports: null == transports
+          ? _value.transports
+          : transports // ignore: cast_nullable_to_non_nullable
+              as List<TransportInfo>,
       notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
@@ -118,6 +127,7 @@ abstract class _$$DayPlanImplCopyWith<$Res> implements $DayPlanCopyWith<$Res> {
       DateTime date,
       String theme,
       List<Activity> activities,
+      List<TransportInfo> transports,
       String? notes,
       String? estimatedTotalCost});
 }
@@ -137,6 +147,7 @@ class __$$DayPlanImplCopyWithImpl<$Res>
     Object? date = null,
     Object? theme = null,
     Object? activities = null,
+    Object? transports = null,
     Object? notes = freezed,
     Object? estimatedTotalCost = freezed,
   }) {
@@ -157,6 +168,10 @@ class __$$DayPlanImplCopyWithImpl<$Res>
           ? _value._activities
           : activities // ignore: cast_nullable_to_non_nullable
               as List<Activity>,
+      transports: null == transports
+          ? _value._transports
+          : transports // ignore: cast_nullable_to_non_nullable
+              as List<TransportInfo>,
       notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
@@ -177,9 +192,11 @@ class _$DayPlanImpl implements _DayPlan {
       required this.date,
       required this.theme,
       final List<Activity> activities = const [],
+      final List<TransportInfo> transports = const [],
       this.notes,
       this.estimatedTotalCost})
-      : _activities = activities;
+      : _activities = activities,
+        _transports = transports;
 
   factory _$DayPlanImpl.fromJson(Map<String, dynamic> json) =>
       _$$DayPlanImplFromJson(json);
@@ -208,6 +225,18 @@ class _$DayPlanImpl implements _DayPlan {
     return EqualUnmodifiableListView(_activities);
   }
 
+  /// 活動之間的交通信息 (索引對應活動間的交通，如 [0] 是第一個活動到第二個活動的交通)
+  final List<TransportInfo> _transports;
+
+  /// 活動之間的交通信息 (索引對應活動間的交通，如 [0] 是第一個活動到第二個活動的交通)
+  @override
+  @JsonKey()
+  List<TransportInfo> get transports {
+    if (_transports is EqualUnmodifiableListView) return _transports;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_transports);
+  }
+
   /// 當日備註
   @override
   final String? notes;
@@ -218,7 +247,7 @@ class _$DayPlanImpl implements _DayPlan {
 
   @override
   String toString() {
-    return 'DayPlan(dayIndex: $dayIndex, date: $date, theme: $theme, activities: $activities, notes: $notes, estimatedTotalCost: $estimatedTotalCost)';
+    return 'DayPlan(dayIndex: $dayIndex, date: $date, theme: $theme, activities: $activities, transports: $transports, notes: $notes, estimatedTotalCost: $estimatedTotalCost)';
   }
 
   @override
@@ -232,6 +261,8 @@ class _$DayPlanImpl implements _DayPlan {
             (identical(other.theme, theme) || other.theme == theme) &&
             const DeepCollectionEquality()
                 .equals(other._activities, _activities) &&
+            const DeepCollectionEquality()
+                .equals(other._transports, _transports) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.estimatedTotalCost, estimatedTotalCost) ||
                 other.estimatedTotalCost == estimatedTotalCost));
@@ -245,6 +276,7 @@ class _$DayPlanImpl implements _DayPlan {
       date,
       theme,
       const DeepCollectionEquality().hash(_activities),
+      const DeepCollectionEquality().hash(_transports),
       notes,
       estimatedTotalCost);
 
@@ -268,6 +300,7 @@ abstract class _DayPlan implements DayPlan {
       required final DateTime date,
       required final String theme,
       final List<Activity> activities,
+      final List<TransportInfo> transports,
       final String? notes,
       final String? estimatedTotalCost}) = _$DayPlanImpl;
 
@@ -289,6 +322,10 @@ abstract class _DayPlan implements DayPlan {
 
   /// 當日活動列表
   List<Activity> get activities;
+  @override
+
+  /// 活動之間的交通信息 (索引對應活動間的交通，如 [0] 是第一個活動到第二個活動的交通)
+  List<TransportInfo> get transports;
   @override
 
   /// 當日備註

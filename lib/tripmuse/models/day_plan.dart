@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'activity.dart';
+import 'transport_info.dart';
 import 'enums.dart';
 
 part 'day_plan.freezed.dart';
@@ -22,6 +23,9 @@ class DayPlan with _$DayPlan {
 
     /// 當日活動列表
     @Default([]) List<Activity> activities,
+
+    /// 活動之間的交通信息 (索引對應活動間的交通，如 [0] 是第一個活動到第二個活動的交通)
+    @Default([]) List<TransportInfo> transports,
 
     /// 當日備註
     String? notes,
@@ -88,5 +92,21 @@ extension DayPlanExtension on DayPlan {
       grouped.putIfAbsent(activity.category, () => []).add(activity);
     }
     return grouped;
+  }
+
+  /// 取得指定活動索引之後的交通信息
+  TransportInfo? getTransportAfter(int activityIndex) {
+    if (activityIndex >= 0 && activityIndex < transports.length) {
+      return transports[activityIndex];
+    }
+    return null;
+  }
+
+  /// 檢查是否有交通信息
+  bool get hasTransports => transports.isNotEmpty;
+
+  /// 取得總通勤時間（分鐘）
+  int get totalTransportDuration {
+    return transports.fold(0, (sum, transport) => sum + transport.durationMinutes);
   }
 }

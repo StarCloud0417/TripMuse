@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import '../models/models.dart';
 import 'api_client.dart';
 import 'places_service.dart';
+import 'transport_service.dart';
 
 /// 行程生成階段
 enum TripGenerationPhase {
@@ -352,13 +353,16 @@ ${request.description}
   /// 驗證和增強行程
   Trip _validateAndEnhanceTrip(Trip trip, UserPreferenceAnalysis analysis) {
     // 添加偏好分析到行程
-    final enhancedTrip = trip.copyWith(
+    var enhancedTrip = trip.copyWith(
       preferenceAnalysis: analysis,
       updatedAt: DateTime.now(),
     );
 
     // 驗證行程完整性
     _validateTripIntegrity(enhancedTrip);
+
+    // 自動生成交通信息（預設使用步行）
+    enhancedTrip = TransportService.generateTransportForTrip(enhancedTrip);
 
     return enhancedTrip;
   }

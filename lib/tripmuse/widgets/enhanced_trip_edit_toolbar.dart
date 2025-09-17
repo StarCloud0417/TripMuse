@@ -6,8 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/trip_edit_mode_provider.dart';
 import '../providers/activity_edit_provider.dart';
+import '../providers/transport_provider.dart';
+import '../providers/trip_provider.dart';
 import '../services/auto_save_service.dart';
-import '../services/route_optimization_service.dart';
+
+import '../models/enums.dart';
 
 
 class EnhancedTripEditToolbar extends ConsumerStatefulWidget {
@@ -185,19 +188,19 @@ class _EnhancedTripEditToolbarState extends ConsumerState<EnhancedTripEditToolba
                 children: [
                   Expanded(
                     child: _buildActionButton(
-                      icon: Icons.route,
-                      label: '路線最佳化',
-                      color: Colors.orange,
-                      onPressed: activityEditState.isLoading ? null : () => _optimizeRoute(),
+                      icon: Icons.directions,
+                      label: '生成交通',
+                      color: Colors.purple,
+                      onPressed: activityEditState.isLoading ? null : () => _generateTransport(),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildActionButton(
-                      icon: Icons.schedule,
-                      label: '調整時間',
-                      color: Colors.blue,
-                      onPressed: activityEditState.isLoading ? null : () => _adjustTiming(),
+                      icon: Icons.route,
+                      label: '路線最佳化',
+                      color: Colors.orange,
+                      onPressed: activityEditState.isLoading ? null : () => _optimizeRoute(),
                     ),
                   ),
                 ],
@@ -263,14 +266,24 @@ class _EnhancedTripEditToolbarState extends ConsumerState<EnhancedTripEditToolba
             runSpacing: 8,
             children: [
               _buildAdvancedButton(
+                icon: Icons.auto_awesome,
+                label: '智能交通',
+                onPressed: () => _autoRecommendTransport(),
+              ),
+              _buildAdvancedButton(
                 icon: Icons.auto_fix_high,
                 label: '智能排序',
                 onPressed: () => _smartSort(),
               ),
               _buildAdvancedButton(
-                icon: Icons.timeline,
-                label: '時間驗證',
-                onPressed: () => _validateTiming(),
+                icon: Icons.schedule,
+                label: '調整時間',
+                onPressed: () => _adjustTiming(),
+              ),
+              _buildAdvancedButton(
+                icon: Icons.clear_all,
+                label: '清除交通',
+                onPressed: () => _clearTransport(),
               ),
               _buildAdvancedButton(
                 icon: Icons.analytics,
@@ -507,8 +520,42 @@ class _EnhancedTripEditToolbarState extends ConsumerState<EnhancedTripEditToolba
         return Icons.directions_bike;
       case TransportMode.driving:
         return Icons.directions_car;
-      case TransportMode.publicTransport:
+      case TransportMode.transit:
         return Icons.directions_bus;
+      case TransportMode.taxi:
+        return Icons.local_taxi;
+      case TransportMode.metro:
+        return Icons.subway;
+    }
+  }
+
+  void _generateTransport() async {
+    final transportNotifier = ref.read(transportProvider.notifier);
+    final success = await transportNotifier.generateTransportForTrip(
+      tripId: widget.tripId,
+      defaultMode: _selectedTransportMode,
+    );
+
+    if (mounted) {
+      if (success) {
+        // 刷新行程資料
+        ref.invalidate(tripProvider(widget.tripId));
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已生成 ${_selectedTransportMode.displayName} 交通信息'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        final error = ref.read(transportErrorProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error ?? '生成交通信息失敗'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -547,22 +594,66 @@ class _EnhancedTripEditToolbarState extends ConsumerState<EnhancedTripEditToolba
     }
   }
 
+  void _autoRecommendTransport() async {
+    final transportNotifier = ref.read(transportProvider.notifier);
+    final success = await transportNotifier.autoRecommendTransports(widget.tripId);
+
+    if (mounted) {
+      if (success) {
+        // 刷新行程資料
+        ref.invalidate(tripProvider(widget.tripId));
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('已自動推薦最適合的交通方式'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        final error = ref.read(transportErrorProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error ?? '自動推薦失敗'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _clearTransport() async {
+    final transportNotifier = ref.read(transportProvider.notifier);
+    final success = await transportNotifier.clearAllTransports(widget.tripId);
+
+    if (mounted) {
+      if (success) {
+        // 刷新行程資料
+        ref.invalidate(tripProvider(widget.tripId));
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('已清除所有交通信息'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      } else {
+        final error = ref.read(transportErrorProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error ?? '清除失敗'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _smartSort() {
     // 智能排序功能
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('智能排序功能開發中...'),
         backgroundColor: Colors.orange,
-      ),
-    );
-  }
-
-  void _validateTiming() {
-    // 時間驗證功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('時間驗證功能開發中...'),
-        backgroundColor: Colors.blue,
       ),
     );
   }

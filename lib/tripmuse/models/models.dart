@@ -9,6 +9,7 @@ export 'activity.dart';
 export 'destination.dart';
 export 'user.dart';
 export 'user_preference_analysis.dart';
+export 'transport_info.dart';
 
 // Trip 相關模型
 export 'trip_models.dart';

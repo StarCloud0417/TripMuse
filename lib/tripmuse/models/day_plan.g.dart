@@ -15,6 +15,10 @@ _$DayPlanImpl _$$DayPlanImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => Activity.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      transports: (json['transports'] as List<dynamic>?)
+              ?.map((e) => TransportInfo.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       notes: json['notes'] as String?,
       estimatedTotalCost: json['estimatedTotalCost'] as String?,
     );
@@ -25,6 +29,7 @@ Map<String, dynamic> _$$DayPlanImplToJson(_$DayPlanImpl instance) =>
       'date': instance.date.toIso8601String(),
       'theme': instance.theme,
       'activities': instance.activities,
+      'transports': instance.transports,
       'notes': instance.notes,
       'estimatedTotalCost': instance.estimatedTotalCost,
     };

@@ -31,8 +31,12 @@ class RouteOptimizationService {
         return (distance * 4).round(); // 騎車速度約 15 km/h
       case TransportMode.driving:
         return (distance * 2).round(); // 開車速度約 30 km/h（市區）
-      case TransportMode.publicTransport:
+      case TransportMode.transit:
         return (distance * 3).round(); // 大眾運輸約 20 km/h
+      case TransportMode.taxi:
+        return (distance * 2.5).round(); // 計程車速度約 24 km/h（市區含等車時間）
+      case TransportMode.metro:
+        return (distance * 1.7).round(); // 地鐵速度約 36 km/h
     }
   }
   
@@ -122,7 +126,7 @@ class RouteOptimizationService {
     } else if (averageDistance <= 2.0) {
       return TransportMode.cycling; // 平均距離 2km 以內，建議騎車
     } else if (averageDistance <= 5.0) {
-      return TransportMode.publicTransport; // 平均距離 5km 以內，建議大眾運輸
+      return TransportMode.transit; // 平均距離 5km 以內，建議大眾運輸
     } else {
       return TransportMode.driving; // 超過 5km，建議開車
     }
@@ -330,16 +334,7 @@ class RouteOptimizationService {
   }
 }
 
-/// 交通方式
-enum TransportMode {
-  walking('步行'),
-  cycling('騎車'),
-  driving('開車'),
-  publicTransport('大眾運輸');
-  
-  const TransportMode(this.displayName);
-  final String displayName;
-}
+
 
 /// 最佳化結果
 class OptimizationResult {

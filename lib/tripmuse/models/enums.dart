@@ -56,3 +56,16 @@ enum TravelStyle {
   const TravelStyle(this.displayName);
   final String displayName;
 }
+
+/// 交通方式
+enum TransportMode {
+  walking('步行'),
+  driving('開車'),
+  transit('大眾運輸'),
+  cycling('騎車'),
+  taxi('計程車'),
+  metro('地鐵');
+
+  const TransportMode(this.displayName);
+  final String displayName;
+}

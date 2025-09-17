@@ -60,10 +60,29 @@ final tripProvider = FutureProvider.family<Trip?, String>((ref, tripId) async {
     }
     
     final tripRepository = storageManager.tripRepository;
-    final trip = await tripRepository.getTripById(tripId);
+    var trip = await tripRepository.getTripById(tripId);
     
     if (trip != null) {
       print('✅ 成功載入行程: ${trip.title}');
+      
+      // 檢查是否需要生成預設交通信息
+      bool needsTransportGeneration = false;
+      for (final dayPlan in trip.days) {
+        if (dayPlan.activities.length > 1 && dayPlan.transports.length < dayPlan.activities.length - 1) {
+          needsTransportGeneration = true;
+          break;
+        }
+      }
+      
+      // 如果需要，自動生成預設交通信息
+      if (needsTransportGeneration) {
+        print('🚶 自動生成預設交通信息（步行）');
+        trip = TransportService.generateTransportForTrip(trip);
+        
+        // 保存更新後的行程
+        await tripRepository.saveTrip(trip);
+        print('✅ 預設交通信息已生成並保存');
+      }
     } else {
       print('⚠️ 找不到行程: $tripId');
     }

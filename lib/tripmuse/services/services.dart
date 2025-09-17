@@ -35,3 +35,6 @@ export 'auto_save_service.dart';
 
 // 路線最佳化服務
 export 'route_optimization_service.dart';
+
+// 交通服務
+export 'transport_service.dart';

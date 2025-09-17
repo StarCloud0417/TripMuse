@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.6] - 2025-09-17
+
+### Added
+- 🛣️ **路線重新計算** | Route Recalculation: 實作完整的路線重新計算功能，根據活動變更自動更新行程路線
+- 🎯 **路線最佳化** | Route Optimization: 實作智慧路線最佳化演算法，提升行程效率和時間利用
+- 📍 **動態路線更新** | Dynamic Route Updates: 支援即時路線更新，活動移動時自動重新計算最佳路徑
+- 🧭 **交通時間預估** | Travel Time Estimation: 新增精確的交通時間預估功能，包含交通狀況考慮
+- 🔄 **路線同步更新** | Route Synchronization: 確保地圖顯示與行程編輯同步更新
+
+### Enhanced
+- 🚗 **交通模式優化** | Transportation Mode Optimization: 優化不同交通模式的路線計算和時間預估
+- 📊 **路線效率分析** | Route Efficiency Analysis: 新增路線效率分析，提供行程時間和距離統計
+- 🎨 **地圖視覺化增強** | Map Visualization Enhancement: 增強地圖上的路線視覺化，支援多種路線樣式
+- ⚡ **效能優化** | Performance Optimization: 優化路線計算效能，提升大型行程的處理速度
+- 🔄 **即時同步** | Real-time Synchronization: 增強編輯操作與地圖顯示的即時同步
+
+### Technical
+- 🏗️ **路線計算引擎** | Route Calculation Engine: 建立專門的路線計算引擎，支援多種最佳化演算法
+- 📦 **模組化路線服務** | Modular Route Service: 將路線功能模組化，提高可維護性和可擴展性
+- 🔧 **快取機制** | Caching Mechanism: 實作智慧快取機制，提升重複計算的效能
+- 🧪 **測試覆蓋** | Test Coverage: 新增完整的路線功能測試覆蓋
+- 📚 **API 整合** | API Integration: 整合外部地圖服務 API 提供精確的路線資料
+
+### 中文
+- 🛣️ **路線重新計算** - 實作完整的路線重新計算功能，根據活動變更自動更新行程路線
+- 🎯 **路線最佳化** - 實作智慧路線最佳化演算法，提升行程效率和時間利用
+- 📍 **動態路線更新** - 支援即時路線更新，活動移動時自動重新計算最佳路徑
+- 🧭 **交通時間預估** - 新增精確的交通時間預估功能，包含交通狀況考慮
+- 🔄 **路線同步更新** - 確保地圖顯示與行程編輯同步更新
+
+### 技術改進
+- 🏗️ **路線計算引擎** - 建立專門的路線計算引擎，支援多種最佳化演算法
+- 📦 **模組化路線服務** - 將路線功能模組化，提高可維護性和可擴展性
+- 🔧 **快取機制** - 實作智慧快取機制，提升重複計算的效能
+- 🧪 **測試覆蓋** - 新增完整的路線功能測試覆蓋
+
+### 檔案變更
+- 新增: `lib/tripmuse/services/route_calculation_service.dart` - 路線計算服務
+- 新增: `lib/tripmuse/services/route_optimization_service.dart` - 路線最佳化服務
+- 修改: `lib/tripmuse/providers/trip_provider.dart` - 整合路線計算功能
+- 修改: `lib/tripmuse/widgets/map_view.dart` - 增強地圖路線顯示
+- 修改: `lib/tripmuse/models/day_plan.dart` - 新增路線相關資料結構
+- 新增: `test/tripmuse/route_services_test.dart` - 路線服務測試
+
+### Requirements
+- ✅ **Requirements: 5.5** - 完成所有行程編輯功能需求
+
 ## [0.3.5] - 2025-09-17
 
 ### Added
