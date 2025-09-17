@@ -3,6 +3,7 @@
 /// 提供活動編輯、移動、刪除等操作的業務邏輯
 
 import '../models/models.dart';
+import 'route_optimization_service.dart';
 
 class ActivityEditService {
   /// 驗證活動時間範圍
@@ -241,4 +242,257 @@ class ValidationResult {
     required this.isValid,
     required this.errors,
   });
+}
+
+class ActivityEditServiceExtended {
+  /// 跨日期移動活動
+  static Trip moveActivityBetweenDays(
+    Trip trip,
+    int fromDayIndex,
+    int toDayIndex,
+    Activity activity,
+  ) {
+    if (fromDayIndex == toDayIndex || 
+        fromDayIndex < 0 || fromDayIndex >= trip.days.length ||
+        toDayIndex < 0 || toDayIndex >= trip.days.length) {
+      return trip; // 無效操作
+    }
+
+    final updatedDays = List<DayPlan>.from(trip.days);
+    
+    // 從原日期移除活動
+    final fromDay = updatedDays[fromDayIndex];
+    final updatedFromDay = ActivityEditService.removeActivityFromDay(fromDay, activity.id);
+    updatedDays[fromDayIndex] = updatedFromDay;
+    
+    // 添加到目標日期
+    final toDay = updatedDays[toDayIndex];
+    final updatedToDay = ActivityEditService.addActivityToDay(toDay, activity);
+    updatedDays[toDayIndex] = updatedToDay;
+    
+    return trip.copyWith(
+      days: updatedDays,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// 批量刪除活動
+  static Trip batchDeleteActivities(
+    Trip trip,
+    List<ActivityReference> activityRefs,
+  ) {
+    final updatedDays = List<DayPlan>.from(trip.days);
+    
+    // 按日期分組刪除
+    final deletesByDay = <int, List<String>>{};
+    for (final ref in activityRefs) {
+      deletesByDay.putIfAbsent(ref.dayIndex, () => []).add(ref.activityId);
+    }
+    
+    // 執行刪除
+    for (final entry in deletesByDay.entries) {
+      final dayIndex = entry.key;
+      final activityIds = entry.value;
+      
+      if (dayIndex >= 0 && dayIndex < updatedDays.length) {
+        var dayPlan = updatedDays[dayIndex];
+        
+        for (final activityId in activityIds) {
+          dayPlan = ActivityEditService.removeActivityFromDay(dayPlan, activityId);
+        }
+        
+        updatedDays[dayIndex] = dayPlan;
+      }
+    }
+    
+    return trip.copyWith(
+      days: updatedDays,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// 最佳化整個行程的路線
+  static Trip optimizeTripRoute(
+    Trip trip, {
+    TransportMode transportMode = TransportMode.walking,
+    bool preserveTimeConstraints = true,
+  }) {
+    final updatedDays = <DayPlan>[];
+    
+    for (final dayPlan in trip.days) {
+      if (dayPlan.activities.isEmpty) {
+        updatedDays.add(dayPlan);
+        continue;
+      }
+      
+      final optimizationResult = RouteOptimizationService.optimizeDayActivities(
+        dayPlan.activities,
+        transportMode: transportMode,
+        preserveTimeConstraints: preserveTimeConstraints,
+      );
+      
+      updatedDays.add(dayPlan.copyWith(
+        activities: optimizationResult.optimizedActivities,
+      ));
+    }
+    
+    return trip.copyWith(
+      days: updatedDays,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// 自動調整行程時間以符合交通需求
+  static Trip autoAdjustTripTiming(
+    Trip trip,
+    TransportMode transportMode,
+  ) {
+    final updatedDays = <DayPlan>[];
+    
+    for (final dayPlan in trip.days) {
+      if (dayPlan.activities.isEmpty) {
+        updatedDays.add(dayPlan);
+        continue;
+      }
+      
+      final adjustedActivities = RouteOptimizationService.autoAdjustTimingForTravel(
+        dayPlan.activities,
+        transportMode,
+      );
+      
+      updatedDays.add(dayPlan.copyWith(
+        activities: adjustedActivities,
+      ));
+    }
+    
+    return trip.copyWith(
+      days: updatedDays,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// 驗證整個行程的時間安排
+  static TripValidationResult validateTripTiming(
+    Trip trip,
+    TransportMode transportMode,
+  ) {
+    final allIssues = <TimingIssue>[];
+    
+    for (final dayPlan in trip.days) {
+      if (dayPlan.activities.length <= 1) continue;
+      
+      final validationResult = RouteOptimizationService.validateActivityTiming(
+        dayPlan.activities,
+        transportMode,
+      );
+      
+      allIssues.addAll(validationResult.issues);
+    }
+    
+    return TripValidationResult(
+      isValid: allIssues.isEmpty,
+      issues: allIssues,
+      totalIssues: allIssues.length,
+    );
+  }
+
+  /// 計算行程統計資訊
+  static TripStatisticsInfo calculateTripStatistics(
+    Trip trip,
+    TransportMode transportMode,
+  ) {
+    double totalDistance = 0;
+    int totalTravelTime = 0;
+    int totalActivities = 0;
+    
+    for (final dayPlan in trip.days) {
+      totalActivities += dayPlan.activities.length;
+      
+      if (dayPlan.activities.length > 1) {
+        for (int i = 0; i < dayPlan.activities.length - 1; i++) {
+          final current = dayPlan.activities[i];
+          final next = dayPlan.activities[i + 1];
+          
+          final distance = RouteOptimizationService.calculateDistance(
+            current.lat, current.lng, next.lat, next.lng,
+          );
+          final travelTime = RouteOptimizationService.calculateTravelTime(distance, transportMode);
+          
+          totalDistance += distance;
+          totalTravelTime += travelTime;
+        }
+      }
+    }
+    
+    return TripStatisticsInfo(
+      totalActivities: totalActivities,
+      totalDistance: totalDistance,
+      totalTravelTime: totalTravelTime,
+      averageDistancePerDay: trip.days.isNotEmpty ? totalDistance / trip.days.length : 0,
+      suggestedTransportMode: RouteOptimizationService.suggestTransportMode(
+        trip.days.expand((day) => day.activities).toList(),
+      ),
+    );
+  }
+}
+
+/// 活動參考
+class ActivityReference {
+  final String activityId;
+  final int dayIndex;
+  
+  const ActivityReference({
+    required this.activityId,
+    required this.dayIndex,
+  });
+}
+
+/// 行程驗證結果
+class TripValidationResult {
+  final bool isValid;
+  final List<TimingIssue> issues;
+  final int totalIssues;
+  
+  const TripValidationResult({
+    required this.isValid,
+    required this.issues,
+    required this.totalIssues,
+  });
+}
+
+/// 行程統計資訊
+class TripStatisticsInfo {
+  final int totalActivities;
+  final double totalDistance;
+  final int totalTravelTime;
+  final double averageDistancePerDay;
+  final TransportMode suggestedTransportMode;
+  
+  const TripStatisticsInfo({
+    required this.totalActivities,
+    required this.totalDistance,
+    required this.totalTravelTime,
+    required this.averageDistancePerDay,
+    required this.suggestedTransportMode,
+  });
+  
+  /// 格式化總距離
+  String get formattedTotalDistance {
+    if (totalDistance < 1) {
+      return '${(totalDistance * 1000).round()}m';
+    } else {
+      return '${totalDistance.toStringAsFixed(1)}km';
+    }
+  }
+  
+  /// 格式化總旅行時間
+  String get formattedTotalTravelTime {
+    if (totalTravelTime < 60) {
+      return '${totalTravelTime}分鐘';
+    } else {
+      final hours = totalTravelTime ~/ 60;
+      final minutes = totalTravelTime % 60;
+      return '${hours}小時${minutes}分鐘';
+    }
+  }
 }

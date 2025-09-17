@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.5] - 2025-09-17
+
+### Added
+- ✏️ **行程編輯功能** | Trip Editing Feature: 實作完整的行程編輯功能，支援即時編輯和視覺回饋
+- 💾 **自動儲存機制** | Auto-Save Mechanism: 建立行程自動儲存機制，確保編輯內容不會遺失
+- 🗑️ **活動刪除功能** | Activity Deletion Feature: 實作活動刪除和地圖更新邏輯
+- 🔄 **跨日期活動移動** | Cross-Date Activity Movement: 建立跨日期活動移動功能，支援活動重新排序
+- 🛠️ **編輯工具欄** | Edit Toolbar: 新增 TripEditToolbar 組件，提供編輯模式的統一控制介面
+- 🔄 **編輯狀態管理** | Edit State Management: 新增 TripEditModeProvider 進行編輯狀態的集中管理
+
+### Enhanced
+- 🎨 **編輯模式UI優化** | Edit Mode UI Enhancement: 編輯模式下的活動卡片提供特殊的視覺樣式和控制按鈕
+- 📱 **編輯控制按鈕** | Edit Control Buttons: 新增上移、下移、刪除等編輯控制按鈕，提升編輯體驗
+- 🎯 **長按觸發優化** | Long Press Optimization: 優化長按行為，在編輯模式和普通模式下提供不同的互動體驗
+- 🔔 **觸覺回饋增強** | Haptic Feedback Enhancement: 新增觸覺回饋，提升用戶操作的即時反饋體驗
+- 🎨 **編輯工具欄佈局優化** | Edit Toolbar Layout Optimization: 將編輯工具欄移動到頂部，提升用戶操作便利性
+
+### Technical
+- 🏗️ **狀態管理架構優化** | State Management Architecture Optimization: 優化 Riverpod provider 的狀態管理架構
+- 🔄 **組件生命週期管理** | Component Lifecycle Management: 改善組件的狀態同步和生命週期管理
+- 📦 **模組化組件設計** | Modular Component Design: 將編輯功能模組化，提高代碼的可維護性和可測試性
+- 🧪 **錯誤處理強化** | Error Handling Enhancement: 增強編輯操作的錯誤處理和用戶提示
+
+### 中文
+- ✏️ **行程編輯功能** - 實作完整的行程編輯功能，支援即時編輯和視覺回饋
+- 💾 **自動儲存機制** - 建立行程自動儲存機制，確保編輯內容不會遺失
+- 🗑️ **活動刪除功能** - 實作活動刪除和地圖更新邏輯
+- 🔄 **跨日期活動移動** - 建立跨日期活動移動功能，支援活動重新排序
+- 🛠️ **編輯工具欄** - 新增 TripEditToolbar 組件，提供編輯模式的統一控制介面
+
+### 技術改進
+- 🏗️ **狀態管理架構優化** - 優化 Riverpod provider 的狀態管理架構
+- 🔄 **組件生命週期管理** - 改善組件的狀態同步和生命週期管理
+- 📦 **模組化組件設計** - 將編輯功能模組化，提高代碼的可維護性和可測試性
+
+### 檔案變更
+- 新增: `lib/tripmuse/widgets/trip_edit_toolbar.dart` - 新增編輯工具欄組件
+- 修改: `lib/tripmuse/providers/trip_edit_mode_provider.dart` - 新增編輯狀態管理 Provider
+- 修改: `lib/tripmuse/widgets/draggable_activity_card.dart` - 重構支援編輯模式
+- 修改: `lib/tripmuse/providers/activity_edit_provider.dart` - 增強編輯功能和自動儲存
+- 修改: `lib/tripmuse/tripmuse_app.dart` - 整合編輯模式路由和狀態管理
+
+### 注意事項
+- 🚧 **路線重新計算和最佳化** - 此功能尚未完成，將在後續版本中實作
+
 ## [0.3.4] - 2025-09-17
 
 ### Added

@@ -1,6 +1,6 @@
 # TripMuse 🧳
 
-**Version 0.3.4**
+**Version 0.3.5**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 

@@ -1,6 +1,6 @@
 name: mapbox_maps_example
 description: TripMuse - AI 智能旅行規劃應用，基於 MapBox Maps Flutter SDK 開發
-version: "0.3.4"
+version: "0.3.5"
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -13,6 +13,8 @@ environment:
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
   mapbox_maps_flutter:

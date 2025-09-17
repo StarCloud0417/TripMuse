@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'theme/app_theme.dart';
@@ -52,12 +53,16 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
       final storageManager = StorageManager.instance;
       if (storageManager.isInitialized) {
         print('✅ TripMuse 儲存系統已經初始化');
+        // 啟用自動儲存服務
+        _initializeAutoSave();
       } else {
         print('⚠️ TripMuse 儲存系統尚未初始化，嘗試初始化...');
         
         try {
           await storageManager.initialize();
           print('✅ TripMuse 儲存系統初始化成功');
+          // 啟用自動儲存服務
+          _initializeAutoSave();
         } catch (initError) {
           print('❌ TripMuse 儲存系統初始化失敗，嘗試清除數據: $initError');
           
@@ -67,6 +72,8 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
           // 重新初始化
           await storageManager.initialize();
           print('✅ TripMuse 儲存系統重新初始化成功');
+          // 啟用自動儲存服務
+          _initializeAutoSave();
         }
       }
     } catch (e) {
@@ -89,6 +96,25 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
         );
       }
     }
+  }
+
+  /// 初始化自動儲存服務
+  void _initializeAutoSave() {
+    // 暫時禁用自動儲存以避免狀態管理問題
+    // TODO: 修復自動儲存的狀態管理問題後重新啟用
+    /*
+    // 延遲到下一個 frame 執行，確保 Widget 已完全構建
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final autoSaveNotifier = ref.read(autoSaveProvider.notifier);
+        autoSaveNotifier.enable();
+        print('✅ 自動儲存服務已啟用');
+      } catch (e) {
+        print('⚠️ 自動儲存服務啟用失敗: $e');
+      }
+    });
+    */
+    print('自動儲存服務已暫時禁用');
   }
 
   /// 清除 Hive 數據
@@ -125,6 +151,24 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
         darkTheme: TripMuseTheme.darkTheme,
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
+        // 添加本地化設定以修復文字顯示問題
+        locale: const Locale('zh', 'TW'),
+        supportedLocales: const [
+          Locale('zh', 'TW'),
+          Locale('en', 'US'),
+        ],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        // 確保文字方向正確
+        builder: (context, child) {
+          return Directionality(
+            textDirection: TextDirection.ltr,
+            child: child!,
+          );
+        },
         routes: {
           '/trip-detail': (context) {
             final trip = ModalRoute.of(context)!.settings.arguments as Trip;

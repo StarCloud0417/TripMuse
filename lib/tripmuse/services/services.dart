@@ -29,3 +29,9 @@ export 'destination_image_service.dart';
 
 // 活動編輯服務
 export 'activity_edit_service.dart';
+
+// 自動儲存服務
+export 'auto_save_service.dart';
+
+// 路線最佳化服務
+export 'route_optimization_service.dart';

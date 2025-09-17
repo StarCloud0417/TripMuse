@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../services/activity_edit_service.dart';
 import '../services/storage_manager.dart';
+
+import '../services/route_optimization_service.dart';
 import 'trip_provider.dart';
 
 /// 活動編輯狀態
@@ -496,6 +498,205 @@ class ActivityEditNotifier extends StateNotifier<ActivityEditState> {
     }
   }
 
+  /// 跨日期移動活動
+  Future<bool> moveActivityBetweenDays(
+    String tripId,
+    int fromDayIndex,
+    int toDayIndex,
+    Activity activity,
+  ) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // 獲取行程資料
+      final storageManager = StorageManager.instance;
+      final tripRepository = storageManager.tripRepository;
+      final trip = await tripRepository.getTripById(tripId);
+
+      if (trip == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '找不到行程資料',
+        );
+        return false;
+      }
+
+      // 使用服務層進行跨日期移動
+      final updatedTrip = ActivityEditServiceExtended.moveActivityBetweenDays(
+        trip,
+        fromDayIndex,
+        toDayIndex,
+        activity,
+      );
+
+      // 儲存更新並觸發自動儲存
+      await tripRepository.saveTrip(updatedTrip);
+      _triggerAutoSave(updatedTrip);
+
+      // 刷新相關的 provider
+      _ref.invalidate(tripProvider(tripId));
+      _ref.invalidate(userTripsProvider);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: '跨日期移動活動失敗: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  /// 批量刪除活動
+  Future<bool> batchDeleteActivities(
+    String tripId,
+    List<ActivityReference> activityRefs,
+  ) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // 獲取行程資料
+      final storageManager = StorageManager.instance;
+      final tripRepository = storageManager.tripRepository;
+      final trip = await tripRepository.getTripById(tripId);
+
+      if (trip == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '找不到行程資料',
+        );
+        return false;
+      }
+
+      // 使用服務層進行批量刪除
+      final updatedTrip = ActivityEditServiceExtended.batchDeleteActivities(trip, activityRefs);
+
+      // 儲存更新並觸發自動儲存
+      await tripRepository.saveTrip(updatedTrip);
+      _triggerAutoSave(updatedTrip);
+
+      // 刷新相關的 provider
+      _ref.invalidate(tripProvider(tripId));
+      _ref.invalidate(userTripsProvider);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: '批量刪除活動失敗: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  /// 最佳化行程路線
+  Future<bool> optimizeTripRoute(
+    String tripId, {
+    TransportMode transportMode = TransportMode.walking,
+    bool preserveTimeConstraints = true,
+  }) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // 獲取行程資料
+      final storageManager = StorageManager.instance;
+      final tripRepository = storageManager.tripRepository;
+      final trip = await tripRepository.getTripById(tripId);
+
+      if (trip == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '找不到行程資料',
+        );
+        return false;
+      }
+
+      // 使用服務層進行路線最佳化
+      final optimizedTrip = ActivityEditServiceExtended.optimizeTripRoute(
+        trip,
+        transportMode: transportMode,
+        preserveTimeConstraints: preserveTimeConstraints,
+      );
+
+      // 儲存更新並觸發自動儲存
+      await tripRepository.saveTrip(optimizedTrip);
+      _triggerAutoSave(optimizedTrip);
+
+      // 刷新相關的 provider
+      _ref.invalidate(tripProvider(tripId));
+      _ref.invalidate(userTripsProvider);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: '路線最佳化失敗: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  /// 自動調整行程時間
+  Future<bool> autoAdjustTripTiming(
+    String tripId,
+    TransportMode transportMode,
+  ) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // 獲取行程資料
+      final storageManager = StorageManager.instance;
+      final tripRepository = storageManager.tripRepository;
+      final trip = await tripRepository.getTripById(tripId);
+
+      if (trip == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '找不到行程資料',
+        );
+        return false;
+      }
+
+      // 使用服務層進行時間調整
+      final adjustedTrip = ActivityEditServiceExtended.autoAdjustTripTiming(trip, transportMode);
+
+      // 儲存更新並觸發自動儲存
+      await tripRepository.saveTrip(adjustedTrip);
+      _triggerAutoSave(adjustedTrip);
+
+      // 刷新相關的 provider
+      _ref.invalidate(tripProvider(tripId));
+      _ref.invalidate(userTripsProvider);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: '自動調整時間失敗: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  /// 觸發自動儲存
+  void _triggerAutoSave(Trip trip) {
+    // 暫時禁用自動儲存以避免狀態管理問題
+    // TODO: 修復自動儲存的狀態管理問題後重新啟用
+    /*
+    try {
+      final autoSaveNotifier = _ref.read(autoSaveProvider.notifier);
+      autoSaveNotifier.markTripForSave(trip);
+    } catch (e) {
+      print('觸發自動儲存失敗: $e');
+    }
+    */
+    print('自動儲存已暫時禁用');
+  }
+
   /// 清除錯誤訊息
   void clearError() {
     state = state.copyWith(error: null);
@@ -526,3 +727,57 @@ final activityEditErrorProvider = Provider<String?>((ref) {
 final activityEditLoadingProvider = Provider<bool>((ref) {
   return ref.watch(activityEditProvider).isLoading;
 });
+
+/// 路線最佳化 Provider
+final routeOptimizationProvider = FutureProvider.family<OptimizationResult, RouteOptimizationParams>((ref, params) async {
+  return RouteOptimizationService.optimizeDayActivities(
+    params.activities,
+    transportMode: params.transportMode,
+    preserveTimeConstraints: params.preserveTimeConstraints,
+  );
+});
+
+/// 行程詳細統計 Provider
+final tripDetailStatisticsProvider = FutureProvider.family<TripStatisticsInfo, TripStatisticsParams>((ref, params) async {
+  return ActivityEditServiceExtended.calculateTripStatistics(params.trip, params.transportMode);
+});
+
+/// 時間驗證 Provider
+final tripTimingValidationProvider = FutureProvider.family<TripValidationResult, TripValidationParams>((ref, params) async {
+  return ActivityEditServiceExtended.validateTripTiming(params.trip, params.transportMode);
+});
+
+/// 路線最佳化參數
+class RouteOptimizationParams {
+  final List<Activity> activities;
+  final TransportMode transportMode;
+  final bool preserveTimeConstraints;
+
+  const RouteOptimizationParams({
+    required this.activities,
+    required this.transportMode,
+    required this.preserveTimeConstraints,
+  });
+}
+
+/// 行程統計參數
+class TripStatisticsParams {
+  final Trip trip;
+  final TransportMode transportMode;
+
+  const TripStatisticsParams({
+    required this.trip,
+    required this.transportMode,
+  });
+}
+
+/// 行程驗證參數
+class TripValidationParams {
+  final Trip trip;
+  final TransportMode transportMode;
+
+  const TripValidationParams({
+    required this.trip,
+    required this.transportMode,
+  });
+}

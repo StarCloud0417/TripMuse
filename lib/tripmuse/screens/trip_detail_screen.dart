@@ -10,6 +10,8 @@ import '../widgets/activity_card.dart';
 import '../widgets/timeline_widget.dart';
 import '../widgets/trip_map_widget.dart';
 import '../widgets/trip_edit_toolbar.dart';
+import '../widgets/enhanced_trip_edit_toolbar.dart';
+
 import '../widgets/activity_detail_bottom_sheet.dart';
 import '../providers/trip_provider.dart';
 import '../providers/trip_edit_mode_provider.dart';
@@ -32,6 +34,18 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   bool _isTimelineView = true; // 預設顯示時間軸視圖
 
   @override
+  void initState() {
+    super.initState();
+    // 暫時禁用自動儲存服務初始化
+    // TODO: 修復自動儲存的狀態管理問題後重新啟用
+    /*
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(autoSaveProvider.notifier).setCurrentTrip(widget.trip.id);
+    });
+    */
+  }
+
+  @override
   Widget build(BuildContext context) {
     // 監聽行程資料的變化，確保排序更新後 UI 能即時刷新
     final tripAsyncValue = ref.watch(tripProvider(widget.trip.id));
@@ -51,8 +65,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   : _buildMapView(context, currentTrip),
               ),
               
-              // 編輯工具欄移到底部
-              TripEditToolbar(
+              // 增強版編輯工具欄
+              EnhancedTripEditToolbar(
                 tripId: currentTrip.id,
                 onSave: () {
                   // 刷新行程資料

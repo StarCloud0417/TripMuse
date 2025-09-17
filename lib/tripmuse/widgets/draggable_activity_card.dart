@@ -7,7 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../providers/trip_edit_mode_provider.dart';
+import '../providers/trip_provider.dart';
+import '../providers/activity_edit_provider.dart';
 import 'activity_detail_bottom_sheet.dart';
+import 'move_activity_dialog.dart';
 
 class DraggableActivityCard extends ConsumerStatefulWidget {
   final Activity activity;
@@ -881,29 +884,34 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
           ),
         ),
       ),
-      child: Row(
-        children: [
-          // 左側：拖拽提示
-          Expanded(
-            child: Row(
-              children: [
-                Icon(
-                  Icons.drag_handle,
-                  size: 16,
-                  color: _getCategoryColor().withValues(alpha: 0.6),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '拖拽調整順序',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _getCategoryColor().withValues(alpha: 0.8),
-                    fontWeight: FontWeight.w500,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Row(
+          children: [
+            // 左側：拖拽提示
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.drag_handle,
+                    size: 16,
+                    color: _getCategoryColor().withValues(alpha: 0.6),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      '拖拽調整順序',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _getCategoryColor().withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           
           // 右側：操作按鈕
           Row(
@@ -941,6 +949,16 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
               
               const SizedBox(width: 8),
               
+              // 跨日期移動按鈕
+              _buildControlButton(
+                icon: Icons.calendar_month,
+                color: Colors.purple,
+                onTap: () => _showMoveToDateDialog(context),
+                tooltip: '移動到其他日期',
+              ),
+              
+              const SizedBox(width: 8),
+              
               // 刪除按鈕
               _buildControlButton(
                 icon: Icons.delete,
@@ -951,6 +969,7 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
             ],
           ),
         ],
+        ),
       ),
     );
   }
@@ -1185,25 +1204,145 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('刪除活動'),
-        content: Text('確定要刪除「${widget.activity.name}」嗎？此操作無法復原。'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('刪除活動'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('確定要刪除「${widget.activity.name}」嗎？'),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.red.shade600,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      '此操作無法復原',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('取消'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               widget.onDelete?.call(widget.activity);
               HapticFeedback.lightImpact();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('刪除'),
           ),
         ],
       ),
     );
+  }
+
+  void _showMoveToDateDialog(BuildContext context) async {
+    if (widget.tripId == null) return;
+
+    // 獲取完整的行程資料
+    final tripAsyncValue = ref.read(tripProvider(widget.tripId!));
+    
+    tripAsyncValue.when(
+      data: (trip) {
+        if (trip != null) {
+          showDialog(
+            context: context,
+            builder: (context) => MoveActivityDialog(
+              activity: widget.activity,
+              trip: trip,
+              currentDayIndex: _getCurrentDayIndex(trip),
+              onMoveActivity: (fromDayIndex, toDayIndex, activity) async {
+                // 在這裡處理移動邏輯，使用正確的 Provider context
+                final activityEditNotifier = ref.read(activityEditProvider.notifier);
+                final success = await activityEditNotifier.moveActivityBetweenDays(
+                  widget.tripId!,
+                  fromDayIndex,
+                  toDayIndex,
+                  activity,
+                );
+                
+                if (!success) {
+                  throw Exception('移動失敗');
+                }
+              },
+            ),
+          );
+        }
+      },
+      loading: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('載入行程資料中...'),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      },
+      error: (error, stackTrace) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('載入行程資料失敗'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      },
+    );
+  }
+
+  int _getCurrentDayIndex(Trip trip) {
+    // 根據活動找到當前所在的日期索引
+    for (int i = 0; i < trip.days.length; i++) {
+      final dayPlan = trip.days[i];
+      if (dayPlan.activities.any((activity) => activity.id == widget.activity.id)) {
+        return i;
+      }
+    }
+    return 0; // 預設返回第一天
   }
 
   void _showActivityDetails(BuildContext context) {
