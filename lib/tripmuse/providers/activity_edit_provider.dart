@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../services/activity_edit_service.dart';
 import '../services/storage_manager.dart';
+import 'trip_provider.dart';
 
 /// 活動編輯狀態
 class ActivityEditState {
@@ -38,7 +39,9 @@ class ActivityEditState {
 
 /// 活動編輯 Notifier
 class ActivityEditNotifier extends StateNotifier<ActivityEditState> {
-  ActivityEditNotifier() : super(const ActivityEditState());
+  ActivityEditNotifier(this._ref) : super(const ActivityEditState());
+  
+  final Ref _ref;
 
   /// 開始編輯活動
   void startEditing(Activity activity) {
@@ -415,6 +418,10 @@ class ActivityEditNotifier extends StateNotifier<ActivityEditState> {
       // 儲存更新
       await tripRepository.saveTrip(updatedTrip);
 
+      // 刷新相關的 provider
+      _ref.invalidate(tripProvider(tripId));
+      _ref.invalidate(userTripsProvider);
+
       state = state.copyWith(isLoading: false);
       return true;
     } catch (e) {
@@ -474,6 +481,10 @@ class ActivityEditNotifier extends StateNotifier<ActivityEditState> {
       // 儲存更新
       await tripRepository.saveTrip(updatedTrip);
 
+      // 刷新相關的 provider
+      _ref.invalidate(tripProvider(tripId));
+      _ref.invalidate(userTripsProvider);
+
       state = state.copyWith(isLoading: false);
       return true;
     } catch (e) {
@@ -493,7 +504,7 @@ class ActivityEditNotifier extends StateNotifier<ActivityEditState> {
 
 /// 活動編輯 Provider
 final activityEditProvider = StateNotifierProvider<ActivityEditNotifier, ActivityEditState>((ref) {
-  return ActivityEditNotifier();
+  return ActivityEditNotifier(ref);
 });
 
 /// 當前編輯的活動 Provider

@@ -32,19 +32,104 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 監聽行程資料的變化，確保排序更新後 UI 能即時刷新
+    final tripAsyncValue = ref.watch(tripProvider(widget.trip.id));
+    
+    return tripAsyncValue.when(
+      data: (trip) {
+        // 如果找不到行程，使用原始行程資料
+        final currentTrip = trip ?? widget.trip;
+        
+        return Scaffold(
+          body: Column(
+            children: [
+              // 主要內容
+              Expanded(
+                child: _isTimelineView 
+                  ? _buildTimelineView(context, currentTrip)
+                  : _buildMapView(context, currentTrip),
+              ),
+              
+              // 編輯工具欄移到底部
+              TripEditToolbar(
+                tripId: currentTrip.id,
+                onSave: () {
+                  // 刷新行程資料
+                  ref.invalidate(tripProvider(currentTrip.id));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('行程已儲存'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                },
+                onCancel: () {
+                  // 刷新行程資料以恢復原始狀態
+                  ref.invalidate(tripProvider(currentTrip.id));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('已取消編輯'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingEditButton(
+            tripId: currentTrip.id,
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('已進入編輯模式'),
+                  backgroundColor: Colors.blue,
+                ),
+              );
+            },
+          ),
+        );
+      },
+      loading: () => Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF4ECDC4),
+                Color(0xFF44A08D),
+                Color(0xFFFF9A8B),
+                Color(0xFFFEAD96),
+              ],
+              stops: [0.0, 0.3, 0.7, 1.0],
+            ),
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      ),
+      error: (error, stackTrace) {
+        // 發生錯誤時使用原始行程資料
+        return _buildErrorFallback(context, widget.trip);
+      },
+    );
+  }
+
+  Widget _buildErrorFallback(BuildContext context, Trip trip) {
     return Scaffold(
       body: Column(
         children: [
           // 主要內容
           Expanded(
             child: _isTimelineView 
-              ? _buildTimelineView(context)
-              : _buildMapView(context),
+              ? _buildTimelineView(context, trip)
+              : _buildMapView(context, trip),
           ),
           
           // 編輯工具欄移到底部
           TripEditToolbar(
-            tripId: widget.trip.id,
+            tripId: trip.id,
             onSave: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -65,7 +150,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         ],
       ),
       floatingActionButton: FloatingEditButton(
-        tripId: widget.trip.id,
+        tripId: trip.id,
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -78,7 +163,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
-  Widget _buildTimelineView(BuildContext context) {
+  Widget _buildTimelineView(BuildContext context, Trip trip) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -95,7 +180,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       ),
       child: Column(
         children: [
-          _buildAppBar(context),
+          _buildAppBar(context, trip),
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 20),
@@ -107,7 +192,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 ),
               ),
               child: TimelineWidget(
-                trip: widget.trip,
+                trip: trip,
                 onSwitchToMap: () {
                   setState(() {
                     _isTimelineView = false;
@@ -121,7 +206,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
-  Widget _buildMapView(BuildContext context) {
+  Widget _buildMapView(BuildContext context, Trip trip) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -138,7 +223,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       ),
       child: Column(
         children: [
-          _buildAppBar(context),
+          _buildAppBar(context, trip),
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 20),
@@ -247,7 +332,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   ),
                   // 地圖內容
                   Expanded(
-                    child: _buildTripMapContent(context),
+                    child: _buildTripMapContent(context, trip),
                   ),
                 ],
               ),
@@ -258,7 +343,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
-  Widget _buildTripMapContent(BuildContext context) {
+  Widget _buildTripMapContent(BuildContext context, Trip trip) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: TripMuseSpacing.md),
       decoration: BoxDecoration(
@@ -300,13 +385,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                     _buildMapStatChip(
                       context,
                       Icons.location_on,
-                      '${widget.trip.totalActivities}',
+                      '${trip.totalActivities}',
                     ),
                     const SizedBox(width: TripMuseSpacing.sm),
                     _buildMapStatChip(
                       context,
                       Icons.calendar_today,
-                      '${widget.trip.days.length}天',
+                      '${trip.days.length}天',
                     ),
                   ],
                 ),
@@ -322,7 +407,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 bottomRight: Radius.circular(TripMuseRadius.lg),
               ),
               child: TripMapWidget(
-                initialTrip: widget.trip,
+                initialTrip: trip,
                 showControls: false, // 在詳情頁面中不顯示控制項
                 onActivityTap: (activity) {
                   _showActivityDetails(context, activity);
@@ -551,7 +636,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     }
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, Trip trip) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -591,7 +676,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   ),
                   Expanded(
                     child: Text(
-                      widget.trip.title,
+                      trip.title,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -605,11 +690,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       // 測試編輯模式按鈕
                       Consumer(
                         builder: (context, ref, child) {
-                          final isEditMode = ref.watch(isEditingTripProvider(widget.trip.id));
+                          final isEditMode = ref.watch(isEditingTripProvider(trip.id));
                           return GestureDetector(
                             onTap: () {
                               print('Test button tapped. Current edit mode: $isEditMode');
-                              ref.read(tripEditModeProvider.notifier).toggleEditMode(widget.trip.id);
+                              ref.read(tripEditModeProvider.notifier).toggleEditMode(trip.id);
                             },
                             child: Container(
                               padding: const EdgeInsets.all(8),
@@ -627,7 +712,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      AppBarEditButton(tripId: widget.trip.id),
+                      AppBarEditButton(tripId: trip.id),
                     ],
                   ),
                 ],
@@ -641,17 +726,17 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 children: [
                   _buildTripInfoChip(
                     Icons.location_on,
-                    widget.trip.destination.city,
+                    trip.destination.city,
                   ),
                   const SizedBox(width: 12),
                   _buildTripInfoChip(
                     Icons.calendar_today,
-                    '${widget.trip.days.length}天',
+                    '${trip.days.length}天',
                   ),
                   const SizedBox(width: 12),
                   _buildTripInfoChip(
                     Icons.event,
-                    '${widget.trip.totalActivities}個活動',
+                    '${trip.totalActivities}個活動',
                   ),
                 ],
               ),

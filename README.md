@@ -8,6 +8,12 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 
 ## 📈 Latest Updates / 最新更新
 
+### v0.3.3-patch (2025-09-17)
+- 🐛 **編譯錯誤修復** | Compilation Error Fixes: 修復 TripDetailScreen 構造函數參數錯誤和相關的編譯問題
+- 🔧 **Provider 參數修復** | Provider Parameter Fix: 修復 ActivityEditNotifier 構造函數參數問題
+- 🔄 **狀態同步優化** | State Synchronization Enhancement: 優化 Provider 失效處理，確保 UI 即時更新
+- 📱 **測試文件修復** | Test File Fixes: 修復測試文件中過時的構造函數調用
+
 ### v0.3.1 (2025-09-16)
 - 🖼️ **目的地圖片服務** | Destination Image Service: 新增專門的圖片服務根據目的地城市獲取高品質風景圖片
 - 🎨 **行程卡片視覺優化** | Trip Card Visual Enhancement: 改進行程卡片的視覺效果，使用真實目的地圖片替代漸層背景

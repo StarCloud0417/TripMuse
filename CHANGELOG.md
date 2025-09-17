@@ -47,6 +47,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 修改: `lib/tripmuse/widgets/widgets.dart` - 添加新組件導出
 - 刪除: 未使用的 import 和函數，清理代碼結構
 
+### v0.3.3-patch (2025-09-17)
+
+### Fixed
+- 🐛 **編譯錯誤修復** | Compilation Error Fixes: 修復 TripDetailScreen 構造函數參數錯誤和相關的編譯問題
+- 🔧 **Provider 參數修復** | Provider Parameter Fix: 修復 ActivityEditNotifier 構造函數參數問題
+- 🔄 **狀態同步優化** | State Synchronization Enhancement: 優化 Provider 失效處理，確保 UI 即時更新
+- 📱 **測試文件修復** | Test File Fixes: 修復測試文件中過時的構造函數調用
+
+### Technical
+- 🏗️ **構造函數重構** | Constructor Refactoring: 將 TripDetailScreen 從接受 Trip 對象改為接受 tripId 字符串
+- 🔄 **Provider 失效處理** | Provider Invalidation Handling: 添加 tripProvider 和 userTripsProvider 的失效處理
+- 🧪 **測試環境優化** | Test Environment Optimization: 修復測試文件中的 Provider 設置和構造函數調用
+
+### 中文
+- 🐛 **編譯錯誤修復** - 修復 TripDetailScreen 構造函數參數錯誤和相關的編譯問題
+- 🔧 **Provider 參數修復** - 修復 ActivityEditNotifier 構造函數參數問題
+- 🔄 **狀態同步優化** - 優化 Provider 失效處理，確保 UI 即時更新
+
+### 檔案變更
+- 修改: `lib/tripmuse/screens/trip_detail_screen.dart` - 重構構造函數，修復編譯錯誤
+- 修改: `lib/tripmuse/providers/activity_edit_provider.dart` - 添加 Provider 參數和失效處理
+- 修改: `lib/tripmuse/tripmuse_app.dart` - 更新路由中的構造函數調用
+- 修改: `test/tripmuse/screens/trip_detail_screen_test.dart` - 修復測試中的構造函數調用
+
 ## [0.3.2] - 2025-09-16
 
 ### Added
