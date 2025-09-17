@@ -35,7 +35,14 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // 編輯工具欄
+          // 主要內容
+          Expanded(
+            child: _isTimelineView 
+              ? _buildTimelineView(context)
+              : _buildMapView(context),
+          ),
+          
+          // 編輯工具欄移到底部
           TripEditToolbar(
             tripId: widget.trip.id,
             onSave: () {
@@ -54,13 +61,6 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 ),
               );
             },
-          ),
-          
-          // 主要內容
-          Expanded(
-            child: _isTimelineView 
-              ? _buildTimelineView(context)
-              : _buildMapView(context),
           ),
         ],
       ),
