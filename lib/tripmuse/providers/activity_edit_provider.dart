@@ -367,6 +367,124 @@ class ActivityEditNotifier extends StateNotifier<ActivityEditState> {
     }
   }
 
+  /// 向上移動活動
+  Future<bool> moveActivityUp(
+    String tripId,
+    int dayIndex,
+    Activity activity,
+  ) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // 獲取行程資料
+      final storageManager = StorageManager.instance;
+      final tripRepository = storageManager.tripRepository;
+      final trip = await tripRepository.getTripById(tripId);
+
+      if (trip == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '找不到行程資料',
+        );
+        return false;
+      }
+
+      final dayPlan = trip.days[dayIndex];
+      final currentIndex = dayPlan.activities.indexWhere((a) => a.id == activity.id);
+      
+      if (currentIndex <= 0) {
+        state = state.copyWith(isLoading: false);
+        return false; // 已經在最上面或找不到活動
+      }
+
+      // 交換活動位置
+      final updatedActivities = List<Activity>.from(dayPlan.activities);
+      final temp = updatedActivities[currentIndex];
+      updatedActivities[currentIndex] = updatedActivities[currentIndex - 1];
+      updatedActivities[currentIndex - 1] = temp;
+
+      final updatedDayPlan = dayPlan.copyWith(activities: updatedActivities);
+      final updatedDays = List<DayPlan>.from(trip.days);
+      updatedDays[dayIndex] = updatedDayPlan;
+
+      final updatedTrip = trip.copyWith(
+        days: updatedDays,
+        updatedAt: DateTime.now(),
+      );
+
+      // 儲存更新
+      await tripRepository.saveTrip(updatedTrip);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: '移動活動失敗: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  /// 向下移動活動
+  Future<bool> moveActivityDown(
+    String tripId,
+    int dayIndex,
+    Activity activity,
+  ) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      // 獲取行程資料
+      final storageManager = StorageManager.instance;
+      final tripRepository = storageManager.tripRepository;
+      final trip = await tripRepository.getTripById(tripId);
+
+      if (trip == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '找不到行程資料',
+        );
+        return false;
+      }
+
+      final dayPlan = trip.days[dayIndex];
+      final currentIndex = dayPlan.activities.indexWhere((a) => a.id == activity.id);
+      
+      if (currentIndex < 0 || currentIndex >= dayPlan.activities.length - 1) {
+        state = state.copyWith(isLoading: false);
+        return false; // 已經在最下面或找不到活動
+      }
+
+      // 交換活動位置
+      final updatedActivities = List<Activity>.from(dayPlan.activities);
+      final temp = updatedActivities[currentIndex];
+      updatedActivities[currentIndex] = updatedActivities[currentIndex + 1];
+      updatedActivities[currentIndex + 1] = temp;
+
+      final updatedDayPlan = dayPlan.copyWith(activities: updatedActivities);
+      final updatedDays = List<DayPlan>.from(trip.days);
+      updatedDays[dayIndex] = updatedDayPlan;
+
+      final updatedTrip = trip.copyWith(
+        days: updatedDays,
+        updatedAt: DateTime.now(),
+      );
+
+      // 儲存更新
+      await tripRepository.saveTrip(updatedTrip);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: '移動活動失敗: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
   /// 清除錯誤訊息
   void clearError() {
     state = state.copyWith(error: null);

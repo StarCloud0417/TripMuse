@@ -9,7 +9,10 @@ import '../theme/app_theme.dart';
 import '../widgets/activity_card.dart';
 import '../widgets/timeline_widget.dart';
 import '../widgets/trip_map_widget.dart';
+import '../widgets/trip_edit_toolbar.dart';
 import '../providers/trip_provider.dart';
+import '../providers/trip_edit_mode_provider.dart';
+
 import '../services/storage_manager.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
@@ -30,15 +33,47 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isTimelineView 
-        ? _buildTimelineView(context)
-        : _buildMapView(context),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _shareTrip(context),
-        backgroundColor: TripMuseTheme.primaryColor,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.share),
-        label: const Text('分享行程'),
+      body: Column(
+        children: [
+          // 編輯工具欄
+          TripEditToolbar(
+            tripId: widget.trip.id,
+            onSave: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('行程已儲存'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            onCancel: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('已取消編輯'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            },
+          ),
+          
+          // 主要內容
+          Expanded(
+            child: _isTimelineView 
+              ? _buildTimelineView(context)
+              : _buildMapView(context),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingEditButton(
+        tripId: widget.trip.id,
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('已進入編輯模式'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        },
       ),
     );
   }
@@ -565,46 +600,35 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Colors.white),
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'edit':
-                            _editTrip(context);
-                            break;
-                          case 'delete':
-                            _deleteTrip(context);
-                            break;
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, color: Color(0xFF4ECDC4)),
-                              SizedBox(width: 8),
-                              Text('編輯行程'),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('刪除行程', style: TextStyle(color: Colors.red)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      // 測試編輯模式按鈕
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final isEditMode = ref.watch(isEditingTripProvider(widget.trip.id));
+                          return GestureDetector(
+                            onTap: () {
+                              print('Test button tapped. Current edit mode: $isEditMode');
+                              ref.read(tripEditModeProvider.notifier).toggleEditMode(widget.trip.id);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: isEditMode ? Colors.red.withValues(alpha: 0.2) : Colors.blue.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                isEditMode ? Icons.edit_off : Icons.edit,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      AppBarEditButton(tripId: widget.trip.id),
+                    ],
                   ),
                 ],
               ),
@@ -1011,13 +1035,6 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       side: BorderSide(
         color: TripMuseTheme.primaryColor.withValues(alpha: 0.3),
       ),
-    );
-  }
-
-  void _shareTrip(BuildContext context) {
-    // TODO: 實作分享功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('分享功能即將推出')),
     );
   }
 

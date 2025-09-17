@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 import '../providers/activity_edit_provider.dart';
+import '../providers/trip_edit_mode_provider.dart';
 import 'draggable_activity_card.dart';
 
 class DayTimelineCard extends ConsumerWidget {
@@ -275,10 +276,13 @@ class DayTimelineCard extends ConsumerWidget {
       final index = entry.key;
       final activity = entry.value;
       final isLastActivity = index == dayPlan.activities.length - 1;
+      final isFirstActivity = index == 0;
       
       return DraggableActivityCard(
         activity: activity,
         isLastActivity: isLastActivity,
+        isFirstActivity: isFirstActivity,
+        tripId: tripId,
         onTimeChanged: (activity, newTimeFrom, newTimeTo) {
           _handleTimeChanged(ref, activity, newTimeFrom, newTimeTo, context);
         },
@@ -294,8 +298,17 @@ class DayTimelineCard extends ConsumerWidget {
         onEdit: (activity) {
           _handleEditActivity(ref, activity, context);
         },
+        onMoveUp: (activity) {
+          _handleMoveActivityUp(ref, activity, context);
+        },
+        onMoveDown: (activity) {
+          _handleMoveActivityDown(ref, activity, context);
+        },
         onMapSync: () {
           _handleMapSync(context);
+        },
+        onEnterEditMode: () {
+          _handleEnterEditMode(ref, context);
         },
       );
     }).toList();
@@ -418,6 +431,84 @@ class DayTimelineCard extends ConsumerWidget {
       const SnackBar(
         content: Text('已同步到地圖視圖'),
         backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  void _handleMoveActivityUp(WidgetRef ref, Activity activity, BuildContext context) {
+    if (tripId == null) return;
+    
+    final activityEditNotifier = ref.read(activityEditProvider.notifier);
+    activityEditNotifier.moveActivityUp(
+      tripId!,
+      dayNumber - 1,
+      activity,
+    ).then((success) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已將「${activity.name}」向上移動'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      } else {
+        final error = ref.read(activityEditErrorProvider);
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _handleMoveActivityDown(WidgetRef ref, Activity activity, BuildContext context) {
+    if (tripId == null) return;
+    
+    final activityEditNotifier = ref.read(activityEditProvider.notifier);
+    activityEditNotifier.moveActivityDown(
+      tripId!,
+      dayNumber - 1,
+      activity,
+    ).then((success) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已將「${activity.name}」向下移動'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      } else {
+        final error = ref.read(activityEditErrorProvider);
+        if (error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _handleEnterEditMode(WidgetRef ref, BuildContext context) {
+    if (tripId == null) return;
+    
+    // 進入編輯模式
+    ref.read(tripEditModeProvider.notifier).enterEditMode(tripId!);
+    
+    // 顯示提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('已進入編輯模式，現在可以拖拉活動調整順序'),
+        backgroundColor: Colors.blue,
+        duration: Duration(seconds: 2),
       ),
     );
   }

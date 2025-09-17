@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2025-09-17
+
+### Added
+- 🎯 **行程編輯模式** - 新增完整的行程編輯模式，支援即時編輯和視覺回饋 (Added complete trip editing mode with real-time editing and visual feedback)
+- 🛠️ **編輯工具欄** - 新增 TripEditToolbar 組件，提供編輯模式的統一控制介面 (Added TripEditToolbar component for unified editing mode control)
+- 🔄 **編輯狀態管理** - 新增 TripEditModeProvider 進行編輯狀態的集中管理 (Added TripEditModeProvider for centralized editing state management)
+- 🎨 **編輯模式UI優化** - 編輯模式下的活動卡片提供特殊的視覺樣式和控制按鈕 (Enhanced UI for editing mode with special visual styles and control buttons)
+
+### Enhanced
+- 🔧 **活動卡片重構** - DraggableActivityCard 重構為 ConsumerWidget，支援編輯模式切換 (Refactored DraggableActivityCard to ConsumerWidget with editing mode support)
+- 📱 **編輯控制按鈕** - 新增上移、下移、刪除等編輯控制按鈕，提升編輯體驗 (Added move up, move down, and delete control buttons for better editing experience)
+- 🎯 **長按觸發優化** - 優化長按行為，在編輯模式和普通模式下提供不同的互動體驗 (Optimized long press behavior with different interactions for editing and normal modes)
+- 🔔 **觸覺回饋增強** - 新增觸覺回饋，提升用戶操作的即時反饋體驗 (Enhanced haptic feedback for immediate user interaction response)
+
+### Technical
+- 🏗️ **狀態管理架構優化** - 優化 Riverpod provider 的狀態管理架構 (Optimized Riverpod provider state management architecture)
+- 🔄 **組件生命週期管理** - 改善組件的狀態同步和生命週期管理 (Improved component state synchronization and lifecycle management)
+- 📦 **模組化組件設計** - 將編輯功能模組化，提高代碼的可維護性和可測試性 (Modularized editing functionality for better code maintainability and testability)
+- 🧪 **錯誤處理強化** - 增強編輯操作的錯誤處理和用戶提示 (Strengthened error handling and user notifications for editing operations)
+
+### 中文
+- 🎯 **行程編輯模式** - 新增完整的行程編輯模式，支援即時編輯和視覺回饋
+- 🛠️ **編輯工具欄** - 新增 TripEditToolbar 組件，提供編輯模式的統一控制介面
+- 🔄 **編輯狀態管理** - 新增 TripEditModeProvider 進行編輯狀態的集中管理
+- 🎨 **編輯模式UI優化** - 編輯模式下的活動卡片提供特殊的視覺樣式和控制按鈕
+
+### 技術改進
+- 🔧 **活動卡片重構** - DraggableActivityCard 重構為 ConsumerWidget，支援編輯模式切換
+- 📱 **編輯控制按鈕** - 新增上移、下移、刪除等編輯控制按鈕，提升編輯體驗
+- 🎯 **長按觸發優化** - 優化長按行為，在編輯模式和普通模式下提供不同的互動體驗
+- 🔔 **觸覺回饋增強** - 新增觸覺回饋，提升用戶操作的即時反饋體驗
+
+### 檔案變更
+- 新增: `lib/tripmuse/providers/trip_edit_mode_provider.dart` - 行程編輯狀態管理
+- 新增: `lib/tripmuse/widgets/trip_edit_toolbar.dart` - 編輯工具欄組件
+- 修改: `lib/tripmuse/screens/trip_detail_screen.dart` - 整合編輯模式和工具欄
+- 修改: `lib/tripmuse/widgets/draggable_activity_card.dart` - 重構為 ConsumerWidget，支援編輯模式
+- 修改: `lib/tripmuse/providers/providers.dart` - 添加編輯模式 provider
+- 修改: `lib/tripmuse/widgets/widgets.dart` - 添加新組件導出
+- 刪除: 未使用的 import 和函數，清理代碼結構
+
 ## [0.3.2] - 2025-09-16
 
 ### Added

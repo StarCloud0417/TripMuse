@@ -4,60 +4,72 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
+import '../providers/trip_edit_mode_provider.dart';
 
-class DraggableActivityCard extends StatefulWidget {
+class DraggableActivityCard extends ConsumerStatefulWidget {
   final Activity activity;
   final bool isLastActivity;
+  final bool isFirstActivity;
+  final String? tripId;
   final Function(Activity, String, String)? onTimeChanged;
   final Function(Activity)? onDelete;
   final Function(Activity, int)? onMoveToDay;
   final Function(Activity)? onReplace;
   final Function(Activity)? onEdit;
+  final Function(Activity)? onMoveUp;
+  final Function(Activity)? onMoveDown;
   final VoidCallback? onMapSync;
+  final VoidCallback? onEnterEditMode;
 
   const DraggableActivityCard({
     super.key,
     required this.activity,
     this.isLastActivity = false,
+    this.isFirstActivity = false,
+    this.tripId,
     this.onTimeChanged,
     this.onDelete,
     this.onMoveToDay,
     this.onReplace,
     this.onEdit,
+    this.onMoveUp,
+    this.onMoveDown,
     this.onMapSync,
+    this.onEnterEditMode,
   });
 
   @override
-  State<DraggableActivityCard> createState() => _DraggableActivityCardState();
+  ConsumerState<DraggableActivityCard> createState() => _DraggableActivityCardState();
 }
 
-class _DraggableActivityCardState extends State<DraggableActivityCard>
+class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
     with TickerProviderStateMixin {
   late AnimationController _scaleController;
   late AnimationController _elevationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _elevationAnimation;
-
+  
   bool _isEditing = false;
-
+  
   late TextEditingController _timeFromController;
   late TextEditingController _timeToController;
 
   @override
   void initState() {
     super.initState();
-
+    
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-
+    
     _elevationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-
+    
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 1.05,
@@ -65,7 +77,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
       parent: _scaleController,
       curve: Curves.easeInOut,
     ));
-
+    
     _elevationAnimation = Tween<double>(
       begin: 4.0,
       end: 12.0,
@@ -73,7 +85,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
       parent: _elevationController,
       curve: Curves.easeInOut,
     ));
-
+    
     _timeFromController = TextEditingController(text: widget.activity.timeFrom);
     _timeToController = TextEditingController(text: widget.activity.timeTo);
   }
@@ -89,6 +101,10 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
 
   @override
   Widget build(BuildContext context) {
+    final isEditMode = widget.tripId != null 
+        ? ref.watch(isEditingTripProvider(widget.tripId!))
+        : false;
+
     return Column(
       children: [
         // 可拖拉的活動卡片
@@ -97,51 +113,98 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
           builder: (context, child) {
             return Transform.scale(
               scale: _scaleAnimation.value,
-              child: Draggable<Activity>(
-                data: widget.activity,
-                feedback: _buildDragFeedback(context),
-                childWhenDragging: _buildDragPlaceholder(context),
-                onDragStarted: _onDragStarted,
-                onDragEnd: _onDragEnd,
-                child: GestureDetector(
-                  onLongPress: _showContextMenu,
-                  onTap: () => widget.onEdit?.call(widget.activity),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _getCategoryColor().withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: _elevationAnimation.value,
-                          offset: Offset(0, _elevationAnimation.value / 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // 時間標籤區域
-                        _buildTimeSection(context),
-
-                        // 活動內容區域
-                        _buildActivityContent(context),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              child: isEditMode 
+                  ? _buildEditModeCard(context)
+                  : _buildNormalModeCard(context),
             );
           },
         ),
-
+        
         // 活動間連接線（除了最後一個活動）
         if (!widget.isLastActivity) _buildActivityConnector(),
       ],
+    );
+  }
+
+  Widget _buildNormalModeCard(BuildContext context) {
+    return GestureDetector(
+      onLongPress: _handleLongPress,
+      onTap: () => widget.onEdit?.call(widget.activity),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _getCategoryColor().withValues(alpha: 0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: _elevationAnimation.value,
+              offset: Offset(0, _elevationAnimation.value / 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // 時間標籤區域
+            _buildTimeSection(context),
+            
+            // 活動內容區域
+            _buildActivityContent(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditModeCard(BuildContext context) {
+    return Draggable<Activity>(
+      data: widget.activity,
+      feedback: _buildDragFeedback(context),
+      childWhenDragging: _buildDragPlaceholder(context),
+      onDragStarted: _onDragStarted,
+      onDragEnd: _onDragEnd,
+      child: GestureDetector(
+        onLongPress: () => widget.onEdit?.call(widget.activity),
+        onTap: () => widget.onEdit?.call(widget.activity),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _getCategoryColor().withValues(alpha: 0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: _getCategoryColor().withValues(alpha: 0.15),
+                blurRadius: _elevationAnimation.value,
+                offset: Offset(0, _elevationAnimation.value / 3),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // 編輯模式時間標籤
+                  _buildEditModeTimeSection(context),
+                  
+                  // 活動內容區域
+                  _buildActivityContent(context),
+                ],
+              ),
+              
+              // 編輯模式控制按鈕
+              _buildEditModeControls(context),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -163,7 +226,6 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
       ),
       child: Row(
         children: [
-          // 拖拉手柄
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -171,22 +233,94 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(
-              Icons.drag_handle,
-              size: 16,
+              Icons.access_time,
+              size: 14,
               color: _getCategoryColor(),
             ),
           ),
           const SizedBox(width: 8),
+          Text(
+            widget.activity.timeRange,
+            style: TextStyle(
+              color: _getCategoryColor(),
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: _getPriorityColor(),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: _getPriorityColor().withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              widget.activity.priority.displayName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildEditModeTimeSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            _getCategoryColor().withValues(alpha: 0.15),
+            _getCategoryColor().withValues(alpha: 0.08),
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      child: Row(
+        children: [
+          // 拖拉手柄（編輯模式下更明顯）
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: _getCategoryColor().withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _getCategoryColor().withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.drag_handle,
+              size: 18,
+              color: _getCategoryColor(),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
           // 時間顯示/編輯
           if (_isEditing) ...[
             _buildTimeEditor(context),
           ] else ...[
-            _buildTimeDisplay(context),
+            _buildEditModeTimeDisplay(context),
           ],
-
+          
           const Spacer(),
-
+          
           // 優先級標籤
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -215,28 +349,35 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
     );
   }
 
-  Widget _buildTimeDisplay(BuildContext context) {
+  Widget _buildEditModeTimeDisplay(BuildContext context) {
     return GestureDetector(
       onTap: () => setState(() => _isEditing = true),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: _getCategoryColor().withValues(alpha: 0.3),
-            width: 1,
+            color: _getCategoryColor().withValues(alpha: 0.4),
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: _getCategoryColor().withValues(alpha: 0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.access_time,
-              size: 14,
+              size: 16,
               color: _getCategoryColor(),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             Text(
               widget.activity.timeRange,
               style: TextStyle(
@@ -245,10 +386,10 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
                 fontSize: 14,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             Icon(
               Icons.edit,
-              size: 12,
+              size: 14,
               color: _getCategoryColor().withValues(alpha: 0.7),
             ),
           ],
@@ -273,8 +414,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
             ),
             decoration: InputDecoration(
               isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(color: _getCategoryColor()),
@@ -288,7 +428,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
             readOnly: true,
           ),
         ),
-
+        
         const SizedBox(width: 8),
         Text(
           '-',
@@ -298,7 +438,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
           ),
         ),
         const SizedBox(width: 8),
-
+        
         // 結束時間編輯
         SizedBox(
           width: 60,
@@ -311,8 +451,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
             ),
             decoration: InputDecoration(
               isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(color: _getCategoryColor()),
@@ -326,9 +465,9 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
             readOnly: true,
           ),
         ),
-
+        
         const SizedBox(width: 8),
-
+        
         // 確認按鈕
         GestureDetector(
           onTap: _saveTimeChanges,
@@ -345,9 +484,9 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
             ),
           ),
         ),
-
+        
         const SizedBox(width: 4),
-
+        
         // 取消按鈕
         GestureDetector(
           onTap: _cancelTimeEdit,
@@ -403,7 +542,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
                 ),
               ),
               const SizedBox(width: 12),
-
+              
               // 活動名稱
               Expanded(
                 child: Text(
@@ -417,9 +556,9 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
               ),
             ],
           ),
-
+          
           const SizedBox(height: 12),
-
+          
           // 活動描述
           Text(
             widget.activity.description,
@@ -429,17 +568,15 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
               height: 1.4,
             ),
           ),
-
+          
           // 額外資訊
-          if (widget.activity.estimatedCost != null ||
-              widget.activity.address != null) ...[
+          if (widget.activity.estimatedCost != null || widget.activity.address != null) ...[
             const SizedBox(height: 12),
             _buildExtraInfo(context),
           ],
-
+          
           // 旅行小貼士
-          if (widget.activity.tips != null &&
-              widget.activity.tips!.isNotEmpty) ...[
+          if (widget.activity.tips != null && widget.activity.tips!.isNotEmpty) ...[
             const SizedBox(height: 12),
             _buildTipsSection(context),
           ],
@@ -481,7 +618,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
               ],
             ),
           ),
-
+        
         // 地址資訊
         if (widget.activity.address != null)
           Row(
@@ -622,6 +759,92 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
     );
   }
 
+  Widget _buildEditModeControls(BuildContext context) {
+    return Positioned(
+      top: 12,
+      right: 12,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: _getCategoryColor().withValues(alpha: 0.01),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: _getCategoryColor().withValues(alpha: 0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _getCategoryColor().withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 上移按鈕
+            if (!widget.isFirstActivity) ...[
+              GestureDetector(
+                onTap: () => widget.onMoveUp?.call(widget.activity),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.keyboard_arrow_up,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            
+            // 下移按鈕
+            if (!widget.isLastActivity) ...[
+              GestureDetector(
+                onTap: () => widget.onMoveDown?.call(widget.activity),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            
+            // 刪除按鈕
+            GestureDetector(
+              onTap: () => _showDeleteConfirmation(context),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.delete,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDragPlaceholder(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -669,213 +892,19 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
     _elevationController.reverse();
   }
 
-  void _showContextMenu() {
-    HapticFeedback.heavyImpact();
+  void _handleLongPress() {
+    final isEditMode = widget.tripId != null 
+        ? ref.read(isEditingTripProvider(widget.tripId!))
+        : false;
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildContextMenu(context),
-    );
-  }
-
-  Widget _buildContextMenu(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 標題
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  _getCategoryColor().withValues(alpha: 0.1),
-                  _getCategoryColor().withValues(alpha: 0.05),
-                ],
-              ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  _getCategoryIcon(),
-                  color: _getCategoryColor(),
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    widget.activity.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // 選項列表
-          _buildMenuOption(
-            context,
-            Icons.edit,
-            '編輯活動',
-            Colors.blue,
-            () {
-              Navigator.pop(context);
-              widget.onEdit?.call(widget.activity);
-            },
-          ),
-
-          _buildMenuOption(
-            context,
-            Icons.swap_horiz,
-            '替換活動',
-            Colors.orange,
-            () {
-              Navigator.pop(context);
-              widget.onReplace?.call(widget.activity);
-            },
-          ),
-
-          _buildMenuOption(
-            context,
-            Icons.calendar_today,
-            '移動到其他日期',
-            Colors.purple,
-            () {
-              Navigator.pop(context);
-              _showMoveTodayDialog(context);
-            },
-          ),
-
-          _buildMenuOption(
-            context,
-            Icons.map,
-            '同步到地圖',
-            Colors.green,
-            () {
-              Navigator.pop(context);
-              widget.onMapSync?.call();
-            },
-          ),
-
-          const Divider(height: 1),
-
-          _buildMenuOption(
-            context,
-            Icons.delete,
-            '刪除活動',
-            Colors.red,
-            () {
-              Navigator.pop(context);
-              _showDeleteConfirmation(context);
-            },
-          ),
-
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuOption(
-    BuildContext context,
-    IconData icon,
-    String title,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          color: color,
-          size: 20,
-        ),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      onTap: onTap,
-    );
-  }
-
-  void _showMoveTodayDialog(BuildContext context) {
-    // 這裡應該顯示日期選擇對話框
-    // 暫時用簡單的對話框代替
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('移動到其他日期'),
-        content: const Text('選擇要移動到的日期'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // 這裡應該實作移動邏輯
-              widget.onMoveToDay?.call(widget.activity, 2); // 示例：移動到第2天
-            },
-            child: const Text('確定'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('刪除活動'),
-        content: Text('確定要刪除「${widget.activity.name}」嗎？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onDelete?.call(widget.activity);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('刪除'),
-          ),
-        ],
-      ),
-    );
+    if (isEditMode) {
+      // 編輯模式下長按直接編輯活動內容
+      widget.onEdit?.call(widget.activity);
+    } else {
+      // 非編輯模式下長按進入編輯模式
+      HapticFeedback.mediumImpact();
+      widget.onEnterEditMode?.call();
+    }
   }
 
   Future<void> _selectTime(BuildContext context, bool isStartTime) async {
@@ -886,18 +915,17 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: _getCategoryColor(),
-                ),
+              primary: _getCategoryColor(),
+            ),
           ),
           child: child!,
         );
       },
     );
-
+    
     if (picked != null) {
-      final timeString =
-          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-
+      final timeString = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+      
       if (isStartTime) {
         _timeFromController.text = timeString;
       } else {
@@ -909,7 +937,7 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
   void _saveTimeChanges() {
     final newTimeFrom = _timeFromController.text;
     final newTimeTo = _timeToController.text;
-
+    
     // 驗證時間格式和邏輯
     if (_validateTimeRange(newTimeFrom, newTimeTo)) {
       widget.onTimeChanged?.call(widget.activity, newTimeFrom, newTimeTo);
@@ -936,22 +964,20 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
     try {
       final fromParts = timeFrom.split(':');
       final toParts = timeTo.split(':');
-
+      
       if (fromParts.length != 2 || toParts.length != 2) return false;
-
+      
       final fromHour = int.parse(fromParts[0]);
       final fromMinute = int.parse(fromParts[1]);
       final toHour = int.parse(toParts[0]);
       final toMinute = int.parse(toParts[1]);
-
-      if (fromHour < 0 || fromHour > 23 || toHour < 0 || toHour > 23)
-        return false;
-      if (fromMinute < 0 || fromMinute > 59 || toMinute < 0 || toMinute > 59)
-        return false;
-
+      
+      if (fromHour < 0 || fromHour > 23 || toHour < 0 || toHour > 23) return false;
+      if (fromMinute < 0 || fromMinute > 59 || toMinute < 0 || toMinute > 59) return false;
+      
       final fromTotalMinutes = fromHour * 60 + fromMinute;
       final toTotalMinutes = toHour * 60 + toMinute;
-
+      
       return toTotalMinutes > fromTotalMinutes;
     } catch (e) {
       return false;
@@ -1005,5 +1031,30 @@ class _DraggableActivityCardState extends State<DraggableActivityCard>
       case ActivityPriority.low:
         return Colors.green;
     }
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('刪除活動'),
+        content: Text('確定要刪除「${widget.activity.name}」嗎？此操作無法復原。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              widget.onDelete?.call(widget.activity);
+              HapticFeedback.lightImpact();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('刪除'),
+          ),
+        ],
+      ),
+    );
   }
 }
