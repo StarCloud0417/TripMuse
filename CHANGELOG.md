@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📱 **編輯控制按鈕** - 新增上移、下移、刪除等編輯控制按鈕，提升編輯體驗 (Added move up, move down, and delete control buttons for better editing experience)
 - 🎯 **長按觸發優化** - 優化長按行為，在編輯模式和普通模式下提供不同的互動體驗 (Optimized long press behavior with different interactions for editing and normal modes)
 - 🔔 **觸覺回饋增強** - 新增觸覺回饋，提升用戶操作的即時反饋體驗 (Enhanced haptic feedback for immediate user interaction response)
+- 🎨 **編輯工具欄佈局優化** - 將編輯工具欄移動到頂部，提升用戶操作便利性 (Optimized edit toolbar layout by moving it to the top for better user accessibility)
 
 ### Technical
 - 🏗️ **狀態管理架構優化** - 優化 Riverpod provider 的狀態管理架構 (Optimized Riverpod provider state management architecture)
