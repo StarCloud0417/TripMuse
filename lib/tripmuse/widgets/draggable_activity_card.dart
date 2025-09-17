@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../providers/trip_edit_mode_provider.dart';
+import 'activity_detail_bottom_sheet.dart';
 
 class DraggableActivityCard extends ConsumerStatefulWidget {
   final Activity activity;
@@ -129,7 +130,7 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
   Widget _buildNormalModeCard(BuildContext context) {
     return GestureDetector(
       onLongPress: _handleLongPress,
-      onTap: () => widget.onEdit?.call(widget.activity),
+      onTap: () => _showActivityDetails(context),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
@@ -169,7 +170,7 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
       onDragEnd: _onDragEnd,
       child: GestureDetector(
         onLongPress: () => widget.onEdit?.call(widget.activity),
-        onTap: () => widget.onEdit?.call(widget.activity),
+        onTap: () => _showActivityDetails(context),
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
@@ -1201,6 +1202,19 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
             child: const Text('刪除'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showActivityDetails(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ActivityDetailBottomSheet(
+        activity: widget.activity,
+        onEdit: () => widget.onEdit?.call(widget.activity),
+        onDelete: () => widget.onDelete?.call(widget.activity),
       ),
     );
   }

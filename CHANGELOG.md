@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2025-09-17
+
+### Added
+- 🎯 **活動詳情展示** - 新增完整的活動詳情 BottomSheet，提供豐富的地點資訊展示 (Added comprehensive activity detail BottomSheet with rich location information display)
+- 📋 **分頁式詳情介面** - 實作概覽、詳情、照片三個分頁，提供結構化的資訊瀏覽體驗 (Implemented tabbed interface with Overview, Details, and Photos tabs for structured information browsing)
+- 🗺️ **地圖整合** - 支援直接在地圖中開啟活動位置，提供便捷的導航功能 (Added map integration to open activity locations directly with convenient navigation)
+- 🚗 **交通建議** - 提供步行、大眾運輸、計程車等多種交通方式建議 (Added transportation suggestions including walking, public transport, and taxi options)
+- 📸 **照片輪播** - 實作地點照片輪播功能，支援多張照片展示和指示器 (Implemented photo carousel with multiple image display and indicators)
+
+### Enhanced
+- 🎨 **活動卡片互動** - ActivityCard 和 DraggableActivityCard 現在支援點擊顯示詳情 (Enhanced ActivityCard and DraggableActivityCard with tap-to-show-details functionality)
+- 📱 **響應式設計** - 活動詳情 BottomSheet 採用響應式設計，適配不同螢幕尺寸 (Responsive design for activity detail BottomSheet to adapt to different screen sizes)
+- 🔗 **外部連結支援** - 支援開啟外部地圖應用或複製座標到剪貼簿 (Added support for opening external map applications or copying coordinates to clipboard)
+- ⭐ **評分顯示** - 新增地點評分顯示，包含星級評分和數值評分 (Added location rating display with star ratings and numerical scores)
+
 ## [0.3.3] - 2025-09-17
 
 ### Added
@@ -47,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 修改: `lib/tripmuse/widgets/widgets.dart` - 添加新組件導出
 - 刪除: 未使用的 import 和函數，清理代碼結構
 
-### v0.3.3-patch (2025-09-17)
+## [0.3.4] - 2025-09-17
 
 ### Fixed
 - 🐛 **編譯錯誤修復** | Compilation Error Fixes: 修復 TripDetailScreen 構造函數參數錯誤和相關的編譯問題
@@ -70,6 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 修改: `lib/tripmuse/providers/activity_edit_provider.dart` - 添加 Provider 參數和失效處理
 - 修改: `lib/tripmuse/tripmuse_app.dart` - 更新路由中的構造函數調用
 - 修改: `test/tripmuse/screens/trip_detail_screen_test.dart` - 修復測試中的構造函數調用
+- 修改: `pubspec.yaml` - 更新版本號到 0.3.4
+- 修改: `README.md` - 更新版本號顯示
 
 ## [0.3.2] - 2025-09-16
 

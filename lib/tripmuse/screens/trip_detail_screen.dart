@@ -10,6 +10,7 @@ import '../widgets/activity_card.dart';
 import '../widgets/timeline_widget.dart';
 import '../widgets/trip_map_widget.dart';
 import '../widgets/trip_edit_toolbar.dart';
+import '../widgets/activity_detail_bottom_sheet.dart';
 import '../providers/trip_provider.dart';
 import '../providers/trip_edit_mode_provider.dart';
 
@@ -460,181 +461,31 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.6,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(TripMuseRadius.xl)),
-        ),
-        child: Column(
-          children: [
-            // 拖拽指示器
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: TripMuseSpacing.sm),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: TripMuseTheme.dividerColor,
-                borderRadius: BorderRadius.circular(2),
-              ),
+      builder: (context) => ActivityDetailBottomSheet(
+        activity: activity,
+        onEdit: () {
+          // 這裡可以添加編輯功能
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('編輯「${activity.name}」功能開發中...'),
+              backgroundColor: Colors.blue,
             ),
-            
-            // 活動資訊
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(TripMuseSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 標題和類別
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(TripMuseSpacing.sm),
-                          decoration: BoxDecoration(
-                            color: _getCategoryColor(activity.category).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(TripMuseRadius.sm),
-                          ),
-                          child: Icon(
-                            _getCategoryIcon(activity.category),
-                            color: _getCategoryColor(activity.category),
-                          ),
-                        ),
-                        const SizedBox(width: TripMuseSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                activity.name,
-                                style: Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              Text(
-                                activity.timeRange,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: TripMuseTheme.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: TripMuseSpacing.lg),
-                    
-                    // 描述
-                    if (activity.description.isNotEmpty) ...[
-                      Text(
-                        '活動描述',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: TripMuseSpacing.sm),
-                      Text(
-                        activity.description,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: TripMuseSpacing.lg),
-                    ],
-                    
-                    // 詳細資訊
-                    if (activity.address != null || 
-                        activity.estimatedCost != null || 
-                        activity.tips != null) ...[
-                      Text(
-                        '詳細資訊',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: TripMuseSpacing.sm),
-                      
-                      if (activity.address != null)
-                        _buildInfoRow(Icons.location_on, '地址', activity.address!),
-                      
-                      if (activity.estimatedCost != null)
-                        _buildInfoRow(Icons.attach_money, '預估費用', activity.estimatedCost!),
-                      
-                      if (activity.tips != null)
-                        _buildInfoRow(Icons.lightbulb_outline, '小貼士', activity.tips!),
-                    ],
-                  ],
-                ),
-              ),
+          );
+        },
+        onDelete: () {
+          // 這裡可以添加刪除功能
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('刪除「${activity.name}」功能開發中...'),
+              backgroundColor: Colors.red,
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: TripMuseSpacing.sm),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            size: 20,
-            color: TripMuseTheme.textSecondary,
-          ),
-          const SizedBox(width: TripMuseSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: TripMuseTheme.textSecondary,
-                  ),
-                ),
-                Text(value),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Color _getCategoryColor(ActivityCategory category) {
-    switch (category) {
-      case ActivityCategory.food:
-        return Colors.orange;
-      case ActivityCategory.sightseeing:
-        return Colors.blue;
-      case ActivityCategory.culture:
-        return Colors.purple;
-      case ActivityCategory.nature:
-        return Colors.green;
-      case ActivityCategory.shopping:
-        return Colors.pink;
-      case ActivityCategory.outdoor:
-        return Colors.teal;
-      case ActivityCategory.transportation:
-        return Colors.grey;
-    }
-  }
-
-  IconData _getCategoryIcon(ActivityCategory category) {
-    switch (category) {
-      case ActivityCategory.food:
-        return Icons.restaurant;
-      case ActivityCategory.sightseeing:
-        return Icons.camera_alt;
-      case ActivityCategory.culture:
-        return Icons.museum;
-      case ActivityCategory.nature:
-        return Icons.park;
-      case ActivityCategory.shopping:
-        return Icons.shopping_bag;
-      case ActivityCategory.outdoor:
-        return Icons.directions_run;
-      case ActivityCategory.transportation:
-        return Icons.directions_bus;
-    }
-  }
 
   Widget _buildAppBar(BuildContext context, Trip trip) {
     return Container(
