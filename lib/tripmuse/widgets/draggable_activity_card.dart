@@ -187,19 +187,15 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
               ),
             ],
           ),
-          child: Stack(
+          child: Column(
             children: [
-              Column(
-                children: [
-                  // 編輯模式時間標籤
-                  _buildEditModeTimeSection(context),
-                  
-                  // 活動內容區域
-                  _buildActivityContent(context),
-                ],
-              ),
+              // 編輯模式時間標籤
+              _buildEditModeTimeSection(context),
               
-              // 編輯模式控制按鈕
+              // 活動內容區域
+              _buildActivityContent(context),
+              
+              // 編輯模式控制按鈕區域
               _buildEditModeControls(context),
             ],
           ),
@@ -278,7 +274,7 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
   Widget _buildEditModeTimeSection(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, _isEditing ? 16 : 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -291,59 +287,81 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
           topRight: Radius.circular(16),
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          // 拖拉手柄（編輯模式下更明顯）
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: _getCategoryColor().withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: _getCategoryColor().withValues(alpha: 0.5),
-                width: 1,
+          // 第一行：拖拉手柄、時間顯示、優先級
+          Row(
+            children: [
+              // 拖拉手柄（編輯模式下更明顯）
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _getCategoryColor().withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _getCategoryColor().withValues(alpha: 0.5),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.drag_handle,
+                  size: 18,
+                  color: _getCategoryColor(),
+                ),
               ),
-            ),
-            child: Icon(
-              Icons.drag_handle,
-              size: 18,
-              color: _getCategoryColor(),
-            ),
-          ),
-          const SizedBox(width: 12),
-          
-          // 時間顯示/編輯
-          if (_isEditing) ...[
-            _buildTimeEditor(context),
-          ] else ...[
-            _buildEditModeTimeDisplay(context),
-          ],
-          
-          const Spacer(),
-          
-          // 優先級標籤
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: _getPriorityColor(),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: _getPriorityColor().withValues(alpha: 0.3),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+              const SizedBox(width: 12),
+              
+              // 時間顯示（非編輯狀態）
+              if (!_isEditing) ...[
+                Expanded(child: _buildEditModeTimeDisplay(context)),
+              ] else ...[
+                // 編輯狀態下顯示提示文字
+                Expanded(
+                  child: Text(
+                    '正在編輯時間',
+                    style: TextStyle(
+                      color: _getCategoryColor(),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               ],
-            ),
-            child: Text(
-              widget.activity.priority.displayName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
+              
+              // 優先級標籤
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getPriorityColor(),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _getPriorityColor().withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  widget.activity.priority.displayName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
+          
+          // 第二行：時間編輯器（編輯狀態時顯示）
+          if (_isEditing) ...[
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _buildTimeEditor(context),
+            ),
+          ],
         ],
       ),
     );
@@ -399,109 +417,190 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
   }
 
   Widget _buildTimeEditor(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 開始時間編輯
-        SizedBox(
-          width: 60,
-          child: TextFormField(
-            controller: _timeFromController,
-            style: TextStyle(
-              color: _getCategoryColor(),
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: _getCategoryColor()),
+        // 時間輸入區域
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 開始時間編輯
+            Container(
+              width: 65,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _getCategoryColor(), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: _getCategoryColor().withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: _getCategoryColor(), width: 2),
-              ),
-            ),
-            onTap: () => _selectTime(context, true),
-            readOnly: true,
-          ),
-        ),
-        
-        const SizedBox(width: 8),
-        Text(
-          '-',
-          style: TextStyle(
-            color: _getCategoryColor(),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(width: 8),
-        
-        // 結束時間編輯
-        SizedBox(
-          width: 60,
-          child: TextFormField(
-            controller: _timeToController,
-            style: TextStyle(
-              color: _getCategoryColor(),
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: _getCategoryColor()),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: _getCategoryColor(), width: 2),
+              child: TextFormField(
+                controller: _timeFromController,
+                style: TextStyle(
+                  color: _getCategoryColor(),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                  border: InputBorder.none,
+                ),
+                onTap: () => _selectTime(context, true),
+                readOnly: true,
               ),
             ),
-            onTap: () => _selectTime(context, false),
-            readOnly: true,
-          ),
+            
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: _getCategoryColor().withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '至',
+                style: TextStyle(
+                  color: _getCategoryColor(),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            
+            // 結束時間編輯
+            Container(
+              width: 65,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _getCategoryColor(), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: _getCategoryColor().withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextFormField(
+                controller: _timeToController,
+                style: TextStyle(
+                  color: _getCategoryColor(),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                  border: InputBorder.none,
+                ),
+                onTap: () => _selectTime(context, false),
+                readOnly: true,
+              ),
+            ),
+          ],
         ),
         
-        const SizedBox(width: 8),
+        const SizedBox(height: 8),
         
-        // 確認按鈕
-        GestureDetector(
-          onTap: _saveTimeChanges,
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(4),
+        // 操作按鈕區域
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 確認按鈕
+            Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
+                ),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _saveTimeChanges,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '確認',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-            child: const Icon(
-              Icons.check,
-              size: 16,
-              color: Colors.white,
+            
+            const SizedBox(width: 8),
+            
+            // 取消按鈕
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.red, width: 1.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _cancelTimeEdit,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.close,
+                          size: 16,
+                          color: Colors.red,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '取消',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-        
-        const SizedBox(width: 4),
-        
-        // 取消按鈕
-        GestureDetector(
-          onTap: _cancelTimeEdit,
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Icon(
-              Icons.close,
-              size: 16,
-              color: Colors.white,
-            ),
-          ),
+          ],
         ),
       ],
     );
@@ -760,86 +859,134 @@ class _DraggableActivityCardState extends ConsumerState<DraggableActivityCard>
   }
 
   Widget _buildEditModeControls(BuildContext context) {
-    return Positioned(
-      top: 12,
-      right: 12,
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: _getCategoryColor().withValues(alpha: 0.01),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: _getCategoryColor().withValues(alpha: 0.3),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _getCategoryColor().withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            _getCategoryColor().withValues(alpha: 0.05),
+            _getCategoryColor().withValues(alpha: 0.02),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 上移按鈕
-            if (!widget.isFirstActivity) ...[
-              GestureDetector(
-                onTap: () => widget.onMoveUp?.call(widget.activity),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.keyboard_arrow_up,
-                    size: 14,
-                    color: Colors.white,
-                  ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: _getCategoryColor().withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // 左側：拖拽提示
+          Expanded(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.drag_handle,
+                  size: 16,
+                  color: _getCategoryColor().withValues(alpha: 0.6),
                 ),
-              ),
-              const SizedBox(width: 4),
-            ],
-            
-            // 下移按鈕
-            if (!widget.isLastActivity) ...[
-              GestureDetector(
-                onTap: () => widget.onMoveDown?.call(widget.activity),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 14,
-                    color: Colors.white,
+                const SizedBox(width: 8),
+                Text(
+                  '拖拽調整順序',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _getCategoryColor().withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-              const SizedBox(width: 4),
-            ],
-            
-            // 刪除按鈕
-            GestureDetector(
-              onTap: () => _showDeleteConfirmation(context),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.delete,
-                  size: 14,
-                  color: Colors.white,
-                ),
-              ),
+              ],
             ),
-          ],
+          ),
+          
+          // 右側：操作按鈕
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 上移按鈕
+              if (!widget.isFirstActivity) ...[
+                _buildControlButton(
+                  icon: Icons.keyboard_arrow_up,
+                  color: Colors.blue,
+                  onTap: () => widget.onMoveUp?.call(widget.activity),
+                  tooltip: '上移',
+                ),
+                const SizedBox(width: 8),
+              ],
+              
+              // 下移按鈕
+              if (!widget.isLastActivity) ...[
+                _buildControlButton(
+                  icon: Icons.keyboard_arrow_down,
+                  color: Colors.blue,
+                  onTap: () => widget.onMoveDown?.call(widget.activity),
+                  tooltip: '下移',
+                ),
+                const SizedBox(width: 8),
+              ],
+              
+              // 編輯按鈕
+              _buildControlButton(
+                icon: Icons.edit,
+                color: Colors.orange,
+                onTap: () => widget.onEdit?.call(widget.activity),
+                tooltip: '編輯',
+              ),
+              
+              const SizedBox(width: 8),
+              
+              // 刪除按鈕
+              _buildControlButton(
+                icon: Icons.delete,
+                color: Colors.red,
+                onTap: () => _showDeleteConfirmation(context),
+                tooltip: '刪除',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+    required String tooltip,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );
