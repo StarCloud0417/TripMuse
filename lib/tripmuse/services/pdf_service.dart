@@ -28,6 +28,7 @@ class PdfService {
     final fonts = await _loadFonts();
     final font = fonts['regular']!;
     final boldFont = fonts['bold']!;
+    final emojiFont = fonts['emoji']!;
     print('✅ 字體載入完成');
 
     // 封面頁
@@ -35,7 +36,7 @@ class PdfService {
       pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.all(_pageMargin),
-        build: (pw.Context context) => _buildCoverPage(trip, font, boldFont, language),
+        build: (pw.Context context) => _buildCoverPage(trip, font, boldFont, emojiFont, language),
       ),
     );
 
@@ -44,7 +45,7 @@ class PdfService {
       pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.all(_pageMargin),
-        build: (pw.Context context) => _buildOverviewPage(trip, font, boldFont, language),
+        build: (pw.Context context) => _buildOverviewPage(trip, font, boldFont, emojiFont, language),
       ),
     );
 
@@ -55,7 +56,7 @@ class PdfService {
         pw.Page(
           pageFormat: PdfPageFormat.a4,
           margin: pw.EdgeInsets.all(_pageMargin),
-          build: (pw.Context context) => _buildDayDetailPage(day, font, boldFont, language),
+          build: (pw.Context context) => _buildDayDetailPage(day, font, boldFont, emojiFont, language),
         ),
       );
     }
@@ -95,6 +96,15 @@ class PdfService {
   static Future<Map<String, pw.Font>> _loadFonts() async {
     pw.Font regularFont;
     pw.Font boldFont;
+    pw.Font? emojiFont;
+    
+    try {
+      // 載入 Emoji 字體
+      emojiFont = await _loadEmojiFont();
+      print('✅ 成功載入 Emoji 字體');
+    } catch (e) {
+      print('⚠️ 無法載入 Emoji 字體: $e');
+    }
     
     try {
       // 優先嘗試載入 assets 中的字體檔案
@@ -126,7 +136,21 @@ class PdfService {
     return {
       'regular': regularFont,
       'bold': boldFont,
+      'emoji': emojiFont ?? regularFont,
     };
+  }
+
+  /// 載入 Emoji 字體
+  static Future<pw.Font> _loadEmojiFont() async {
+    try {
+      print('🔍 載入 Emoji 字體: assets/fonts/NotoColorEmoji.ttf');
+      final fontData = await rootBundle.load('assets/fonts/NotoColorEmoji.ttf');
+      final font = pw.Font.ttf(fontData);
+      print('✅ 成功載入 Emoji 字體');
+      return font;
+    } catch (e) {
+      throw Exception('載入 Emoji 字體失敗: $e');
+    }
   }
 
   /// 載入 Assets 中的中文字體
@@ -250,8 +274,93 @@ class PdfService {
     return await _tryLoadSystemChineseFont();
   }
 
+  /// 建立包含 Emoji 的文字
+  static pw.Widget _buildTextWithEmoji(
+    String text, 
+    pw.Font regularFont, 
+    pw.Font emojiFont, {
+    double fontSize = 12,
+    PdfColor? color,
+    pw.FontWeight? fontWeight,
+    pw.TextAlign? textAlign,
+  }) {
+    // 檢查文字是否包含 emoji
+    final emojiRegex = RegExp(r'[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]', unicode: true);
+    
+    if (emojiRegex.hasMatch(text)) {
+      // 如果包含 emoji，分割文字並分別處理
+      final parts = <pw.InlineSpan>[];
+      final matches = emojiRegex.allMatches(text);
+      int lastEnd = 0;
+      
+      for (final match in matches) {
+        // 添加 emoji 前的文字
+        if (match.start > lastEnd) {
+          final beforeText = text.substring(lastEnd, match.start);
+          if (beforeText.isNotEmpty) {
+            parts.add(pw.TextSpan(
+              text: beforeText,
+              style: pw.TextStyle(
+                font: regularFont,
+                fontSize: fontSize,
+                color: color,
+                fontWeight: fontWeight,
+              ),
+            ));
+          }
+        }
+        
+        // 添加 emoji
+        parts.add(pw.TextSpan(
+          text: match.group(0)!,
+          style: pw.TextStyle(
+            font: emojiFont,
+            fontSize: fontSize,
+            color: color,
+            fontWeight: fontWeight,
+          ),
+        ));
+        
+        lastEnd = match.end;
+      }
+      
+      // 添加最後剩餘的文字
+      if (lastEnd < text.length) {
+        final remainingText = text.substring(lastEnd);
+        if (remainingText.isNotEmpty) {
+          parts.add(pw.TextSpan(
+            text: remainingText,
+            style: pw.TextStyle(
+              font: regularFont,
+              fontSize: fontSize,
+              color: color,
+              fontWeight: fontWeight,
+            ),
+          ));
+        }
+      }
+      
+      return pw.RichText(
+        text: pw.TextSpan(children: parts),
+        textAlign: textAlign ?? pw.TextAlign.left,
+      );
+    } else {
+      // 如果不包含 emoji，使用一般字體
+      return pw.Text(
+        text,
+        style: pw.TextStyle(
+          font: regularFont,
+          fontSize: fontSize,
+          color: color,
+          fontWeight: fontWeight,
+        ),
+        textAlign: textAlign,
+      );
+    }
+  }
+
   /// 建立封面頁
-  static pw.Widget _buildCoverPage(Trip trip, pw.Font font, pw.Font boldFont, String? language) {
+  static pw.Widget _buildCoverPage(Trip trip, pw.Font font, pw.Font boldFont, pw.Font emojiFont, String? language) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -362,7 +471,7 @@ class PdfService {
   }
 
   /// 建立概覽頁
-  static pw.Widget _buildOverviewPage(Trip trip, pw.Font font, pw.Font boldFont, String? language) {
+  static pw.Widget _buildOverviewPage(Trip trip, pw.Font font, pw.Font boldFont, pw.Font emojiFont, String? language) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -435,7 +544,7 @@ class PdfService {
         pw.SizedBox(height: _sectionSpacing),
         
         // 活動統計
-        _buildActivityStatistics(trip, font, boldFont, language),
+        _buildActivityStatistics(trip, font, boldFont, emojiFont, language),
         
         if (trip.notes != null && trip.notes!.isNotEmpty) ...[
           pw.SizedBox(height: _sectionSpacing),
@@ -454,7 +563,7 @@ class PdfService {
   }
 
   /// 建立每日詳情頁
-  static pw.Widget _buildDayDetailPage(DayPlan day, pw.Font font, pw.Font boldFont, String? language) {
+  static pw.Widget _buildDayDetailPage(DayPlan day, pw.Font font, pw.Font boldFont, pw.Font emojiFont, String? language) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -522,12 +631,12 @@ class PdfService {
           
           return pw.Column(
             children: [
-              _buildActivityCard(activity, font, boldFont),
+              _buildActivityCard(activity, font, boldFont, emojiFont),
               
               // 交通資訊（如果有的話）
               if (index < day.transports.length) ...[
                 pw.SizedBox(height: 8),
-                _buildTransportInfo(day.transports[index], font, boldFont),
+                _buildTransportInfo(day.transports[index], font, boldFont, emojiFont),
               ],
               
               pw.SizedBox(height: _itemSpacing),
@@ -553,7 +662,7 @@ class PdfService {
   }
 
   /// 建立活動卡片
-  static pw.Widget _buildActivityCard(Activity activity, pw.Font font, pw.Font boldFont) {
+  static pw.Widget _buildActivityCard(Activity activity, pw.Font font, pw.Font boldFont, pw.Font emojiFont) {
     return pw.Container(
       width: double.infinity,
       padding: const pw.EdgeInsets.all(12),
@@ -605,12 +714,12 @@ class PdfService {
           // 活動詳情
           pw.Row(
             children: [
-              _buildActivityTag(activity.category.displayName, PdfColors.green100, PdfColors.green800, font),
+              _buildActivityTag(activity.category.displayName, PdfColors.green100, PdfColors.green800, font, emojiFont),
               pw.SizedBox(width: 8),
-              _buildActivityTag(activity.priority.displayName, PdfColors.orange100, PdfColors.orange800, font),
+              _buildActivityTag(activity.priority.displayName, PdfColors.orange100, PdfColors.orange800, font, emojiFont),
               if (activity.estimatedCost != null) ...[
                 pw.SizedBox(width: 8),
-                _buildActivityTag('💰 ${activity.estimatedCost}', PdfColors.blue100, PdfColors.blue800, font),
+                _buildActivityTag('💰 ${activity.estimatedCost}', PdfColors.blue100, PdfColors.blue800, font, emojiFont),
               ],
             ],
           ),
@@ -618,23 +727,12 @@ class PdfService {
           // 地址（如果有的話）
           if (activity.address != null && activity.address!.isNotEmpty) ...[
             pw.SizedBox(height: 6),
-            pw.Row(
-              children: [
-                pw.Text(
-                  '📍 ',
-                  style: pw.TextStyle(font: font, fontSize: 10),
-                ),
-                pw.Expanded(
-                  child: pw.Text(
-                    activity.address!,
-                    style: pw.TextStyle(
-                      font: font,
-                      fontSize: 10,
-                      color: PdfColors.grey600,
-                    ),
-                  ),
-                ),
-              ],
+            _buildTextWithEmoji(
+              '📍 ${activity.address!}',
+              font,
+              emojiFont,
+              fontSize: 10,
+              color: PdfColors.grey600,
             ),
           ],
           
@@ -648,13 +746,12 @@ class PdfService {
                 color: PdfColors.yellow50,
                 borderRadius: pw.BorderRadius.circular(4),
               ),
-              child: pw.Text(
+              child: _buildTextWithEmoji(
                 '💡 ${activity.tips}',
-                style: pw.TextStyle(
-                  font: font,
-                  fontSize: 10,
-                  color: PdfColors.grey700,
-                ),
+                font,
+                emojiFont,
+                fontSize: 10,
+                color: PdfColors.grey700,
               ),
             ),
           ],
@@ -664,7 +761,7 @@ class PdfService {
   }
 
   /// 建立交通資訊
-  static pw.Widget _buildTransportInfo(TransportInfo transport, pw.Font font, pw.Font boldFont) {
+  static pw.Widget _buildTransportInfo(TransportInfo transport, pw.Font font, pw.Font boldFont, pw.Font emojiFont) {
     return pw.Container(
       width: double.infinity,
       padding: const pw.EdgeInsets.all(8),
@@ -675,9 +772,11 @@ class PdfService {
       ),
       child: pw.Row(
         children: [
-          pw.Text(
+          _buildTextWithEmoji(
             '🚗 ',
-            style: pw.TextStyle(font: font, fontSize: 12),
+            font,
+            emojiFont,
+            fontSize: 12,
           ),
           pw.Expanded(
             child: pw.Text(
@@ -704,26 +803,25 @@ class PdfService {
   }
 
   /// 建立活動標籤
-  static pw.Widget _buildActivityTag(String text, PdfColor bgColor, PdfColor textColor, pw.Font font) {
+  static pw.Widget _buildActivityTag(String text, PdfColor bgColor, PdfColor textColor, pw.Font font, pw.Font emojiFont) {
     return pw.Container(
       padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: pw.BoxDecoration(
         color: bgColor,
         borderRadius: pw.BorderRadius.circular(4),
       ),
-      child: pw.Text(
+      child: _buildTextWithEmoji(
         text,
-        style: pw.TextStyle(
-          font: font,
-          fontSize: 9,
-          color: textColor,
-        ),
+        font,
+        emojiFont,
+        fontSize: 9,
+        color: textColor,
       ),
     );
   }
 
   /// 建立活動統計
-  static pw.Widget _buildActivityStatistics(Trip trip, pw.Font font, pw.Font boldFont, String? language) {
+  static pw.Widget _buildActivityStatistics(Trip trip, pw.Font font, pw.Font boldFont, pw.Font emojiFont, String? language) {
     final categoryStats = <String, int>{};
     for (final day in trip.days) {
       for (final activity in day.activities) {
