@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-09-18
+
+### Added
+- 📄 **PDF 生成功能** | PDF Generation Feature: 實作完整的 PDF 行程報告生成功能
+- 🎨 **PDF 模板設計** | PDF Template Design: 建立美觀的 PDF 模板，包含封面、概覽和詳情頁面
+- 🖼️ **地圖截圖整合** | Map Screenshot Integration: 整合地圖截圖功能，在 PDF 中顯示行程路線
+- 📊 **行程統計資訊** | Trip Statistics: 在 PDF 中顯示行程的詳細統計資訊和分析
+- 🎯 **多頁面佈局** | Multi-page Layout: 實作多頁面 PDF 佈局，支援長行程的完整展示
+- 🔧 **PDF 設定對話框** | PDF Settings Dialog: 新增 PDF 生成設定介面，讓用戶自訂輸出選項
+
+### Enhanced
+- 📱 **PDF 匯出體驗** | PDF Export Experience: 優化 PDF 生成流程，提供即時進度和狀態回饋
+- 🎨 **視覺化設計** | Visual Design: 增強 PDF 的視覺效果，使用現代化設計元素
+- ⚡ **生成效能** | Generation Performance: 優化 PDF 生成速度，提升大型行程的處理效率
+- 🔄 **圖片處理** | Image Processing: 改進圖片處理邏輯，支援高品質圖片輸出
+
+### Technical
+- 📦 **PDF 套件整合** | PDF Package Integration: 配置 pdf 和 printing 套件到專案中
+- 🏗️ **PDF 服務架構** | PDF Service Architecture: 建立模組化的 PDF 生成服務架構
+- 🖼️ **圖片處理引擎** | Image Processing Engine: 實作圖片處理和優化引擎
+- 🧪 **PDF 測試覆蓋** | PDF Testing Coverage: 新增完整的 PDF 功能測試覆蓋
+- 📚 **文件產生器** | Document Generator: 開發靈活的 PDF 文件產生器支援多種模板
+
+### 中文
+- 📄 **PDF 生成功能** - 實作完整的 PDF 行程報告生成功能
+- 🎨 **PDF 模板設計** - 建立美觀的 PDF 模板，包含封面、概覽和詳情頁面
+- 🖼️ **地圖截圖整合** - 整合地圖截圖功能，在 PDF 中顯示行程路線
+- 📊 **行程統計資訊** - 在 PDF 中顯示行程的詳細統計資訊和分析
+
+### 技術改進
+- 📦 **PDF 套件整合** - 配置 pdf 和 printing 套件到專案中
+- 🏗️ **PDF 服務架構** - 建立模組化的 PDF 生成服務架構
+- 🖼️ **圖片處理引擎** - 實作圖片處理和優化引擎
+- 🧪 **PDF 測試覆蓋** - 新增完整的 PDF 功能測試覆蓋
+
+### 檔案變更
+- 新增: `lib/tripmuse/services/pdf_service.dart` - PDF 生成服務
+- 新增: `lib/tripmuse/services/pdf_service_simple.dart` - 簡化版 PDF 服務
+- 新增: `lib/tripmuse/services/map_screenshot_service.dart` - 地圖截圖服務
+- 新增: `lib/tripmuse/widgets/pdf_generation_dialog.dart` - PDF 生成對話框
+- 新增: `lib/tripmuse/screens/pdf_demo_screen.dart` - PDF 演示畫面
+- 新增: `lib/tripmuse/screens/pdf_demo_screen_simple.dart` - 簡化版 PDF 演示畫面
+- 修改: `pubspec.yaml` - 新增 pdf 和 printing 套件依賴
+
+### Requirements
+- ✅ **Requirements: 8** - 完成 PDF 生成功能需求
+
 ## [0.3.7] - 2025-09-18
 
 ### Added

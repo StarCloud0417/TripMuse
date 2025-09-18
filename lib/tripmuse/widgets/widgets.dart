@@ -20,3 +20,6 @@ export 'trip_edit_toolbar.dart';
 export 'offline_edit_status_widget.dart';
 export 'conflict_resolution_dialog.dart';
 export 'edit_history_widget.dart';
+
+// PDF 匯出相關 Widgets
+export 'pdf_export_dialog.dart';

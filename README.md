@@ -1,12 +1,20 @@
 # TripMuse 🧳
 
-**Version 0.3.7**
+**Version 0.4.0**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
 TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 MapBox Maps SDK 開發。透過人工智慧的力量，將您的旅行想法轉化為個人化的行程規劃。
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.4.0 (2025-09-18)
+- 📄 **PDF 生成功能** | PDF Generation Feature: 實作完整的 PDF 行程報告生成功能，包含封面頁、概覽頁、每日詳情頁
+- 🎨 **PDF 模板設計** | PDF Template Design: 建立美觀的 PDF 模板，使用現代化設計元素和品牌色彩
+- 🖼️ **地圖截圖整合** | Map Screenshot Integration: 整合地圖截圖功能，在 PDF 中顯示完整的行程路線和地點
+- 📊 **行程統計資訊** | Trip Statistics: 在 PDF 中顯示行程的詳細統計資訊，包括總天數、活動數量、交通時間等
+- 🔧 **PDF 設定對話框** | PDF Settings Dialog: 新增 PDF 生成設定介面，讓用戶自訂輸出選項和格式
+- ⚡ **高效能生成** | High-performance Generation: 優化 PDF 生成速度，提升大型行程的處理效率
 
 ### v0.3.3-patch (2025-09-17)
 - 🐛 **編譯錯誤修復** | Compilation Error Fixes: 修復 TripDetailScreen 構造函數參數錯誤和相關的編譯問題
