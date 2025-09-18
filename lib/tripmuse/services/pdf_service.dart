@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -18,11 +18,17 @@ class PdfService {
 
   /// 生成行程 PDF
   static Future<Uint8List> generateTripPdf(Trip trip, {String? language}) async {
+    print('📄 開始生成 PDF: ${trip.title}');
+    print('🌐 語言設定: ${language ?? "預設"}');
+    
     final pdf = pw.Document();
     
-    // 使用預設字體
-    final font = pw.Font.helvetica();
-    final boldFont = pw.Font.helveticaBold();
+    // 載入支援中文的字體
+    print('🔤 載入字體中...');
+    final fonts = await _loadFonts();
+    final font = fonts['regular']!;
+    final boldFont = fonts['bold']!;
+    print('✅ 字體載入完成');
 
     // 封面頁
     pdf.addPage(
@@ -83,6 +89,165 @@ class PdfService {
   static Future<Uint8List> generateOfflinePdf(Trip trip, {String? language}) async {
     // 離線模式下使用相同的生成邏輯，但不依賴網路資源
     return generateTripPdf(trip, language: language);
+  }
+
+  /// 載入字體（統一處理）
+  static Future<Map<String, pw.Font>> _loadFonts() async {
+    pw.Font regularFont;
+    pw.Font boldFont;
+    
+    try {
+      // 優先嘗試載入 assets 中的字體檔案
+      regularFont = await _loadAssetChineseFont();
+      boldFont = await _loadAssetChineseBoldFont();
+      
+      print('✅ 成功載入 Assets 中文字體');
+      
+    } catch (e) {
+      print('⚠️ 無法載入 Assets 字體: $e');
+      
+      try {
+        // 備用方案：嘗試載入系統中文字體
+        regularFont = await _tryLoadSystemChineseFont();
+        boldFont = await _tryLoadSystemChineseBoldFont();
+        
+        print('✅ 成功載入系統中文字體');
+        
+      } catch (e2) {
+        print('⚠️ 無法載入系統中文字體: $e2');
+        print('⚠️ 使用預設字體，中文字符可能顯示為方塊');
+        
+        // 最終備用方案：使用預設字體
+        regularFont = pw.Font.helvetica();
+        boldFont = pw.Font.helveticaBold();
+      }
+    }
+    
+    return {
+      'regular': regularFont,
+      'bold': boldFont,
+    };
+  }
+
+  /// 載入 Assets 中的中文字體
+  static Future<pw.Font> _loadAssetChineseFont() async {
+    try {
+      // 嘗試載入 assets 中的字體檔案
+      final fontPaths = [
+        'assets/fonts/NotoSansTC-Regular.ttf',
+        'assets/fonts/NotoSansCJK-Regular.ttf',
+        'assets/fonts/SourceHanSans-Regular.ttf',
+        'assets/fonts/chinese-font-regular.ttf',
+      ];
+      
+      for (final path in fontPaths) {
+        try {
+          print('🔍 嘗試載入 Assets 字體: $path');
+          final fontData = await rootBundle.load(path);
+          final font = pw.Font.ttf(fontData);
+          print('✅ 成功載入 Assets 字體: $path');
+          return font;
+        } catch (e) {
+          print('❌ 載入 Assets 字體失敗 $path: $e');
+          continue;
+        }
+      }
+      
+      throw Exception('找不到可用的 Assets 中文字體檔案');
+      
+    } catch (e) {
+      throw Exception('載入 Assets 中文字體失敗: $e');
+    }
+  }
+
+  /// 載入 Assets 中的中文粗體字體
+  static Future<pw.Font> _loadAssetChineseBoldFont() async {
+    try {
+      final boldFontPaths = [
+        'assets/fonts/NotoSansTC-Bold.ttf',
+        'assets/fonts/NotoSansCJK-Bold.ttf',
+        'assets/fonts/SourceHanSans-Bold.ttf',
+        'assets/fonts/chinese-font-bold.ttf',
+      ];
+      
+      for (final path in boldFontPaths) {
+        try {
+          final fontData = await rootBundle.load(path);
+          return pw.Font.ttf(fontData);
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      // 如果找不到粗體，使用一般字體
+      return await _loadAssetChineseFont();
+      
+    } catch (e) {
+      // 如果找不到粗體，使用一般字體
+      return await _loadAssetChineseFont();
+    }
+  }
+
+  /// 嘗試載入系統中文字體
+  static Future<pw.Font> _tryLoadSystemChineseFont() async {
+    if (Platform.isAndroid) {
+      // Android 常見中文字體路徑
+      final fontPaths = [
+        '/system/fonts/NotoSansCJK-Regular.ttc',
+        '/system/fonts/DroidSansFallback.ttf',
+        '/system/fonts/NotoSansTC-Regular.otf',
+        '/system/fonts/SourceHanSans-Regular.ttc',
+        '/system/fonts/NotoSansTC-Regular.ttf',
+      ];
+      
+      for (final path in fontPaths) {
+        try {
+          final file = File(path);
+          if (await file.exists()) {
+            print('🔍 嘗試載入字體: $path');
+            final fontData = await file.readAsBytes();
+            final font = pw.Font.ttf(fontData.buffer.asByteData());
+            print('✅ 成功載入字體: $path');
+            return font;
+          }
+        } catch (e) {
+          print('❌ 載入字體失敗 $path: $e');
+          continue;
+        }
+      }
+    } else if (Platform.isIOS) {
+      // iOS 系統字體（需要不同的處理方式）
+      print('📱 iOS 平台暫不支援系統字體載入');
+    }
+    
+    throw Exception('找不到可用的系統中文字體');
+  }
+
+  /// 嘗試載入系統中文粗體字體
+  static Future<pw.Font> _tryLoadSystemChineseBoldFont() async {
+    if (Platform.isAndroid) {
+      final boldFontPaths = [
+        '/system/fonts/NotoSansCJK-Bold.ttc',
+        '/system/fonts/NotoSansTC-Bold.otf',
+        '/system/fonts/SourceHanSans-Bold.ttc',
+        '/system/fonts/NotoSansTC-Bold.ttf',
+      ];
+      
+      for (final path in boldFontPaths) {
+        try {
+          final file = File(path);
+          if (await file.exists()) {
+            final fontData = await file.readAsBytes();
+            return pw.Font.ttf(fontData.buffer.asByteData());
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+    
+    // 如果找不到粗體，使用一般字體
+    return await _tryLoadSystemChineseFont();
   }
 
   /// 建立封面頁
