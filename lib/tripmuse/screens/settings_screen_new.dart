@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'transport_demo_screen.dart';
+import 'offline_edit_demo_screen.dart';
 
 class SettingsScreenNew extends ConsumerStatefulWidget {
   const SettingsScreenNew({super.key});
@@ -201,7 +202,12 @@ class _SettingsScreenNewState extends ConsumerState<SettingsScreenNew> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Container(), // 空白佔位符
+                child: _buildQuickSettingButton(
+                  title: 'Offline Edit',
+                  icon: Icons.offline_bolt,
+                  color: const Color(0xFF607D8B),
+                  onTap: () => _navigateToOfflineEditDemo(),
+                ),
               ),
             ],
           ),
@@ -538,6 +544,15 @@ class _SettingsScreenNewState extends ConsumerState<SettingsScreenNew> {
       context,
       MaterialPageRoute(
         builder: (context) => const TransportDemoScreen(),
+      ),
+    );
+  }
+
+  void _navigateToOfflineEditDemo() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OfflineEditDemoScreen(),
       ),
     );
   }

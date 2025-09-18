@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.7] - 2025-09-18
+
+### Added
+- 📱 **離線編輯佇列管理** | Offline Edit Queue Management: 實作完整的離線編輯佇列系統，管理離線狀態下的編輯操作
+- 🔄 **網路恢復自動同步** | Network Recovery Auto-Sync: 建立網路恢復時的自動同步機制，確保數據一致性
+- ⚠️ **同步衝突檢測** | Sync Conflict Detection: 實作智慧的同步衝突檢測演算法，識別編輯衝突
+- 🔧 **衝突解決策略** | Conflict Resolution Strategy: 建立多種衝突解決策略，包括手動解決和自動合併
+- 📚 **編輯歷史和復原** | Edit History and Undo: 實作完整的編輯歷史追蹤和復原功能
+- 🔄 **離線同步服務** | Offline Sync Service: 新增專門的離線同步服務，處理複雜的同步場景
+- 💾 **本地快取管理** | Local Cache Management: 實作智慧的本地方案快取管理系統
+
+### Enhanced
+- 🌐 **網路狀態監控** | Network Status Monitoring: 增強網路狀態監控，提供即時連接狀態回饋
+- 🔄 **同步狀態指示器** | Sync Status Indicator: 新增同步狀態視覺指示器，顯示當前同步進度
+- 🎯 **衝突解決介面** | Conflict Resolution Interface: 優化衝突解決用戶介面，提供清晰的衝突比較
+- 📊 **同步統計資訊** | Sync Statistics: 新增同步統計資訊，顯示同步成功率和效能指標
+- 🔒 **資料一致性保障** | Data Consistency Guarantee: 增強資料一致性保障機制，防止資料遺失
+
+### Technical
+- 🏗️ **離線架構設計** | Offline Architecture Design: 建立完整的離線優先架構設計
+- 📦 **同步引擎** | Sync Engine: 實作高效率的同步引擎，支援批量操作和增量同步
+- 🔧 **衝突檢測演算法** | Conflict Detection Algorithm: 開發先進的衝突檢測演算法
+- 🧪 **同步測試框架** | Sync Testing Framework: 建立完整的同步功能測試框架
+- 📈 **效能監控** | Performance Monitoring: 新增同步效能監控和優化指標
+- 🔐 **安全同步** | Secure Sync: 實作安全的同步機制，保護用戶資料隱私
+
+### 中文
+- 📱 **離線編輯佇列管理** - 實作完整的離線編輯佇列系統，管理離線狀態下的編輯操作
+- 🔄 **網路恢復自動同步** - 建立網路恢復時的自動同步機制，確保數據一致性
+- ⚠️ **同步衝突檢測** - 實作智慧的同步衝突檢測演算法，識別編輯衝突
+- 🔧 **衝突解決策略** - 建立多種衝突解決策略，包括手動解決和自動合併
+- 📚 **編輯歷史和復原** - 實作完整的編輯歷史追蹤和復原功能
+
+### 技術改進
+- 🏗️ **離線架構設計** - 建立完整的離線優先架構設計
+- 📦 **同步引擎** - 實作高效率的同步引擎，支援批量操作和增量同步
+- 🔧 **衝突檢測演算法** - 開發先進的衝突檢測演算法
+- 🧪 **同步測試框架** - 建立完整的同步功能測試框架
+
+### 檔案變更
+- 新增: `lib/tripmuse/services/offline_sync_service.dart` - 離線同步服務
+- 新增: `lib/tripmuse/services/edit_history_service.dart` - 編輯歷史服務
+- 新增: `lib/tripmuse/services/conflict_resolution_service.dart` - 衝突解決服務
+- 新增: `lib/tripmuse/widgets/offline_edit_status_widget.dart` - 離線編輯狀態Widget
+- 新增: `lib/tripmuse/widgets/conflict_resolution_dialog.dart` - 衝突解決對話框
+- 新增: `lib/tripmuse/widgets/edit_history_widget.dart` - 編輯歷史Widget
+- 修改: `lib/tripmuse/providers/trip_provider.dart` - 整合離線同步功能
+- 修改: `lib/tripmuse/providers/edit_history_provider.dart` - 編輯歷史狀態管理
+- 新增: `test/tripmuse/offline_sync_test.dart` - 離線同步測試
+- 新增: `test/tripmuse/conflict_resolution_test.dart` - 衝突解決測試
+
+### Requirements
+- ✅ **Requirements: 8.3, 8.4, 8.5** - 完成所有離線編輯和同步機制需求
+
 ## [0.3.6] - 2025-09-17
 
 ### Added

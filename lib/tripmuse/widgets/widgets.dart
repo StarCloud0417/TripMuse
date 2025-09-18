@@ -15,3 +15,8 @@ export 'trip_map_widget.dart';
 export 'draggable_activity_card.dart';
 export 'activity_drop_target.dart';
 export 'trip_edit_toolbar.dart';
+
+// 離線編輯和同步相關 Widgets
+export 'offline_edit_status_widget.dart';
+export 'conflict_resolution_dialog.dart';
+export 'edit_history_widget.dart';

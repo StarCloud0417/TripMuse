@@ -11,10 +11,12 @@ import '../widgets/timeline_widget.dart';
 import '../widgets/trip_map_widget.dart';
 import '../widgets/trip_edit_toolbar.dart';
 import '../widgets/enhanced_trip_edit_toolbar.dart';
+import '../widgets/offline_edit_status_widget.dart';
+import '../widgets/edit_history_widget.dart';
 
 import '../widgets/activity_detail_bottom_sheet.dart';
-import '../providers/trip_provider.dart';
-import '../providers/trip_edit_mode_provider.dart';
+
+import '../providers/providers.dart';
 
 import '../services/storage_manager.dart';
 
@@ -58,6 +60,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         return Scaffold(
           body: Column(
             children: [
+              // 離線編輯狀態指示器（暫時禁用）
+              // const OfflineEditStatusWidget(),
+              
               // 主要內容
               Expanded(
                 child: _isTimelineView 
@@ -91,16 +96,37 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               ),
             ],
           ),
-          floatingActionButton: FloatingEditButton(
-            tripId: currentTrip.id,
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('已進入編輯模式'),
-                  backgroundColor: Colors.blue,
+          floatingActionButton: Stack(
+            children: [
+              // 編輯歷史浮動按鈕
+              FloatingUndoRedoButtons(
+                tripId: currentTrip.id,
+                onUndo: () {
+                  // 刷新行程資料
+                  ref.invalidate(tripProvider(currentTrip.id));
+                },
+                onRedo: () {
+                  // 刷新行程資料
+                  ref.invalidate(tripProvider(currentTrip.id));
+                },
+              ),
+              // 原有的編輯按鈕
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: FloatingEditButton(
+                  tripId: currentTrip.id,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('已進入編輯模式'),
+                        backgroundColor: Colors.blue,
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+            ],
           ),
         );
       },
@@ -576,6 +602,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           );
                         },
                       ),
+                      const SizedBox(width: 8),
+                      // 離線編輯狀態指示器（暫時禁用）
+                      // const CompactOfflineStatusWidget(),
                       const SizedBox(width: 8),
                       AppBarEditButton(tripId: trip.id),
                     ],

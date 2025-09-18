@@ -17,6 +17,7 @@ import 'screens/create_trip_screen.dart';
 import 'screens/my_trips_screen.dart';
 import 'services/services.dart';
 import 'models/models.dart';
+import 'providers/providers.dart';
 
 /// 當前頁面索引 Provider
 final currentPageIndexProvider = StateProvider<int>((ref) => 0);
@@ -55,6 +56,8 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
         print('✅ TripMuse 儲存系統已經初始化');
         // 啟用自動儲存服務
         _initializeAutoSave();
+        // 初始化離線編輯服務
+        _initializeOfflineEditServices();
       } else {
         print('⚠️ TripMuse 儲存系統尚未初始化，嘗試初始化...');
         
@@ -63,6 +66,8 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
           print('✅ TripMuse 儲存系統初始化成功');
           // 啟用自動儲存服務
           _initializeAutoSave();
+          // 初始化離線編輯服務
+          _initializeOfflineEditServices();
         } catch (initError) {
           print('❌ TripMuse 儲存系統初始化失敗，嘗試清除數據: $initError');
           
@@ -74,6 +79,8 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
           print('✅ TripMuse 儲存系統重新初始化成功');
           // 啟用自動儲存服務
           _initializeAutoSave();
+          // 初始化離線編輯服務
+          _initializeOfflineEditServices();
         }
       }
     } catch (e) {
@@ -115,6 +122,25 @@ class _TripMuseAppState extends ConsumerState<TripMuseApp> {
     });
     */
     print('自動儲存服務已暫時禁用');
+  }
+
+  /// 初始化離線編輯服務
+  void _initializeOfflineEditServices() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        // 初始化編輯歷史服務
+        final editHistoryService = ref.read(editHistoryServiceProvider);
+        editHistoryService.initialize();
+        
+        // 啟動自動同步
+        final syncService = ref.read(offlineSyncServiceProvider);
+        syncService.startAutoSync();
+        
+        print('✅ 離線編輯服務已初始化');
+      } catch (e) {
+        print('⚠️ 離線編輯服務初始化失敗: $e');
+      }
+    });
   }
 
   /// 清除 Hive 數據
