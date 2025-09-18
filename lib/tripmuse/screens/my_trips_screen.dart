@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../providers/trip_provider.dart';
-import '../services/destination_image_service.dart';
+import '../widgets/enhanced_trip_card.dart';
 
 class MyTripsScreen extends ConsumerStatefulWidget {
   const MyTripsScreen({super.key});
@@ -416,7 +416,14 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
             ),
             itemCount: filteredTrips.length,
             itemBuilder: (context, index) {
-              return _buildTripGridCard(filteredTrips[index]);
+              return EnhancedTripCard(
+                trip: filteredTrips[index],
+                cardType: TripCardType.featured,
+                onTap: () => _navigateToTripDetail(filteredTrips[index]),
+                onEdit: () => _navigateToTripDetail(filteredTrips[index]),
+                onDuplicate: () => _duplicateTrip(filteredTrips[index]),
+                onDelete: () => _showDeleteConfirmation(filteredTrips[index]),
+              );
             },
           ),
         );
@@ -446,7 +453,14 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
           padding: const EdgeInsets.all(24.0),
           itemCount: filteredTrips.length,
           itemBuilder: (context, index) {
-            return _buildTripListCard(filteredTrips[index]);
+            return EnhancedTripCard(
+              trip: filteredTrips[index],
+              cardType: TripCardType.standard,
+              onTap: () => _navigateToTripDetail(filteredTrips[index]),
+              onEdit: () => _navigateToTripDetail(filteredTrips[index]),
+              onDuplicate: () => _duplicateTrip(filteredTrips[index]),
+              onDelete: () => _showDeleteConfirmation(filteredTrips[index]),
+            );
           },
         );
       },
@@ -459,341 +473,9 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
     );
   }
 
-  /// 建立網格卡片
-  Widget _buildTripGridCard(Trip trip) {
-    // 使用目的地圖片服務
-    final imageService = DestinationImageService();
-    final String imageUrl = imageService.getDestinationThumbnail(
-      trip.destination.city,
-      trip.destination.country,
-    );
 
-    return GestureDetector(
-      onTap: () => _navigateToTripDetail(trip),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            children: [
-              // 背景圖片
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                    onError: (exception, stackTrace) {
-                      // 如果圖片載入失敗，使用漸層背景作為後備
-                    },
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.7),
-                      ],
-                      stops: const [0.4, 1.0],
-                    ),
-                  ),
-                ),
-              ),
 
-              
-              // 內容
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 收藏按鈕
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () => _toggleFavorite(trip.id),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.favorite_border,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const Spacer(),
-                    
-                    // 行程信息
-                    Text(
-                      trip.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '${trip.destination.city} • ${trip.days.length}天',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _formatDate(trip.createdAt),
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  /// 建立列表卡片
-  Widget _buildTripListCard(Trip trip) {
-    // 使用目的地圖片服務
-    final imageService = DestinationImageService();
-    final String imageUrl = imageService.getDestinationThumbnail(
-      trip.destination.city,
-      trip.destination.country,
-    );
-    
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: GestureDetector(
-        onTap: () => _navigateToTripDetail(trip),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-            border: Border.all(
-              color: Colors.grey.shade100,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              // 目的地圖片縮圖
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    imageUrl,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // 圖片載入失敗時顯示後備UI
-                      return Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF4ECDC4),
-                              Color(0xFF44A08D),
-                            ],
-                          ),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.luggage,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      );
-                    },
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      // 載入中顯示後備UI
-                      return Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF4ECDC4),
-                              Color(0xFF44A08D),
-                            ],
-                          ),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.luggage,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              
-              const SizedBox(width: 16),
-              
-              // 行程信息
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      trip.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 16,
-                          color: Colors.grey.shade500,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${trip.destination.city} • ${trip.days.length}天',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 14,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '建立於 ${_formatDate(trip.createdAt)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              // 操作按鈕
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: PopupMenuButton<String>(
-                  onSelected: (value) => _handleTripAction(value, trip),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, size: 20, color: Color(0xFF4ECDC4)),
-                          SizedBox(width: 8),
-                          Text('編輯'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'duplicate',
-                      child: Row(
-                        children: [
-                          Icon(Icons.copy, size: 20, color: Color(0xFF4ECDC4)),
-                          SizedBox(width: 8),
-                          Text('複製'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, size: 20, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text('刪除', style: TextStyle(color: Colors.red)),
-                        ],
-                      ),
-                    ),
-                  ],
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.more_vert,
-                      color: Colors.grey.shade600,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   /// 建立空狀態
   Widget _buildEmptyState() {
@@ -1014,52 +696,59 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
   List<Trip> _filterTrips(List<Trip> trips) {
     var filteredTrips = trips;
 
-    // 搜尋篩選
+    // 搜尋篩選 - 增強搜尋功能
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       filteredTrips = filteredTrips.where((trip) {
         return trip.title.toLowerCase().contains(query) ||
                trip.destination.city.toLowerCase().contains(query) ||
-               trip.destination.country.toLowerCase().contains(query);
+               trip.destination.country.toLowerCase().contains(query) ||
+               trip.destination.name.toLowerCase().contains(query) ||
+               trip.days.any((day) => 
+                   day.activities.any((activity) => 
+                       activity.name.toLowerCase().contains(query) ||
+                       activity.description.toLowerCase().contains(query)));
       }).toList();
     }
 
     // 狀態篩選
+    final now = DateTime.now();
     switch (_selectedFilter) {
       case '即將到來':
         filteredTrips = filteredTrips.where((trip) {
           if (trip.days.isEmpty) return false;
-          return trip.days.first.date.isAfter(DateTime.now());
+          return trip.days.first.date.isAfter(now);
         }).toList();
         break;
       case '進行中':
         filteredTrips = filteredTrips.where((trip) {
           if (trip.days.isEmpty) return false;
-          final now = DateTime.now();
           final startDate = trip.days.first.date;
           final endDate = trip.days.last.date;
-          return startDate.isBefore(now) && endDate.isAfter(now);
+          return now.isAfter(startDate.subtract(const Duration(days: 1))) && 
+                 now.isBefore(endDate.add(const Duration(days: 1)));
         }).toList();
         break;
       case '已完成':
         filteredTrips = filteredTrips.where((trip) {
           if (trip.days.isEmpty) return false;
-          return trip.days.last.date.isBefore(DateTime.now());
+          return trip.days.last.date.isBefore(now);
         }).toList();
         break;
       case '收藏':
-        // TODO: 實現收藏篩選
-        filteredTrips = [];
+        final favoriteIds = ref.watch(favoriteTripProvider);
+        filteredTrips = filteredTrips.where((trip) => favoriteIds.contains(trip.id)).toList();
+        break;
+      case '全部':
+      default:
+        // 不需要額外篩選
         break;
     }
 
     return filteredTrips;
   }
 
-  /// 格式化日期
-  String _formatDate(DateTime date) {
-    return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
-  }
+
 
   // 事件處理方法
 
@@ -1071,120 +760,41 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
     });
   }
 
-  /// 顯示排序選項
-  void _showSortOptions() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '排序方式',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildSortOption('建立時間（新到舊）', Icons.access_time),
-              _buildSortOption('建立時間（舊到新）', Icons.history),
-              _buildSortOption('行程名稱（A-Z）', Icons.sort_by_alpha),
-              _buildSortOption('目的地', Icons.location_on),
-              _buildSortOption('天數', Icons.calendar_today),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
-  /// 建立排序選項
-  Widget _buildSortOption(String title, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF4ECDC4).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon, 
-            color: const Color(0xFF4ECDC4),
-            size: 20,
-          ),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: Colors.grey,
-        ),
-        onTap: () {
-          Navigator.pop(context);
-          // TODO: 實現排序功能
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('已選擇：$title'),
-              backgroundColor: const Color(0xFF4ECDC4),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 
-  /// 切換收藏
+
+
+  /// 切換收藏狀態
   void _toggleFavorite(String tripId) {
-    // TODO: 實現收藏功能
+    ref.read(favoriteTripProvider.notifier).toggleFavorite(tripId);
+    
+    // 顯示提示訊息
+    final isFavorite = ref.read(favoriteTripProvider).contains(tripId);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('收藏功能開發中'),
-        backgroundColor: Color(0xFF4ECDC4),
+      SnackBar(
+        content: Text(isFavorite ? '已加入收藏' : '已取消收藏'),
+        backgroundColor: const Color(0xFF4ECDC4),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }
 
-  /// 處理行程操作
-  void _handleTripAction(String action, Trip trip) {
-    switch (action) {
-      case 'edit':
-        // TODO: 導航到編輯頁面
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('編輯功能開發中'),
-            backgroundColor: Color(0xFF4ECDC4),
-          ),
-        );
-        break;
-      case 'duplicate':
-        _duplicateTrip(trip);
-        break;
-      case 'delete':
-        _showDeleteConfirmation(trip);
-        break;
-    }
+  /// 導航到行程詳情
+  void _navigateToTripDetail(Trip trip) {
+    Navigator.pushNamed(
+      context,
+      '/trip-detail',
+      arguments: trip,
+    );
+  }
+
+  /// 建立新行程
+  void _createNewTrip() {
+    Navigator.pushNamed(context, '/create-trip');
   }
 
   /// 複製行程
@@ -1266,17 +876,74 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
     }
   }
 
-  /// 導航到行程詳情
-  void _navigateToTripDetail(Trip trip) {
-    Navigator.pushNamed(
-      context,
-      '/trip-detail',
-      arguments: trip,
+  /// 顯示排序選項
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '排序方式',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildSortOption('建立時間（新到舊）', Icons.access_time),
+              _buildSortOption('建立時間（舊到新）', Icons.history),
+              _buildSortOption('行程名稱（A-Z）', Icons.sort_by_alpha),
+              _buildSortOption('目的地', Icons.location_on),
+              _buildSortOption('天數', Icons.calendar_today),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  /// 建立新行程
-  void _createNewTrip() {
-    Navigator.pushNamed(context, '/create-trip');
+  /// 建立排序選項
+  Widget _buildSortOption(String title, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF4ECDC4)),
+      title: Text(title),
+      onTap: () {
+        Navigator.pop(context);
+        // TODO: 實現排序功能
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('排序方式：$title'),
+            backgroundColor: const Color(0xFF4ECDC4),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 處理行程操作
+  void _handleTripAction(String action, Trip trip) {
+    switch (action) {
+      case 'edit':
+        Navigator.pushNamed(
+          context,
+          '/trip-detail',
+          arguments: trip,
+        );
+        break;
+      case 'duplicate':
+        _duplicateTrip(trip);
+        break;
+      case 'delete':
+        _showDeleteConfirmation(trip);
+        break;
+    }
   }
 }

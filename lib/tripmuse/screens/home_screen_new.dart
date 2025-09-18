@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
 import '../providers/trip_provider.dart';
-import '../services/destination_image_service.dart';
+import '../widgets/enhanced_trip_card.dart';
 
 class HomeScreenNew extends ConsumerStatefulWidget {
   const HomeScreenNew({super.key});
@@ -344,105 +344,103 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
 
   /// 建立旅程列表
   Widget _buildTripsList(List<Trip> trips) {
-    // 優先使用真實的行程數據
-    List<Trip> displayTrips = trips;
+    // 只顯示最近的行程（最多3個）
+    final recentTrips = trips.take(3).toList();
     
-    // 如果沒有真實行程，創建示例數據以展示UI
-    if (trips.isEmpty) {
-      displayTrips = [
-        Trip(
-          id: 'sample-1',
-          title: 'Kyoto Ancient History Tour',
-          destination: const Destination(
-            name: 'Kyoto',
-            city: 'Kyoto',
-            country: 'Japan',
-            lat: 35.0116,
-            lng: 135.7681,
-          ),
-          days: List.generate(10, (i) => DayPlan(
-            dayIndex: i + 1,
-            date: DateTime.now().add(Duration(days: i)),
-            theme: 'Day ${i + 1}',
-            activities: [],
-          )),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        Trip(
-          id: 'sample-2',
-          title: 'Alpine Escape',
-          destination: const Destination(
-            name: 'Alps',
-            city: 'Alps',
-            country: 'Switzerland',
-            lat: 46.5197,
-            lng: 8.2985,
-          ),
-          days: List.generate(5, (i) => DayPlan(
-            dayIndex: i + 1,
-            date: DateTime.now().add(Duration(days: i)),
-            theme: 'Day ${i + 1}',
-            activities: [],
-          )),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        Trip(
-          id: 'sample-3',
-          title: 'NYC Foodie Adventure',
-          destination: const Destination(
-            name: 'New York',
-            city: 'New York',
-            country: 'USA',
-            lat: 40.7128,
-            lng: -74.0060,
-          ),
-          days: List.generate(3, (i) => DayPlan(
-            dayIndex: i + 1,
-            date: DateTime.now().add(Duration(days: i)),
-            theme: 'Day ${i + 1}',
-            activities: [],
-          )),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      ];
-    }
-
-    if (displayTrips.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.explore_off,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No journeys yet',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Start planning your first adventure!',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade500,
-              ),
-            ),
-          ],
-        ),
-      );
+    if (recentTrips.isEmpty) {
+      return _buildEmptyTripsState();
     }
 
     // 使用自定義佈局來匹配設計圖
-    return _buildCustomTripLayout(displayTrips);
+    return _buildCustomTripLayout(recentTrips);
+  }
+
+  /// 建立空行程狀態
+  Widget _buildEmptyTripsState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF4ECDC4).withValues(alpha: 0.1),
+                  const Color(0xFF44A08D).withValues(alpha: 0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: const Icon(
+              Icons.explore_off,
+              size: 64,
+              color: Color(0xFF4ECDC4),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            '還沒有任何行程',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '開始規劃您的第一個旅程吧！',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF4ECDC4),
+                  Color(0xFF44A08D),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _createNewTrip,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              label: const Text(
+                '建立新行程',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// 建立自定義旅程佈局（匹配設計圖）
@@ -450,30 +448,36 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // 第一行：大卡片
+          // 第一行：特色大卡片
           if (trips.isNotEmpty)
-            Container(
-              height: 200,
-              margin: const EdgeInsets.only(bottom: 16),
-              child: _buildTripCard(trips[0]),
+            EnhancedTripCard(
+              trip: trips[0],
+              cardType: TripCardType.featured,
+              onTap: () => _navigateToTripDetail(trips[0]),
             ),
           
-          // 第二行：兩個小卡片
+          // 第二行：兩個精簡卡片
           if (trips.length > 1)
             Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 160,
                     margin: const EdgeInsets.only(right: 8),
-                    child: _buildTripCard(trips[1]),
+                    child: EnhancedTripCard(
+                      trip: trips[1],
+                      cardType: TripCardType.compact,
+                      onTap: () => _navigateToTripDetail(trips[1]),
+                    ),
                   ),
                 ),
                 Expanded(
                   child: Container(
-                    height: 160,
                     margin: const EdgeInsets.only(left: 8),
-                    child: _buildTripCard(trips.length > 2 ? trips[2] : trips[1]),
+                    child: EnhancedTripCard(
+                      trip: trips.length > 2 ? trips[2] : trips[1],
+                      cardType: TripCardType.compact,
+                      onTap: () => _navigateToTripDetail(trips.length > 2 ? trips[2] : trips[1]),
+                    ),
                   ),
                 ),
               ],
@@ -483,101 +487,11 @@ class _HomeScreenNewState extends ConsumerState<HomeScreenNew> {
     );
   }
 
-  /// 建立旅程卡片
-  Widget _buildTripCard(Trip trip) {
-    // 使用實際的行程數據
-    final String title = trip.title;
-    final String subtitle = '${trip.destination.city} • ${trip.days.length}天';
-    
-    // 使用目的地圖片服務獲取高品質圖片
-    final imageService = DestinationImageService();
-    final String imageUrl = imageService.getDestinationThumbnail(
-      trip.destination.city,
-      trip.destination.country,
-    );
 
-    return GestureDetector(
-      onTap: () => _navigateToTripDetail(trip),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            children: [
-              // 背景圖片
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                    onError: (exception, stackTrace) {
-                      // 如果圖片載入失敗，使用漸層背景
-                    },
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.8),
-                      ],
-                      stops: const [0.4, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-              
-              // 內容
-              Positioned(
-                bottom: 16,
-                left: 16,
-                right: 16,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+
+
+
+
 
 
 

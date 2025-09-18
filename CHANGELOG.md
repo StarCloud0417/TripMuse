@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-09-18
+
+### Added
+- 🏠 **主頁面行程列表** | Home Screen Trip List: 在主頁面實現 Recent Journeys 區域，顯示最近 3 個行程
+- 🎴 **增強版行程卡片** | Enhanced Trip Card: 建立三種卡片類型（標準、精簡、特色），支援收藏功能和操作選單
+- 📱 **我的行程頁面** | My Trips Screen: 完整的行程管理頁面，提供搜尋、篩選、雙檢視模式和統計功能
+- ➕ **浮動新增按鈕** | Floating Action Button: 漸層設計的 FAB，支援快速建立新行程
+- 🔍 **搜尋和篩選功能** | Search and Filter Features: 支援標題、目的地、活動搜尋和多種篩選條件
+- ❤️ **收藏系統** | Favorite System: 完整的收藏功能，支援收藏狀態持久化和收藏篩選
+- 📊 **行程統計顯示** | Trip Statistics: 顯示總行程數、即將到來行程數和收藏數量
+- 🎨 **現代化 UI 設計** | Modern UI Design: 使用漸層背景、圓角設計和現代化配色方案
+
+### Features
+- 🏠 **主頁面行程列表** - Recent Journeys 區域顯示最近行程
+- 🎴 **增強版行程卡片** - 高品質目的地圖片、狀態標籤、收藏功能
+- 📱 **我的行程頁面** - 完整的行程管理介面
+- 🔍 **智慧搜尋** - 支援行程標題、目的地城市和活動搜尋
+- 🏷️ **多重篩選** - 全部、即將到來、進行中、已完成、收藏篩選
+- 📱 **雙檢視模式** - 網格檢視和列表檢視切換
+- ❤️ **收藏系統** - 點擊愛心圖標收藏/取消收藏行程
+- 📊 **統計資訊** - 即時顯示行程統計數據
+
+### 中文
+- 🏠 **主頁面行程列表** - 在主頁面實現 Recent Journeys 區域，顯示最近 3 個行程
+- 🎴 **增強版行程卡片** - 建立三種卡片類型（標準、精簡、特色），支援收藏功能和操作選單
+- 📱 **我的行程頁面** - 完整的行程管理頁面，提供搜尋、篩選、雙檢視模式和統計功能
+- ➕ **浮動新增按鈕** - 漸層設計的 FAB，支援快速建立新行程
+- 🔍 **搜尋和篩選功能** - 支援標題、目的地、活動搜尋和多種篩選條件
+- ❤️ **收藏系統** - 完整的收藏功能，支援收藏狀態持久化和收藏篩選
+- 📊 **行程統計顯示** - 顯示總行程數、即將到來行程數和收藏數量
+- 🎨 **現代化 UI 設計** - 使用漸層背景、圓角設計和現代化配色方案
+
+### Technical
+- 🏗️ **組件化架構** | Component Architecture: 建立可重用的增強版行程卡片組件
+- 🔄 **狀態管理** | State Management: 使用 Riverpod 進行收藏狀態管理
+- 💾 **數據持久化** | Data Persistence: 收藏狀態自動保存到本地儲存
+- 🎨 **響應式設計** | Responsive Design: 支援不同螢幕尺寸的適配
+- ⚡ **效能優化** | Performance Optimization: 優化列表渲染和搜尋效能
+
 ## [0.4.1] - 2025-09-18
 
 ### Added

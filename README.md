@@ -1,12 +1,22 @@
-# TripMuse 🧳
+# TripMu### 📈 Latest Updates / 最新更新 (v0.4.2)e 🧳
 
-**Version 0.4.1**
+**Version 0.4.2**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
 TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 MapBox Maps SDK 開發。透過人工智慧的力量，將您的旅行想法轉化為個人化的行程規劃。
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.4.2 (2025-09-18)
+- 🏠 **主頁面行程列表** | Home Screen Trip List: 在主頁面實現 Recent Journeys 區域，顯示最近 3 個行程
+- 🎴 **增強版行程卡片** | Enhanced Trip Card: 建立三種卡片類型（標準、精簡、特色），支援收藏功能和操作選單
+- 📱 **我的行程頁面** | My Trips Screen: 完整的行程管理頁面，提供搜尋、篩選、雙檢視模式和統計功能
+- ➕ **浮動新增按鈕** | Floating Action Button: 漸層設計的 FAB，支援快速建立新行程
+- 🔍 **搜尋和篩選功能** | Search and Filter Features: 支援標題、目的地、活動搜尋和多種篩選條件
+- ❤️ **收藏系統** | Favorite System: 完整的收藏功能，支援收藏狀態持久化和收藏篩選
+- 📊 **行程統計顯示** | Trip Statistics: 顯示總行程數、即將到來行程數和收藏數量
+- 🎨 **現代化 UI 設計** | Modern UI Design: 使用漸層背景、圓角設計和現代化配色方案
 
 ### v0.4.1 (2025-09-18)
 - 📄 **PDF 匯出 UI 和功能** | PDF Export UI and Features: 實作 PDF 匯出選項和預覽功能
@@ -81,6 +91,17 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 - 🔗 **Trip Sharing** - Share itineraries with friends and family
 - 🔐 **Google Sign-In** - Secure authentication and cloud sync
 
+### 🏠 Current Features / 當前功能 (v0.4.2)
+- 🏠 **主頁面行程列表** - Recent Journeys 區域顯示最近 3 個行程
+- 🎴 **增強版行程卡片** - 高品質目的地圖片、狀態標籤、收藏功能
+- 📱 **我的行程頁面** - 完整的行程管理介面，支援搜尋和篩選
+- 🔍 **智慧搜尋功能** - 支援行程標題、目的地城市和活動搜尋
+- 🏷️ **多重篩選條件** - 全部、即將到來、進行中、已完成、收藏篩選
+- 📱 **雙檢視模式** - 網格檢視和列表檢視自由切換
+- ❤️ **收藏系統** - 點擊愛心圖標收藏/取消收藏行程
+- 📊 **行程統計** - 即時顯示總行程數、即將到來和收藏數量
+- ➕ **浮動新增按鈕** - 漸層設計的 FAB，快速建立新行程
+
 ### 🤖 規劃功能
 - 🤖 **AI 行程生成** - 使用自然語言描述生成個人化行程
 - 🗺️ **互動式地圖** - 美觀的地圖視覺化與路線規劃
@@ -91,13 +112,28 @@ TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 Map
 - 🔗 **行程分享** - 與朋友和家人分享行程
 - 🔐 **Google 登入** - 安全認證和雲端同步
 
+### 🏠 當前功能 (v0.0.1)
+- 🏠 **主頁面行程列表** - Recent Journeys 區域顯示最近 3 個行程
+- 🎴 **增強版行程卡片** - 高品質目的地圖片、狀態標籤、收藏功能
+- 📱 **我的行程頁面** - 完整的行程管理介面，支援搜尋和篩選
+- 🔍 **智慧搜尋功能** - 支援行程標題、目的地城市和活動搜尋
+- 🏷️ **多重篩選條件** - 全部、即將到來、進行中、已完成、收藏篩選
+- 📱 **雙檢視模式** - 網格檢視和列表檢視自由切換
+- ❤️ **收藏系統** - 點擊愛心圖標收藏/取消收藏行程
+- 📊 **行程統計** - 即時顯示總行程數、即將到來和收藏數量
+- ➕ **浮動新增按鈕** - 漸層設計的 FAB，快速建立新行程
+
 ## 🚀 Current Status / 目前狀態
 
-**Version 0.3.0** - Map Overview Enhancement / 地圖總覽功能增強
+**Version 0.4.2** - Trip List and Management Features / 行程列表和管理功能
 
 ✅ Project structure established / 專案結構建立  
 ✅ Core dependencies integrated / 核心依賴整合  
 ✅ MapBox SDK configured / MapBox SDK 配置  
+✅ Trip list and management system / 行程列表和管理系統  
+✅ Enhanced trip cards with favorites / 增強版行程卡片和收藏功能  
+✅ Search and filter functionality / 搜尋和篩選功能  
+✅ Modern UI design implementation / 現代化 UI 設計實現  
 ✅ TripMuse app entry point created / TripMuse 應用入口建立  
 ✅ **Complete data models with Freezed** / **使用 Freezed 完成資料模型**  
 ✅ **JSON serialization support** / **JSON 序列化支援**  
