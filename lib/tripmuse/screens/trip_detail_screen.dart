@@ -11,7 +11,6 @@ import '../widgets/timeline_widget.dart';
 import '../widgets/trip_map_widget.dart';
 import '../widgets/trip_edit_toolbar.dart';
 import '../widgets/enhanced_trip_edit_toolbar.dart';
-import '../widgets/offline_edit_status_widget.dart';
 import '../widgets/edit_history_widget.dart';
 
 import '../widgets/activity_detail_bottom_sheet.dart';
