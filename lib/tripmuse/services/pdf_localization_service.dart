@@ -2,17 +2,16 @@ import 'dart:ui';
 
 /// PDF 本地化服務
 /// 
-/// 提供多語言支援（繁體中文、簡體中文、英文）
+/// 提供多語言支援（繁體中文、英文）
 class PdfLocalizationService {
   static const String _traditionalChinese = 'zh_TW';
-  static const String _simplifiedChinese = 'zh_CN';
   static const String _english = 'en';
 
   /// 取得當前語言代碼
   static String getCurrentLanguage() {
     final locale = PlatformDispatcher.instance.locale;
     if (locale.languageCode == 'zh') {
-      return locale.countryCode == 'CN' ? _simplifiedChinese : _traditionalChinese;
+      return _traditionalChinese; // 統一使用繁體中文
     }
     return _english;
   }
@@ -90,73 +89,6 @@ class PdfLocalizationService {
       'preview_print': '列印 PDF',
       'preview_share_failed': '分享失敗：',
       'preview_print_failed': '列印失敗：',
-    },
-    
-    _simplifiedChinese: {
-      // 封面页
-      'cover_generated_by': '由 TripMuse AI 智能旅行规划应用生成',
-      'cover_generated_time': '生成时间：',
-      'cover_days': '天',
-      'cover_activities': '个活动',
-      'cover_trip_days': '行程天数',
-      'cover_total_activities': '活动总数',
-      'cover_start_date': '开始日期',
-      'cover_end_date': '结束日期',
-      
-      // 概览页
-      'overview_title': '行程概览',
-      'overview_destination_info': '目的地信息',
-      'overview_city': '城市',
-      'overview_country': '国家',
-      'overview_daily_themes': '每日主题',
-      'overview_day': '第{}天',
-      'overview_activity_stats': '活动统计',
-      'overview_trip_notes': '行程备注',
-      'overview_activities_count': '个',
-      
-      // 每日详情页
-      'day_detail_day': '第{}天',
-      'day_detail_activities': '活动安排',
-      'day_detail_daily_notes': '当日备注',
-      'day_detail_minutes': '分钟',
-      
-      // 月份
-      'month_1': '一月',
-      'month_2': '二月',
-      'month_3': '三月',
-      'month_4': '四月',
-      'month_5': '五月',
-      'month_6': '六月',
-      'month_7': '七月',
-      'month_8': '八月',
-      'month_9': '九月',
-      'month_10': '十月',
-      'month_11': '十一月',
-      'month_12': '十二月',
-      
-      // PDF 导出对话框
-      'export_title': '导出 PDF',
-      'export_content_description': 'PDF 将包含以下内容：',
-      'export_cover_page': '封面页面',
-      'export_overview': '行程概览',
-      'export_daily_schedule': '每日详细行程',
-      'export_transport_info': '交通信息',
-      'export_travel_tips': '旅行小贴士',
-      'export_preview': '预览',
-      'export_export': '导出',
-      'export_generating': '生成中...',
-      'export_success': 'PDF 已成功导出！',
-      'export_preview_failed': 'PDF 预览失败：',
-      'export_failed': 'PDF 导出失败：',
-      'export_load_failed': '无法加载行程数据',
-      'export_load_data_failed': '加载行程数据失败：',
-      
-      // PDF 预览画面
-      'preview_title_suffix': ' - PDF 预览',
-      'preview_share': '分享 PDF',
-      'preview_print': '打印 PDF',
-      'preview_share_failed': '分享失败：',
-      'preview_print_failed': '打印失败：',
     },
     
     _english: {

@@ -309,10 +309,6 @@ class _PdfExportDialogState extends State<PdfExportDialog> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _buildLanguageOption('简体中文', 'zh_CN'),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
                     child: _buildLanguageOption('English', 'en'),
                   ),
                 ],
