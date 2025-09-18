@@ -9,7 +9,7 @@ import '../providers/transport_provider.dart';
 import '../providers/trip_provider.dart';
 import '../models/enums.dart';
 import '../services/transport_service.dart';
-import 'pdf_export_dialog.dart';
+import 'pdf_export_button.dart';
 
 class TripEditToolbar extends ConsumerWidget {
   final String tripId;
@@ -506,6 +506,7 @@ class AppBarEditButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isEditMode = ref.watch(isEditingTripProvider(tripId));
+    final trip = ref.watch(tripProvider(tripId)).value;
 
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -523,6 +524,12 @@ class AppBarEditButton extends ConsumerWidget {
               ),
             );
             break;
+          case 'export_pdf':
+            // PDF匯出功能
+            if (trip != null) {
+              PdfExportHelper.showExportDialog(context, trip);
+            }
+            break;
           case 'share':
             // 分享功能
             ScaffoldMessenger.of(context).showSnackBar(
@@ -531,10 +538,6 @@ class AppBarEditButton extends ConsumerWidget {
                 backgroundColor: Colors.orange,
               ),
             );
-            break;
-          case 'export':
-            // 匯出 PDF 功能
-            _showPdfExportDialog(context, ref);
             break;
           case 'delete':
             // 刪除功能
@@ -564,22 +567,22 @@ class AppBarEditButton extends ConsumerWidget {
           ),
         ),
         const PopupMenuItem<String>(
+          value: 'export_pdf',
+          child: Row(
+            children: [
+              Icon(Icons.picture_as_pdf, color: Colors.red, size: 20),
+              SizedBox(width: 12),
+              Text('匯出 PDF', style: TextStyle(fontWeight: FontWeight.w500)),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
           value: 'share',
           child: Row(
             children: [
               Icon(Icons.share, color: Colors.green, size: 20),
               SizedBox(width: 12),
               Text('分享行程', style: TextStyle(fontWeight: FontWeight.w500)),
-            ],
-          ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'export',
-          child: Row(
-            children: [
-              Icon(Icons.download, color: Colors.orange, size: 20),
-              SizedBox(width: 12),
-              Text('匯出 PDF', style: TextStyle(fontWeight: FontWeight.w500)),
             ],
           ),
         ),
@@ -598,53 +601,7 @@ class AppBarEditButton extends ConsumerWidget {
     );
   }
 
-  void _showPdfExportDialog(BuildContext context, WidgetRef ref) async {
-    try {
-      // 顯示載入指示器
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-      
-      // 取得行程資料
-      final trip = await ref.read(tripProvider(tripId).future);
-      
-      // 關閉載入指示器
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
-      
-      if (trip != null && context.mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => PdfExportDialog(trip: trip),
-        );
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('無法載入行程資料'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      // 關閉載入指示器（如果還在顯示）
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('載入行程資料失敗：$e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(

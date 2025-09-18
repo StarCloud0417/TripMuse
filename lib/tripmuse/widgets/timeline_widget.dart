@@ -34,20 +34,24 @@ class TimelineWidget extends StatelessWidget {
 
   Widget _buildViewSwitcher(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
+      margin: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+      child: Column(
         children: [
+          // 視圖切換按鈕
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(
@@ -119,6 +123,11 @@ class TimelineWidget extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    ),
+          
+
         ],
       ),
     );

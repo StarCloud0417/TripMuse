@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
+import 'pdf_export_button.dart';
 
 class TripCard extends StatelessWidget {
   const TripCard({
@@ -65,6 +66,9 @@ class TripCard extends StatelessWidget {
                         case 'share':
                           onShare?.call();
                           break;
+                        case 'export_pdf':
+                          PdfExportHelper.showExportDialog(context, trip);
+                          break;
                         case 'delete':
                           onDelete?.call();
                           break;
@@ -89,6 +93,42 @@ class TripCard extends StatelessWidget {
                             SizedBox(width: 8),
                             Text('分享'),
                           ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'export_pdf',
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.red[600],
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.red.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.picture_as_pdf, size: 16, color: Colors.white),
+                                SizedBox(width: 6),
+                                Text(
+                                  '匯出 PDF',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       const PopupMenuItem(

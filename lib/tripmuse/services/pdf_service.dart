@@ -1,18 +1,23 @@
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../models/models.dart';
+import 'pdf_localization_service.dart';
 
 /// PDF 生成服務
 /// 
 /// 負責將行程資料轉換為格式化的 PDF 文件
+/// 支援多語言和離線功能
 class PdfService {
   static const double _pageMargin = 40.0;
   static const double _sectionSpacing = 20.0;
   static const double _itemSpacing = 12.0;
 
   /// 生成行程 PDF
-  static Future<Uint8List> generateTripPdf(Trip trip) async {
+  static Future<Uint8List> generateTripPdf(Trip trip, {String? language}) async {
     final pdf = pw.Document();
     
     // 使用預設字體
@@ -24,7 +29,7 @@ class PdfService {
       pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.all(_pageMargin),
-        build: (pw.Context context) => _buildCoverPage(trip, font, boldFont),
+        build: (pw.Context context) => _buildCoverPage(trip, font, boldFont, language),
       ),
     );
 
@@ -33,7 +38,7 @@ class PdfService {
       pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.all(_pageMargin),
-        build: (pw.Context context) => _buildOverviewPage(trip, font, boldFont),
+        build: (pw.Context context) => _buildOverviewPage(trip, font, boldFont, language),
       ),
     );
 
@@ -44,7 +49,7 @@ class PdfService {
         pw.Page(
           pageFormat: PdfPageFormat.a4,
           margin: pw.EdgeInsets.all(_pageMargin),
-          build: (pw.Context context) => _buildDayDetailPage(day, font, boldFont),
+          build: (pw.Context context) => _buildDayDetailPage(day, font, boldFont, language),
         ),
       );
     }
@@ -52,8 +57,36 @@ class PdfService {
     return pdf.save();
   }
 
+  /// 儲存 PDF 到裝置
+  static Future<String> savePdfToDevice(Uint8List pdfData, String filename) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$filename');
+      await file.writeAsBytes(pdfData);
+      return file.path;
+    } catch (e) {
+      throw Exception('儲存 PDF 失敗: $e');
+    }
+  }
+
+  /// 檢查網路連線狀態
+  static Future<bool> isOnline() async {
+    try {
+      final connectivityResult = await Connectivity().checkConnectivity();
+      return connectivityResult != ConnectivityResult.none;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// 離線 PDF 生成（使用快取資料）
+  static Future<Uint8List> generateOfflinePdf(Trip trip, {String? language}) async {
+    // 離線模式下使用相同的生成邏輯，但不依賴網路資源
+    return generateTripPdf(trip, language: language);
+  }
+
   /// 建立封面頁
-  static pw.Widget _buildCoverPage(Trip trip, pw.Font font, pw.Font boldFont) {
+  static pw.Widget _buildCoverPage(Trip trip, pw.Font font, pw.Font boldFont, String? language) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -99,15 +132,35 @@ class PdfService {
           ),
           child: pw.Column(
             children: [
-              _buildInfoRow('行程天數', '${trip.totalDays} 天', font, boldFont),
+              _buildInfoRow(
+                PdfLocalizationService.getText('cover_trip_days', language), 
+                '${trip.totalDays}${PdfLocalizationService.getText('cover_days', language)}', 
+                font, 
+                boldFont
+              ),
               pw.SizedBox(height: 10),
-              _buildInfoRow('活動總數', '${trip.totalActivities} 個', font, boldFont),
+              _buildInfoRow(
+                PdfLocalizationService.getText('cover_total_activities', language), 
+                '${trip.totalActivities}${PdfLocalizationService.getText('cover_activities', language)}', 
+                font, 
+                boldFont
+              ),
               pw.SizedBox(height: 10),
               if (trip.startDate != null)
-                _buildInfoRow('開始日期', _formatDate(trip.startDate!), font, boldFont),
+                _buildInfoRow(
+                  PdfLocalizationService.getText('cover_start_date', language), 
+                  _formatDate(trip.startDate!, language), 
+                  font, 
+                  boldFont
+                ),
               if (trip.endDate != null && trip.startDate != trip.endDate) ...[
                 pw.SizedBox(height: 10),
-                _buildInfoRow('結束日期', _formatDate(trip.endDate!), font, boldFont),
+                _buildInfoRow(
+                  PdfLocalizationService.getText('cover_end_date', language), 
+                  _formatDate(trip.endDate!, language), 
+                  font, 
+                  boldFont
+                ),
               ],
             ],
           ),
@@ -118,7 +171,7 @@ class PdfService {
         // 生成資訊
         pw.Center(
           child: pw.Text(
-            '由 TripMuse AI 智能旅行規劃應用生成',
+            PdfLocalizationService.getText('cover_generated_by', language),
             style: pw.TextStyle(
               font: font,
               fontSize: 12,
@@ -131,7 +184,7 @@ class PdfService {
         
         pw.Center(
           child: pw.Text(
-            '生成時間：${_formatDateTime(DateTime.now())}',
+            '${PdfLocalizationService.getText('cover_generated_time', language)}${_formatDateTime(DateTime.now(), language)}',
             style: pw.TextStyle(
               font: font,
               fontSize: 10,
@@ -144,13 +197,13 @@ class PdfService {
   }
 
   /// 建立概覽頁
-  static pw.Widget _buildOverviewPage(Trip trip, pw.Font font, pw.Font boldFont) {
+  static pw.Widget _buildOverviewPage(Trip trip, pw.Font font, pw.Font boldFont, String? language) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         // 頁面標題
         pw.Text(
-          '行程概覽',
+          PdfLocalizationService.getText('overview_title', language),
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 24,
@@ -162,13 +215,13 @@ class PdfService {
         
         // 目的地資訊
         _buildSection(
-          '目的地資訊',
+          PdfLocalizationService.getText('overview_destination_info', language),
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              _buildInfoRow('城市', trip.destination.city, font, boldFont),
+              _buildInfoRow(PdfLocalizationService.getText('overview_city', language), trip.destination.city, font, boldFont),
               pw.SizedBox(height: 8),
-              _buildInfoRow('國家', trip.destination.country, font, boldFont),
+              _buildInfoRow(PdfLocalizationService.getText('overview_country', language), trip.destination.country, font, boldFont),
               if (trip.destination.fullAddress != null && trip.destination.fullAddress!.isNotEmpty) ...[
                 pw.SizedBox(height: 8),
                 pw.Text(
@@ -186,7 +239,7 @@ class PdfService {
         
         // 每日主題概覽
         _buildSection(
-          '每日主題',
+          PdfLocalizationService.getText('overview_daily_themes', language),
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: trip.days.map((day) => pw.Padding(
@@ -196,7 +249,7 @@ class PdfService {
                   pw.Container(
                     width: 60,
                     child: pw.Text(
-                      '第${day.dayIndex}天',
+                      PdfLocalizationService.getText('overview_day', language).replaceAll('{}', '${day.dayIndex}'),
                       style: pw.TextStyle(font: boldFont, fontSize: 12),
                     ),
                   ),
@@ -217,12 +270,12 @@ class PdfService {
         pw.SizedBox(height: _sectionSpacing),
         
         // 活動統計
-        _buildActivityStatistics(trip, font, boldFont),
+        _buildActivityStatistics(trip, font, boldFont, language),
         
         if (trip.notes != null && trip.notes!.isNotEmpty) ...[
           pw.SizedBox(height: _sectionSpacing),
           _buildSection(
-            '行程備註',
+            PdfLocalizationService.getText('overview_trip_notes', language),
             pw.Text(
               trip.notes!,
               style: pw.TextStyle(font: font, fontSize: 12),
@@ -236,7 +289,7 @@ class PdfService {
   }
 
   /// 建立每日詳情頁
-  static pw.Widget _buildDayDetailPage(DayPlan day, pw.Font font, pw.Font boldFont) {
+  static pw.Widget _buildDayDetailPage(DayPlan day, pw.Font font, pw.Font boldFont, String? language) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -244,7 +297,7 @@ class PdfService {
         pw.Row(
           children: [
             pw.Text(
-              '第${day.dayIndex}天',
+              PdfLocalizationService.getText('day_detail_day', language).replaceAll('{}', '${day.dayIndex}'),
               style: pw.TextStyle(
                 font: boldFont,
                 fontSize: 24,
@@ -287,7 +340,7 @@ class PdfService {
         
         // 活動列表
         pw.Text(
-          '活動安排',
+          PdfLocalizationService.getText('day_detail_activities', language),
           style: pw.TextStyle(
             font: boldFont,
             fontSize: 16,
@@ -321,7 +374,7 @@ class PdfService {
         if (day.notes != null && day.notes!.isNotEmpty) ...[
           pw.SizedBox(height: _sectionSpacing),
           _buildSection(
-            '當日備註',
+            PdfLocalizationService.getText('day_detail_daily_notes', language),
             pw.Text(
               day.notes!,
               style: pw.TextStyle(font: font, fontSize: 12),
@@ -463,7 +516,7 @@ class PdfService {
           ),
           pw.Expanded(
             child: pw.Text(
-              '${transport.mode.displayName} • ${transport.durationMinutes}分鐘',
+              '${transport.mode.displayName} • ${transport.durationMinutes}${PdfLocalizationService.getText('day_detail_minutes')}',
               style: pw.TextStyle(
                 font: font,
                 fontSize: 11,
@@ -505,7 +558,7 @@ class PdfService {
   }
 
   /// 建立活動統計
-  static pw.Widget _buildActivityStatistics(Trip trip, pw.Font font, pw.Font boldFont) {
+  static pw.Widget _buildActivityStatistics(Trip trip, pw.Font font, pw.Font boldFont, String? language) {
     final categoryStats = <String, int>{};
     for (final day in trip.days) {
       for (final activity in day.activities) {
@@ -515,7 +568,7 @@ class PdfService {
     }
 
     return _buildSection(
-      '活動統計',
+      PdfLocalizationService.getText('overview_activity_stats', language),
       pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: categoryStats.entries.map((entry) => pw.Padding(
@@ -530,7 +583,7 @@ class PdfService {
                 ),
               ),
               pw.Text(
-                '${entry.value} 個',
+                '${entry.value}${PdfLocalizationService.getText('overview_activities_count', language)}',
                 style: pw.TextStyle(font: boldFont, fontSize: 12),
               ),
             ],
@@ -583,14 +636,21 @@ class PdfService {
   }
 
   /// 格式化日期
-  static String _formatDate(DateTime date) {
-    const months = ['一月', '二月', '三月', '四月', '五月', '六月', 
-                   '七月', '八月', '九月', '十月', '十一月', '十二月'];
-    return '${date.year}年${months[date.month - 1]}${date.day}日';
+  static String _formatDate(DateTime date, [String? language]) {
+    final months = List.generate(12, (index) => 
+      PdfLocalizationService.getText('month_${index + 1}', language)
+    );
+    
+    final lang = language ?? PdfLocalizationService.getCurrentLanguage();
+    if (lang == 'en') {
+      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    } else {
+      return '${date.year}年${months[date.month - 1]}${date.day}日';
+    }
   }
 
   /// 格式化日期時間
-  static String _formatDateTime(DateTime dateTime) {
-    return '${_formatDate(dateTime)} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  static String _formatDateTime(DateTime dateTime, [String? language]) {
+    return '${_formatDate(dateTime, language)} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-09-18
+
+### Added
+- 📄 **PDF 匯出 UI 和功能** | PDF Export UI and Features: 實作 PDF 匯出選項和預覽功能
+- 🌐 **多語言支援** | Multi-language Support: 建立多語言支援（繁體/簡體/英文）
+- 💾 **PDF 儲存和分享** | PDF Save and Share: 實作 PDF 儲存到裝置和分享功能
+- 📴 **離線 PDF 生成** | Offline PDF Generation: 加入離線 PDF 生成支援
+
+### 中文
+- 📄 **PDF 匯出 UI 和功能** - 實作 PDF 匯出選項和預覽功能
+- 🌐 **多語言支援** - 建立多語言支援（繁體/簡體/英文）
+- 💾 **PDF 儲存和分享** - 實作 PDF 儲存到裝置和分享功能
+- 📴 **離線 PDF 生成** - 加入離線 PDF 生成支援
+
+### Requirements
+- ✅ **Requirements: 6.1, 6.4, 6.7, 6.8** - 完成 PDF 匯出相關需求
+
 ## [0.4.0] - 2025-09-18
 
 ### Added
