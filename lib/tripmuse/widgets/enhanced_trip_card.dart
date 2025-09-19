@@ -273,23 +273,23 @@ class EnhancedTripCard extends ConsumerWidget {
     );
 
     return Container(
-      height: 250,
-      margin: const EdgeInsets.only(bottom: 20),
+      height: 280, // 增加高度讓內容更舒適
+      margin: const EdgeInsets.only(bottom: 24), // 增加底部間距
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20), // 稍微減少圓角讓視覺更清爽
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
             child: Stack(
               children: [
                 // 背景圖片
@@ -307,91 +307,145 @@ class EnhancedTripCard extends ConsumerWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withValues(alpha: 0.8),
+                          Colors.black.withValues(alpha: 0.7), // 稍微減少遮罩透明度
                         ],
-                        stops: const [0.3, 1.0],
+                        stops: const [0.4, 1.0], // 調整漸層位置
                       ),
                     ),
                   ),
                 ),
                 
-                // 頂部操作區
+                // 狀態標籤 - 左上角
                 Positioned(
-                  top: 20,
-                  left: 20,
-                  right: 20,
-                  child: Row(
-                    children: [
-                      _buildStatusChip(isOverlay: true),
-                      const Spacer(),
-                      if (showActions) _buildFavoriteButton(ref, isOverlay: true),
-                    ],
-                  ),
+                  top: 16,
+                  left: 6,
+                  child: _buildStatusChip(isOverlay: true),
                 ),
                 
-                // 底部內容
+                // 操作按鈕 - 右上角
+                if (showActions)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildFavoriteButton(ref, isOverlay: true),
+                        const SizedBox(width: 8),
+                        _buildDeleteButton(context, isOverlay: true),
+                      ],
+                    ),
+                  ),
+                
+                // 底部內容區域 - 重新設計排版
                 Positioned(
-                  bottom: 20,
-                  left: 20,
-                  right: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trip.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(0, 2),
-                              blurRadius: 4,
-                              color: Colors.black45,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.8),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 標題
+                        Text(
+                          trip.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20, // 稍微減小字體
+                            fontWeight: FontWeight.bold,
+                            height: 1.2, // 調整行高
+                            shadows: [
+                              Shadow(
+                                offset: Offset(0, 1),
+                                blurRadius: 3,
+                                color: Colors.black54,
+                              ),
+                            ],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        
+                        const SizedBox(height: 12), // 增加間距
+                        
+                        // 位置信息
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: Colors.white.withValues(alpha: 0.9),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                '${trip.destination.city}, ${trip.destination.country}',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${trip.destination.city}, ${trip.destination.country}',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                        
+                        const SizedBox(height: 8),
+                        
+                        // 天數和日期信息
+                        Row(
+                          children: [
+                            // 天數標籤
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4ECDC4).withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${trip.days.length}天',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${trip.days.length}天 • ${_formatTripDate()}',
-                            style: TextStyle(
+                            
+                            const SizedBox(width: 12),
+                            
+                            // 日期
+                            Icon(
+                              Icons.calendar_today,
                               color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 14,
+                              size: 14,
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(width: 4),
+                            Text(
+                              _formatTripDate(),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -456,19 +510,56 @@ class EnhancedTripCard extends ConsumerWidget {
         ref.read(favoriteTripProvider.notifier).toggleFavorite(trip.id);
       },
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10), // 增加點擊區域
         decoration: BoxDecoration(
           color: isOverlay 
-              ? Colors.white.withValues(alpha: 0.2)
+              ? Colors.black.withValues(alpha: 0.3) // 更好的對比度
               : Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24), // 更圓的按鈕
+          boxShadow: isOverlay ? [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
         ),
         child: Icon(
           isFavorite ? Icons.favorite : Icons.favorite_border,
           color: isOverlay 
               ? Colors.white 
-              : (isFavorite ? Colors.red : Colors.grey.shade600),
-          size: 20,
+              : (isFavorite ? Colors.red.shade400 : Colors.grey.shade600),
+          size: 18, // 稍微調小圖標
+        ),
+      ),
+    );
+  }
+
+  /// 建立刪除按鈕
+  Widget _buildDeleteButton(BuildContext context, {bool isOverlay = false}) {
+    return GestureDetector(
+      onTap: onDelete,
+      child: Container(
+        padding: const EdgeInsets.all(10), // 增加點擊區域
+        decoration: BoxDecoration(
+          color: isOverlay
+              ? Colors.black.withValues(alpha: 0.3) // 更好的對比度
+              : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(24), // 更圓的按鈕
+          boxShadow: isOverlay ? [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
+        ),
+        child: Icon(
+          Icons.delete_outline,
+          color: isOverlay
+              ? Colors.white
+              : Colors.red.shade400,
+          size: 18, // 稍微調小圖標
         ),
       ),
     );
@@ -482,33 +573,66 @@ class EnhancedTripCard extends ConsumerWidget {
     
     String statusText;
     Color statusColor;
+    IconData statusIcon;
     
     if (now.isBefore(startDate)) {
       statusText = '即將開始';
       statusColor = const Color(0xFF2196F3);
+      statusIcon = Icons.schedule;
     } else if (now.isAfter(endDate)) {
       statusText = '已完成';
-      statusColor = Colors.grey.shade600;
+      statusColor = const Color(0xFF4CAF50); // 改為綠色，更積極的顏色
+      statusIcon = Icons.check_circle;
     } else {
       statusText = '進行中';
-      statusColor = const Color(0xFF4CAF50);
+      statusColor = const Color(0xFFFF9800); // 橙色表示進行中
+      statusIcon = Icons.play_circle;
     }
 
+    // 根據卡片類型調整大小
+    final isCompact = cardType == TripCardType.compact;
+    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 6 : 8, 
+        vertical: isCompact ? 3 : 4,
+      ),
       decoration: BoxDecoration(
         color: isOverlay 
-            ? statusColor.withValues(alpha: 0.9)
+            ? Colors.white.withValues(alpha: 0.95)
             : statusColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        statusText,
-        style: TextStyle(
-          color: isOverlay ? Colors.white : statusColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+        borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
+        border: isOverlay ? null : Border.all(
+          color: statusColor.withValues(alpha: 0.3),
+          width: 1,
         ),
+        boxShadow: isOverlay ? [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ] : null,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            statusIcon,
+            size: isCompact ? 10 : 11,
+            color: isOverlay ? statusColor : statusColor,
+          ),
+          SizedBox(width: isCompact ? 3 : 4),
+          Text(
+            statusText,
+            style: TextStyle(
+              color: isOverlay ? statusColor : statusColor,
+              fontSize: isCompact ? 9 : 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.1,
+            ),
+          ),
+        ],
       ),
     );
   }

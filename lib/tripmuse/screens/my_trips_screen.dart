@@ -170,7 +170,8 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
 
   /// 建立統計信息
   Widget _buildStatistics() {
-    final tripsAsync = ref.watch(userTripsProvider);
+    final tripsAsync = ref.watch(tripNotifierProvider);
+    final favoriteIds = ref.watch(favoriteTripProvider);
     
     return tripsAsync.when(
       data: (trips) {
@@ -179,13 +180,14 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
           if (trip.days.isEmpty) return false;
           return trip.days.first.date.isAfter(DateTime.now());
         }).length;
+        final favoriteTrips = trips.where((trip) => favoriteIds.contains(trip.id)).length;
         
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildStatItem('總行程', totalTrips.toString()),
             _buildStatItem('即將到來', upcomingTrips.toString()),
-            _buildStatItem('收藏', '0'), // TODO: 實現收藏功能
+            _buildStatItem('收藏', favoriteTrips.toString()),
           ],
         );
       },
@@ -395,7 +397,7 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
 
   /// 建立行程網格檢視
   Widget _buildTripsGrid() {
-    final tripsAsync = ref.watch(userTripsProvider);
+    final tripsAsync = ref.watch(tripNotifierProvider);
     
     return tripsAsync.when(
       data: (trips) {
@@ -405,14 +407,17 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
           return _buildEmptyState();
         }
         
-        return Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: GridView.builder(
+        return RefreshIndicator(
+          onRefresh: _refreshPage,
+          color: const Color(0xFF4ECDC4),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+              childAspectRatio: 0.75, // 調整比例讓卡片更高一些
+              crossAxisSpacing: 20, // 增加水平間距
+              mainAxisSpacing: 20, // 增加垂直間距
             ),
             itemCount: filteredTrips.length,
             itemBuilder: (context, index) {
@@ -422,11 +427,11 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
                 onTap: () => _navigateToTripDetail(filteredTrips[index]),
                 onEdit: () => _navigateToTripDetail(filteredTrips[index]),
                 onDuplicate: () => _duplicateTrip(filteredTrips[index]),
-                onDelete: () => _showDeleteConfirmation(filteredTrips[index]),
+                onDelete: () => _deleteTrip(filteredTrips[index]),
               );
             },
           ),
-        );
+        ));
       },
       loading: () => const Center(
         child: CircularProgressIndicator(
@@ -439,7 +444,7 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
 
   /// 建立行程列表檢視
   Widget _buildTripsList() {
-    final tripsAsync = ref.watch(userTripsProvider);
+    final tripsAsync = ref.watch(tripNotifierProvider);
     
     return tripsAsync.when(
       data: (trips) {
@@ -449,7 +454,10 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
           return _buildEmptyState();
         }
         
-        return ListView.builder(
+        return RefreshIndicator(
+          onRefresh: _refreshPage,
+          color: const Color(0xFF4ECDC4),
+          child: ListView.builder(
           padding: const EdgeInsets.all(24.0),
           itemCount: filteredTrips.length,
           itemBuilder: (context, index) {
@@ -459,10 +467,10 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
               onTap: () => _navigateToTripDetail(filteredTrips[index]),
               onEdit: () => _navigateToTripDetail(filteredTrips[index]),
               onDuplicate: () => _duplicateTrip(filteredTrips[index]),
-              onDelete: () => _showDeleteConfirmation(filteredTrips[index]),
+              onDelete: () => _deleteTrip(filteredTrips[index]),
             );
           },
-        );
+        ));
       },
       loading: () => const Center(
         child: CircularProgressIndicator(
@@ -765,24 +773,6 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
 
 
   /// 切換收藏狀態
-  void _toggleFavorite(String tripId) {
-    ref.read(favoriteTripProvider.notifier).toggleFavorite(tripId);
-    
-    // 顯示提示訊息
-    final isFavorite = ref.read(favoriteTripProvider).contains(tripId);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(isFavorite ? '已加入收藏' : '已取消收藏'),
-        backgroundColor: const Color(0xFF4ECDC4),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
   /// 導航到行程詳情
   void _navigateToTripDetail(Trip trip) {
     Navigator.pushNamed(
@@ -824,32 +814,6 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
   }
 
   /// 顯示刪除確認對話框
-  void _showDeleteConfirmation(Trip trip) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('確認刪除'),
-          content: Text('確定要刪除「${trip.title}」嗎？此操作無法復原。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _deleteTrip(trip);
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('刪除'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   /// 刪除行程
   void _deleteTrip(Trip trip) async {
     try {
@@ -928,22 +892,17 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
     );
   }
 
-  /// 處理行程操作
-  void _handleTripAction(String action, Trip trip) {
-    switch (action) {
-      case 'edit':
-        Navigator.pushNamed(
-          context,
-          '/trip-detail',
-          arguments: trip,
-        );
-        break;
-      case 'duplicate':
-        _duplicateTrip(trip);
-        break;
-      case 'delete':
-        _showDeleteConfirmation(trip);
-        break;
+  /// 強制刷新頁面
+  Future<void> _refreshPage() async {
+    // 強制刷新 trip provider
+    ref.invalidate(tripNotifierProvider);
+
+    // 等待刷新完成
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    // 強制重建 widget
+    if (mounted) {
+      setState(() {});
     }
   }
 }

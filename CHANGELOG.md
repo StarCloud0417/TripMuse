@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] - 2025-09-19
+
+### Fixed
+- 🐛 **行程管理錯誤修復** | Trip Management Bug Fixes: 修復我的行程頁面中的語法錯誤和未定義函數問題
+- 🔧 **Provider 使用修復** | Provider Usage Fixes: 統一使用 tripNotifierProvider 替代過時的 userTripsProvider
+- 🗑️ **刪除功能完善** | Delete Functionality Enhancement: 在行程卡片中加入刪除按鈕和完整的刪除流程
+- 🔄 **刷新功能新增** | Refresh Functionality Added: 新增下拉刷新功能，提升用戶體驗
+
+### Improved
+- 🎨 **增強版行程卡片優化** | Enhanced Trip Card UI Optimization: 優化卡片視覺效果，調整圓角、陰影和間距
+- ❤️ **收藏統計完善** | Favorite Statistics Enhancement: 修復收藏行程數量統計顯示
+- 🧹 **代碼清理** | Code Cleanup: 移除未使用的函數和變數，提升代碼品質
+- ⚡ **效能優化** | Performance Optimization: 優化列表渲染和狀態更新效能
+
+### 中文
+- 🐛 **行程管理錯誤修復** - 修復我的行程頁面中的語法錯誤和未定義函數問題
+- 🔧 **Provider 使用修復** - 統一使用 tripNotifierProvider 替代過時的 userTripsProvider
+- 🗑️ **刪除功能完善** - 在行程卡片中加入刪除按鈕和完整的刪除流程
+- 🔄 **刷新功能新增** - 新增下拉刷新功能，提升用戶體驗
+- 🎨 **增強版行程卡片優化** - 優化卡片視覺效果，調整圓角、陰影和間距
+- ❤️ **收藏統計完善** - 修復收藏行程數量統計顯示
+- 🧹 **代碼清理** - 移除未使用的函數和變數，提升代碼品質
+- ⚡ **效能優化** - 優化列表渲染和狀態更新效能
+
+### Technical
+- 🏗️ **組件架構優化** | Component Architecture Optimization: 重構行程卡片組件，增加刪除按鈕支援
+- 🔄 **狀態管理完善** | State Management Enhancement: 統一 Provider 使用，提升狀態同步效能
+- 🎯 **錯誤處理改善** | Error Handling Improvement: 完善刪除操作的錯誤處理和用戶反饋
+- 📱 **UI/UX 提升** | UI/UX Enhancement: 優化觸控體驗和視覺反饋
+
 ## [0.4.2] - 2025-09-18
 
 ### Added

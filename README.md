@@ -1,12 +1,20 @@
-# TripMu### 📈 Latest Updates / 最新更新 (v0.4.2)e 🧳
+# TripMu### 📈 Latest Updates / 最新更新 (v0.4.3)e 🧳
 
-**Version 0.4.2**
+**Version 0.4.3**
 
 TripMuse is an AI-powered intelligent travel planning application built with Flutter and MapBox Maps SDK. Transform your travel ideas into personalized itineraries with the power of artificial intelligence.
 
 TripMuse 是一個基於 AI 的智能旅行規劃應用，使用 Flutter 和 MapBox Maps SDK 開發。透過人工智慧的力量，將您的旅行想法轉化為個人化的行程規劃。
 
 ## 📈 Latest Updates / 最新更新
+
+### v0.4.3 (2025-09-19)
+- 🐛 **行程管理錯誤修復** | Trip Management Bug Fixes: 修復我的行程頁面中的語法錯誤和未定義函數問題
+- 🔧 **Provider 使用修復** | Provider Usage Fixes: 統一使用 tripNotifierProvider 替代過時的 userTripsProvider
+- 🗑️ **刪除功能完善** | Delete Functionality Enhancement: 在行程卡片中加入刪除按鈕和完整的刪除流程
+- 🔄 **刷新功能新增** | Refresh Functionality Added: 新增下拉刷新功能，提升用戶體驗
+- 🎨 **增強版行程卡片優化** | Enhanced Trip Card UI Optimization: 優化卡片視覺效果，調整圓角、陰影和間距
+- ❤️ **收藏統計完善** | Favorite Statistics Enhancement: 修復收藏行程數量統計顯示
 
 ### v0.4.2 (2025-09-18)
 - 🏠 **主頁面行程列表** | Home Screen Trip List: 在主頁面實現 Recent Journeys 區域，顯示最近 3 個行程
