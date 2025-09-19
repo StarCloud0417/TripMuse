@@ -167,6 +167,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
   // 地圖互動狀態
   bool _isAnimating = false;
 
+  // 相機 pitch 控制
+  double _currentPitch = 0.0;
+
   // 現代化每日行程顏色主題 - 美觀漸層色彩
   static const List<Color> dayColors = [
     Color.fromARGB(255, 0, 42, 230), // 漸層藍紫 - 第1天
@@ -1413,6 +1416,28 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
     }
   }
 
+  /// 更新相機 pitch
+  Future<void> _updateCameraPitch(double pitch) async {
+    if (_mapboxMap == null) return;
+
+    setState(() {
+      _currentPitch = pitch;
+    });
+
+    try {
+      final currentCamera = await _mapboxMap!.getCameraState();
+      await _mapboxMap!.setCamera(CameraOptions(
+        center: currentCamera.center,
+        zoom: currentCamera.zoom,
+        bearing: currentCamera.bearing,
+        pitch: pitch,
+      ));
+      print('📐 相機傾斜角度已更新為: ${pitch.toStringAsFixed(1)}°');
+    } catch (e) {
+      print('❌ 更新相機傾斜角度失敗: $e');
+    }
+  }
+
   /// 切換位置追蹤
   Future<void> _toggleLocationTracking() async {
     setState(() {
@@ -1627,6 +1652,9 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                   ],
                 ),
               ),
+
+              // Pitch 控制滑動條
+              _buildPitchControlSlider(),
             ],
 
             // 動畫進行中指示器
@@ -1666,6 +1694,83 @@ class _TripMapWidgetState extends ConsumerState<TripMapWidget>
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 建立 Pitch 控制滑動條
+  Widget _buildPitchControlSlider() {
+    return Positioned(
+      bottom: TripMuseSpacing.lg,
+      left: TripMuseSpacing.lg,
+      right: TripMuseSpacing.lg,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: TripMuseSpacing.md,
+          vertical: TripMuseSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(TripMuseSpacing.lg),
+          boxShadow: TripMuseShadows.small,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 標題和當前值
+            Row(
+              children: [
+                const Icon(
+                  Icons.rotate_90_degrees_ccw,
+                  size: 16,
+                  color: TripMuseTheme.primaryColor,
+                ),
+                const SizedBox(width: TripMuseSpacing.sm),
+                Text(
+                  '傾斜角度',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: TripMuseTheme.primaryColor,
+                      ),
+                ),
+                const Spacer(),
+                Text(
+                  '${_currentPitch.toStringAsFixed(0)}°',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: TripMuseTheme.primaryColor,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: TripMuseSpacing.sm),
+            // 滑動條
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4.0,
+                thumbShape: const RoundSliderThumbShape(
+                  enabledThumbRadius: 8.0,
+                ),
+                overlayShape: const RoundSliderOverlayShape(
+                  overlayRadius: 16.0,
+                ),
+                activeTrackColor: TripMuseTheme.primaryColor,
+                inactiveTrackColor: TripMuseTheme.primaryColor.withValues(alpha: 0.3),
+                thumbColor: TripMuseTheme.primaryColor,
+                overlayColor: TripMuseTheme.primaryColor.withValues(alpha: 0.2),
+              ),
+              child: Slider(
+                value: _currentPitch,
+                min: 0.0,
+                max: 60.0,
+                divisions: 60,
+                onChanged: (value) {
+                  _updateCameraPitch(value);
+                },
+              ),
+            ),
           ],
         ),
       ),
