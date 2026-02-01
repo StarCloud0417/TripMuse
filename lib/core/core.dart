@@ -1,0 +1,19 @@
+// Core exports for easy importing
+export 'providers/app_providers.dart';
+export 'services/logger_service.dart';
+export 'services/error_handler.dart';
+export 'services/api_client.dart';
+export 'services/cache_manager.dart';
+export 'services/connectivity_service.dart';
+export 'services/local_storage_service.dart';
+export 'services/secure_storage_service.dart';
+export 'services/offline_sync_service.dart';
+export 'repositories/repositories.dart';
+export 'storage/hive_adapters.dart';
+export 'exceptions/app_exceptions.dart';
+export 'widgets/error_boundary.dart';
+export 'widgets/app_initializer.dart';
+export 'observers/provider_observer.dart';
+export 'utils/cache_keys.dart';
+export 'extensions/context_extensions.dart';
+export 'models/models.dart';
